@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-cn">
     <head>
   <!-- 元数据 -->
   <meta charset="utf-8">
   
   
-  <title>Kotlin infix中缀函数与操作符重载 | Wenyi&#39;s Blog</title>
+  <title>Kotlin infix中缀函数与操作符重载 | Wenyi&#39;s Blog 🌸</title>
   <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/03/Kotlin-infix%E4%B8%AD%E7%BC%80%E5%87%BD%E6%95%B0%E4%B8%8E%E6%93%8D%E4%BD%9C%E7%AC%A6%E9%87%8D%E8%BD%BD/">
   <meta name="author" content="Wenyi" />
   <meta http-equiv="Cache-Control" content="no-transform" />
@@ -21,23 +21,27 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="Kotlin infix中缀函数与操作符重载">
 <meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/03/Kotlin-infix%E4%B8%AD%E7%BC%80%E5%87%BD%E6%95%B0%E4%B8%8E%E6%93%8D%E4%BD%9C%E7%AC%A6%E9%87%8D%E8%BD%BD/index.html">
-<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:site_name" content="Wenyi&#39;s Blog 🌸">
 <meta property="og:description" content="前言infix 是 Kotlin 中的一个特殊关键字，它允许我们以更自然、更可读的方式调用只有一个参数的函数。这种函数调用方式去掉了传统的点号和括号，使代码更加简洁流畅。 一、infix 函数定义条件 必须是成员函数或扩展函数 必须只有一个参数 参数不能有默认值  基本语法1234infix fun Int.add(other: Int): Int &#x3D; this + other&#x2F;&#x2F; 调用val r">
-<meta property="og:locale" content="en_US">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://images.unsplash.com/photo-1578632767115-351597cf2477?w=800">
 <meta property="article:published_time" content="2026-04-03T23:52:00.000Z">
-<meta property="article:modified_time" content="2026-04-03T15:54:57.636Z">
+<meta property="article:modified_time" content="2026-04-04T07:34:34.120Z">
 <meta property="article:author" content="Wenyi">
 <meta property="article:tag" content="Kotlin">
 <meta property="article:tag" content="infix">
 <meta property="article:tag" content="中缀函数">
 <meta property="article:tag" content="操作符重载">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://images.unsplash.com/photo-1578632767115-351597cf2477?w=800">
+  
+    <link rel="alternate" href="/blog/atom.xml" title="Wenyi's Blog 🌸" type="application/atom+xml">
   
   <!-- JSON-LD 结构化数据 -->
   
   
     <script type="application/ld+json">
-    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Kotlin infix中缀函数与操作符重载","description":"前言infix 是 Kotlin 中的一个特殊关键字，它允许我们以更自然、更可读的方式调用只有一个参数的函数。这种函数调用方式去掉了传统的点号和括号，使代码更...","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:52:00.000Z","dateModified":"2026-04-03T15:54:57.636Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Kotlin-infix%E4%B8%AD%E7%BC%80%E5%87%BD%E6%95%B0%E4%B8%8E%E6%93%8D%E4%BD%9C%E7%AC%A6%E9%87%8D%E8%BD%BD/"}}
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Kotlin infix中缀函数与操作符重载","description":"前言infix 是 Kotlin 中的一个特殊关键字，它允许我们以更自然、更可读的方式调用只有一个参数的函数。这种函数调用方式去掉了传统的点号和括号，使代码更...","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog 🌸","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:52:00.000Z","dateModified":"2026-04-04T07:34:34.120Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Kotlin-infix%E4%B8%AD%E7%BC%80%E5%87%BD%E6%95%B0%E4%B8%8E%E6%93%8D%E4%BD%9C%E7%AC%A6%E9%87%8D%E8%BD%BD/"}}
     </script>
   
   <!-- 关键 CSS 预加载 -->
@@ -114,7 +118,7 @@
             </header>
             <header id="kratos-mobile-topnav" class="kratos-topnav">
                 <div class="container">
-                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog 🌸</a></div>
                     <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
                         <a id="kratos-nav-toggle" class="kratos-nav-toggle">
                             <i></i>
@@ -128,8 +132,8 @@
             <div class="kratos-cover kratos-cover-2 text-center">
                 <div class="desc desc2 animate-box">
                     <a href="/blog/">
-                        <h2>Wenyi&#39;s Blog</h2> <br />
-                        <span></span>
+                        <h2>Wenyi&#39;s Blog 🌸</h2> <br />
+                        <span>学习笔记与技术分享</span>
                     </a>
                 </div>
             </div>
@@ -275,7 +279,7 @@
                     <a class="tag-none-link" href="/blog/tags/Kotlin/" rel="tag">Kotlin</a>, <a class="tag-none-link" href="/blog/tags/infix/" rel="tag">infix</a>, <a class="tag-none-link" href="/blog/tags/%E4%B8%AD%E7%BC%80%E5%87%BD%E6%95%B0/" rel="tag">中缀函数</a>, <a class="tag-none-link" href="/blog/tags/%E6%93%8D%E4%BD%9C%E7%AC%A6%E9%87%8D%E8%BD%BD/" rel="tag">操作符重载</a>
                 </div>
                 <div class="pull-date">
-                    <time datetime="2026-04-03T15:54:57.636Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                    <time datetime="2026-04-04T07:34:34.120Z" itemprop="dateModified">最后编辑：2026-04-04</time>
                 </div>
             </div>
         </footer>
@@ -284,12 +288,12 @@
         <nav class="navigation post-navigation clearfix" role="navigation">
             
             <div class="nav-previous clearfix">
-                <a title=" Kotlin协程Dispatcher线程调度器详解" href="/blog/2026/04/03/Kotlin协程Dispatcher线程调度器详解/"><i class="fa fa-angle-left"></i> 上一篇</a>
+                <a title=" Kotlin延迟初始化-lazy与lateinit" href="/blog/2026/04/03/Kotlin延迟初始化-lazy与lateinit/"><i class="fa fa-angle-left"></i> 上一篇</a>
             </div>
             
             
             <div class="nav-next clearfix">
-                <a title=" Kotlin Companion Object伴生对象详解" href="/blog/2026/04/03/Kotlin-Companion-Object伴生对象详解/">下一篇 <i class="fa fa-angle-right"></i></a>
+                <a title=" Kotlin协程作用域CoroutineScope详解" href="/blog/2026/04/03/Kotlin协程作用域CoroutineScope详解/">下一篇 <i class="fa fa-angle-right"></i></a>
             </div>
             
         </nav>
@@ -330,7 +334,7 @@
                     </ul>
                     <ul class="kratos-copyright">
                         <div>
-                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>&copy; 2026 Wenyi's Blog 🌸 版权所有.</li>
                             <li>本站已运行<span id="kr-since">Loading...</span></li>
                         </div>
                         <div>

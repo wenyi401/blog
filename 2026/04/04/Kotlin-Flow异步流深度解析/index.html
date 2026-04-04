@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-cn">
     <head>
   <!-- 元数据 -->
   <meta charset="utf-8">
   
   
-  <title>Kotlin Flow异步流深度解析 | Wenyi&#39;s Blog</title>
+  <title>Kotlin Flow异步流深度解析 | Wenyi&#39;s Blog 🌸</title>
   <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/04/Kotlin-Flow%E5%BC%82%E6%AD%A5%E6%B5%81%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/">
   <meta name="author" content="Wenyi" />
   <meta http-equiv="Cache-Control" content="no-transform" />
@@ -21,23 +21,27 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="Kotlin Flow异步流深度解析">
 <meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/04/Kotlin-Flow%E5%BC%82%E6%AD%A5%E6%B5%81%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/index.html">
-<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:site_name" content="Wenyi&#39;s Blog 🌸">
 <meta property="og:description" content="前言挂起函数异步返回单个值，但如何返回多个异步计算的值？这就是 Kotlin Flow 的用武之地。Flow 是冷流，类似于序列，只有在被收集时才执行。 一、表示多个值集合12345fun simple(): List&lt;Int&gt; &#x3D; listOf(1, 2, 3)fun main() &#123;    simple().forEach &#123; value -&gt; print">
-<meta property="og:locale" content="en_US">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/honjun/cdn@1.4/img/banner/about.jpg">
 <meta property="article:published_time" content="2026-04-04T01:20:00.000Z">
-<meta property="article:modified_time" content="2026-04-03T17:18:30.304Z">
+<meta property="article:modified_time" content="2026-04-04T07:34:34.116Z">
 <meta property="article:author" content="Wenyi">
 <meta property="article:tag" content="Flow">
 <meta property="article:tag" content="Kotlin">
 <meta property="article:tag" content="协程">
 <meta property="article:tag" content="异步流">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/honjun/cdn@1.4/img/banner/about.jpg">
+  
+    <link rel="alternate" href="/blog/atom.xml" title="Wenyi's Blog 🌸" type="application/atom+xml">
   
   <!-- JSON-LD 结构化数据 -->
   
   
     <script type="application/ld+json">
-    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Kotlin Flow异步流深度解析","description":"前言挂起函数异步返回单个值，但如何返回多个异步计算的值？这就是 Kotlin Flow 的用武之地。Flow 是冷流，类似于序列，只有在被收集时才执行。","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-04T01:20:00.000Z","dateModified":"2026-04-03T17:18:30.304Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/04/Kotlin-Flow%E5%BC%82%E6%AD%A5%E6%B5%81%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/"}}
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Kotlin Flow异步流深度解析","description":"前言挂起函数异步返回单个值，但如何返回多个异步计算的值？这就是 Kotlin Flow 的用武之地。Flow 是冷流，类似于序列，只有在被收集时才执行。","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog 🌸","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-04T01:20:00.000Z","dateModified":"2026-04-04T07:34:34.116Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/04/Kotlin-Flow%E5%BC%82%E6%AD%A5%E6%B5%81%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/"}}
     </script>
   
   <!-- 关键 CSS 预加载 -->
@@ -114,7 +118,7 @@
             </header>
             <header id="kratos-mobile-topnav" class="kratos-topnav">
                 <div class="container">
-                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog 🌸</a></div>
                     <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
                         <a id="kratos-nav-toggle" class="kratos-nav-toggle">
                             <i></i>
@@ -128,8 +132,8 @@
             <div class="kratos-cover kratos-cover-2 text-center">
                 <div class="desc desc2 animate-box">
                     <a href="/blog/">
-                        <h2>Wenyi&#39;s Blog</h2> <br />
-                        <span></span>
+                        <h2>Wenyi&#39;s Blog 🌸</h2> <br />
+                        <span>学习笔记与技术分享</span>
                     </a>
                 </div>
             </div>
@@ -318,7 +322,7 @@
                     <a class="tag-none-link" href="/blog/tags/Flow/" rel="tag">Flow</a>, <a class="tag-none-link" href="/blog/tags/Kotlin/" rel="tag">Kotlin</a>, <a class="tag-none-link" href="/blog/tags/%E5%8D%8F%E7%A8%8B/" rel="tag">协程</a>, <a class="tag-none-link" href="/blog/tags/%E5%BC%82%E6%AD%A5%E6%B5%81/" rel="tag">异步流</a>
                 </div>
                 <div class="pull-date">
-                    <time datetime="2026-04-03T17:18:30.304Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                    <time datetime="2026-04-04T07:34:34.116Z" itemprop="dateModified">最后编辑：2026-04-04</time>
                 </div>
             </div>
         </footer>
@@ -373,7 +377,7 @@
                     </ul>
                     <ul class="kratos-copyright">
                         <div>
-                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>&copy; 2026 Wenyi's Blog 🌸 版权所有.</li>
                             <li>本站已运行<span id="kr-since">Loading...</span></li>
                         </div>
                         <div>

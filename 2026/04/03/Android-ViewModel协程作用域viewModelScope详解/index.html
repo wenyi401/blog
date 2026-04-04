@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-cn">
     <head>
   <!-- 元数据 -->
   <meta charset="utf-8">
   
   
-  <title>Android ViewModel协程作用域viewModelScope详解 | Wenyi&#39;s Blog</title>
+  <title>Android ViewModel协程作用域viewModelScope详解 | Wenyi&#39;s Blog 🌸</title>
   <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/03/Android-ViewModel%E5%8D%8F%E7%A8%8B%E4%BD%9C%E7%94%A8%E5%9F%9FviewModelScope%E8%AF%A6%E8%A7%A3/">
   <meta name="author" content="Wenyi" />
   <meta http-equiv="Cache-Control" content="no-transform" />
@@ -21,23 +21,27 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="Android ViewModel协程作用域viewModelScope详解">
 <meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/03/Android-ViewModel%E5%8D%8F%E7%A8%8B%E4%BD%9C%E7%94%A8%E5%9F%9FviewModelScope%E8%AF%A6%E8%A7%A3/index.html">
-<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:site_name" content="Wenyi&#39;s Blog 🌸">
 <meta property="og:description" content="前言每个 ViewModel 都定义了 viewModelScope，在此作用域中启动的协程会在 ViewModel 清除时自动取消。 一、viewModelScope12345678class MyViewModel : ViewModel() &#123;    fun loadData() &#123;        viewModelScope.launch &#123;">
-<meta property="og:locale" content="en_US">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/other/comment-bg.png">
 <meta property="article:published_time" content="2026-04-03T23:52:00.000Z">
-<meta property="article:modified_time" content="2026-04-03T16:02:28.128Z">
+<meta property="article:modified_time" content="2026-04-04T07:34:34.104Z">
 <meta property="article:author" content="Wenyi">
 <meta property="article:tag" content="Android">
 <meta property="article:tag" content="ViewModel">
 <meta property="article:tag" content="viewModelScope">
 <meta property="article:tag" content="协程">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/other/comment-bg.png">
+  
+    <link rel="alternate" href="/blog/atom.xml" title="Wenyi's Blog 🌸" type="application/atom+xml">
   
   <!-- JSON-LD 结构化数据 -->
   
   
     <script type="application/ld+json">
-    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Android ViewModel协程作用域viewModelScope详解","description":"前言每个 ViewModel 都定义了 viewModelScope，在此作用域中启动的协程会在 ViewModel 清除时自动取消。\n","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:52:00.000Z","dateModified":"2026-04-03T16:02:28.128Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Android-ViewModel%E5%8D%8F%E7%A8%8B%E4%BD%9C%E7%94%A8%E5%9F%9FviewModelScope%E8%AF%A6%E8%A7%A3/"}}
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Android ViewModel协程作用域viewModelScope详解","description":"前言每个 ViewModel 都定义了 viewModelScope，在此作用域中启动的协程会在 ViewModel 清除时自动取消。\n","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog 🌸","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:52:00.000Z","dateModified":"2026-04-04T07:34:34.104Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Android-ViewModel%E5%8D%8F%E7%A8%8B%E4%BD%9C%E7%94%A8%E5%9F%9FviewModelScope%E8%AF%A6%E8%A7%A3/"}}
     </script>
   
   <!-- 关键 CSS 预加载 -->
@@ -114,7 +118,7 @@
             </header>
             <header id="kratos-mobile-topnav" class="kratos-topnav">
                 <div class="container">
-                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog 🌸</a></div>
                     <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
                         <a id="kratos-nav-toggle" class="kratos-nav-toggle">
                             <i></i>
@@ -128,8 +132,8 @@
             <div class="kratos-cover kratos-cover-2 text-center">
                 <div class="desc desc2 animate-box">
                     <a href="/blog/">
-                        <h2>Wenyi&#39;s Blog</h2> <br />
-                        <span></span>
+                        <h2>Wenyi&#39;s Blog 🌸</h2> <br />
+                        <span>学习笔记与技术分享</span>
                     </a>
                 </div>
             </div>
@@ -232,7 +236,7 @@
                     <a class="tag-none-link" href="/blog/tags/Android/" rel="tag">Android</a>, <a class="tag-none-link" href="/blog/tags/ViewModel/" rel="tag">ViewModel</a>, <a class="tag-none-link" href="/blog/tags/viewModelScope/" rel="tag">viewModelScope</a>, <a class="tag-none-link" href="/blog/tags/%E5%8D%8F%E7%A8%8B/" rel="tag">协程</a>
                 </div>
                 <div class="pull-date">
-                    <time datetime="2026-04-03T16:02:28.128Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                    <time datetime="2026-04-04T07:34:34.104Z" itemprop="dateModified">最后编辑：2026-04-04</time>
                 </div>
             </div>
         </footer>
@@ -287,7 +291,7 @@
                     </ul>
                     <ul class="kratos-copyright">
                         <div>
-                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>&copy; 2026 Wenyi's Blog 🌸 版权所有.</li>
                             <li>本站已运行<span id="kr-since">Loading...</span></li>
                         </div>
                         <div>

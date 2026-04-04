@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-cn">
     <head>
   <!-- 元数据 -->
   <meta charset="utf-8">
   
   
-  <title>Android Retrofit与OkHttp网络请求进阶 | Wenyi&#39;s Blog</title>
+  <title>Android Retrofit与OkHttp网络请求进阶 | Wenyi&#39;s Blog 🌸</title>
   <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/03/Android-Retrofit%E4%B8%8EOkHttp%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82%E8%BF%9B%E9%98%B6/">
   <meta name="author" content="Wenyi" />
   <meta http-equiv="Cache-Control" content="no-transform" />
@@ -21,11 +21,12 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="Android Retrofit与OkHttp网络请求进阶">
 <meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/03/Android-Retrofit%E4%B8%8EOkHttp%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82%E8%BF%9B%E9%98%B6/index.html">
-<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:site_name" content="Wenyi&#39;s Blog 🌸">
 <meta property="og:description" content="前言在 Android 开发中，网络请求几乎是每个项目必不可少的功能模块。Retrofit + OkHttp 作为目前最主流、最稳定、最易扩展的网络请求组合，被广泛应用于各类项目中。 架构关系Retrofit vs OkHttp   框架 作用 关键特性    Retrofit 封装网络接口 注解式定义、数据解析、协程支持   OkHttp 执行网络请求 连接池、缓存、拦截器、日志   关系图12">
-<meta property="og:locale" content="en_US">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/honjun/cdn@1.4/img/banner/about.jpg">
 <meta property="article:published_time" content="2026-04-03T23:16:00.000Z">
-<meta property="article:modified_time" content="2026-04-03T15:17:11.164Z">
+<meta property="article:modified_time" content="2026-04-04T07:34:34.100Z">
 <meta property="article:author" content="Wenyi">
 <meta property="article:tag" content="Android">
 <meta property="article:tag" content="OkHttp">
@@ -33,12 +34,15 @@
 <meta property="article:tag" content="拦截器">
 <meta property="article:tag" content="网络请求">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/honjun/cdn@1.4/img/banner/about.jpg">
+  
+    <link rel="alternate" href="/blog/atom.xml" title="Wenyi's Blog 🌸" type="application/atom+xml">
   
   <!-- JSON-LD 结构化数据 -->
   
   
     <script type="application/ld+json">
-    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Android Retrofit与OkHttp网络请求进阶","description":"前言在 Android 开发中，网络请求几乎是每个项目必不可少的功能模块。Retrofit + OkHttp 作为目前最主流、最稳定、最易扩展的网络请求组合，...","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:16:00.000Z","dateModified":"2026-04-03T15:17:11.164Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Android-Retrofit%E4%B8%8EOkHttp%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82%E8%BF%9B%E9%98%B6/"}}
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Android Retrofit与OkHttp网络请求进阶","description":"前言在 Android 开发中，网络请求几乎是每个项目必不可少的功能模块。Retrofit + OkHttp 作为目前最主流、最稳定、最易扩展的网络请求组合，...","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog 🌸","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:16:00.000Z","dateModified":"2026-04-04T07:34:34.100Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Android-Retrofit%E4%B8%8EOkHttp%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82%E8%BF%9B%E9%98%B6/"}}
     </script>
   
   <!-- 关键 CSS 预加载 -->
@@ -115,7 +119,7 @@
             </header>
             <header id="kratos-mobile-topnav" class="kratos-topnav">
                 <div class="container">
-                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog 🌸</a></div>
                     <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
                         <a id="kratos-nav-toggle" class="kratos-nav-toggle">
                             <i></i>
@@ -129,8 +133,8 @@
             <div class="kratos-cover kratos-cover-2 text-center">
                 <div class="desc desc2 animate-box">
                     <a href="/blog/">
-                        <h2>Wenyi&#39;s Blog</h2> <br />
-                        <span></span>
+                        <h2>Wenyi&#39;s Blog 🌸</h2> <br />
+                        <span>学习笔记与技术分享</span>
                     </a>
                 </div>
             </div>
@@ -325,7 +329,7 @@
                     <a class="tag-none-link" href="/blog/tags/Android/" rel="tag">Android</a>, <a class="tag-none-link" href="/blog/tags/OkHttp/" rel="tag">OkHttp</a>, <a class="tag-none-link" href="/blog/tags/Retrofit/" rel="tag">Retrofit</a>, <a class="tag-none-link" href="/blog/tags/%E6%8B%A6%E6%88%AA%E5%99%A8/" rel="tag">拦截器</a>, <a class="tag-none-link" href="/blog/tags/%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82/" rel="tag">网络请求</a>
                 </div>
                 <div class="pull-date">
-                    <time datetime="2026-04-03T15:17:11.164Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                    <time datetime="2026-04-04T07:34:34.100Z" itemprop="dateModified">最后编辑：2026-04-04</time>
                 </div>
             </div>
         </footer>
@@ -380,7 +384,7 @@
                     </ul>
                     <ul class="kratos-copyright">
                         <div>
-                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>&copy; 2026 Wenyi's Blog 🌸 版权所有.</li>
                             <li>本站已运行<span id="kr-since">Loading...</span></li>
                         </div>
                         <div>

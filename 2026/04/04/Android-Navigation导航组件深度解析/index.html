@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-cn">
     <head>
   <!-- 元数据 -->
   <meta charset="utf-8">
   
   
-  <title>Android Navigation导航组件深度解析 | Wenyi&#39;s Blog</title>
+  <title>Android Navigation导航组件深度解析 | Wenyi&#39;s Blog 🌸</title>
   <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/04/Android-Navigation%E5%AF%BC%E8%88%AA%E7%BB%84%E4%BB%B6%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/">
   <meta name="author" content="Wenyi" />
   <meta http-equiv="Cache-Control" content="no-transform" />
@@ -21,23 +21,27 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="Android Navigation导航组件深度解析">
 <meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/04/Android-Navigation%E5%AF%BC%E8%88%AA%E7%BB%84%E4%BB%B6%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/index.html">
-<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:site_name" content="Wenyi&#39;s Blog 🌸">
 <meta property="og:description" content="前言导航是指允许用户跨越、进入和退出应用中不同内容片段的交互。Android Jetpack 的 Navigation 组件包含 Navigation 库、Safe Args Gradle 插件，以及可帮助您实现应用导航的工具。 一、核心概念1. 导航宿主（Host）包含当前导航目的地的界面元素。  Compose：NavHost Fragment：NavHostFragment  2. 导航图（">
-<meta property="og:locale" content="en_US">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/other/comment-bg.png">
 <meta property="article:published_time" content="2026-04-04T03:20:00.000Z">
-<meta property="article:modified_time" content="2026-04-03T19:18:51.076Z">
+<meta property="article:modified_time" content="2026-04-04T07:34:34.100Z">
 <meta property="article:author" content="Wenyi">
 <meta property="article:tag" content="Android">
 <meta property="article:tag" content="Jetpack">
 <meta property="article:tag" content="Navigation">
 <meta property="article:tag" content="导航">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/other/comment-bg.png">
+  
+    <link rel="alternate" href="/blog/atom.xml" title="Wenyi's Blog 🌸" type="application/atom+xml">
   
   <!-- JSON-LD 结构化数据 -->
   
   
     <script type="application/ld+json">
-    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Android Navigation导航组件深度解析","description":"前言导航是指允许用户跨越、进入和退出应用中不同内容片段的交互。Android Jetpack 的 Navigation 组件包含 Navigation 库、S...","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-04T03:20:00.000Z","dateModified":"2026-04-03T19:18:51.076Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/04/Android-Navigation%E5%AF%BC%E8%88%AA%E7%BB%84%E4%BB%B6%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/"}}
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Android Navigation导航组件深度解析","description":"前言导航是指允许用户跨越、进入和退出应用中不同内容片段的交互。Android Jetpack 的 Navigation 组件包含 Navigation 库、S...","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog 🌸","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-04T03:20:00.000Z","dateModified":"2026-04-04T07:34:34.100Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/04/Android-Navigation%E5%AF%BC%E8%88%AA%E7%BB%84%E4%BB%B6%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/"}}
     </script>
   
   <!-- 关键 CSS 预加载 -->
@@ -114,7 +118,7 @@
             </header>
             <header id="kratos-mobile-topnav" class="kratos-topnav">
                 <div class="container">
-                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog 🌸</a></div>
                     <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
                         <a id="kratos-nav-toggle" class="kratos-nav-toggle">
                             <i></i>
@@ -128,8 +132,8 @@
             <div class="kratos-cover kratos-cover-2 text-center">
                 <div class="desc desc2 animate-box">
                     <a href="/blog/">
-                        <h2>Wenyi&#39;s Blog</h2> <br />
-                        <span></span>
+                        <h2>Wenyi&#39;s Blog 🌸</h2> <br />
+                        <span>学习笔记与技术分享</span>
                     </a>
                 </div>
             </div>
@@ -256,7 +260,7 @@
                     <a class="tag-none-link" href="/blog/tags/Android/" rel="tag">Android</a>, <a class="tag-none-link" href="/blog/tags/Jetpack/" rel="tag">Jetpack</a>, <a class="tag-none-link" href="/blog/tags/Navigation/" rel="tag">Navigation</a>, <a class="tag-none-link" href="/blog/tags/%E5%AF%BC%E8%88%AA/" rel="tag">导航</a>
                 </div>
                 <div class="pull-date">
-                    <time datetime="2026-04-03T19:18:51.076Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                    <time datetime="2026-04-04T07:34:34.100Z" itemprop="dateModified">最后编辑：2026-04-04</time>
                 </div>
             </div>
         </footer>
@@ -311,7 +315,7 @@
                     </ul>
                     <ul class="kratos-copyright">
                         <div>
-                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>&copy; 2026 Wenyi's Blog 🌸 版权所有.</li>
                             <li>本站已运行<span id="kr-since">Loading...</span></li>
                         </div>
                         <div>

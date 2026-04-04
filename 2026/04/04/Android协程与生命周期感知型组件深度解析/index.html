@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-cn">
     <head>
   <!-- 元数据 -->
   <meta charset="utf-8">
   
   
-  <title>Android协程与生命周期感知型组件深度解析 | Wenyi&#39;s Blog</title>
+  <title>Android协程与生命周期感知型组件深度解析 | Wenyi&#39;s Blog 🌸</title>
   <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/04/Android%E5%8D%8F%E7%A8%8B%E4%B8%8E%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E6%84%9F%E7%9F%A5%E5%9E%8B%E7%BB%84%E4%BB%B6%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/">
   <meta name="author" content="Wenyi" />
   <meta http-equiv="Cache-Control" content="no-transform" />
@@ -21,11 +21,12 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="Android协程与生命周期感知型组件深度解析">
 <meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/04/Android%E5%8D%8F%E7%A8%8B%E4%B8%8E%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E6%84%9F%E7%9F%A5%E5%9E%8B%E7%BB%84%E4%BB%B6%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/index.html">
-<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:site_name" content="Wenyi&#39;s Blog 🌸">
 <meta property="og:description" content="前言Kotlin 协程提供了异步编程的 API，结合生命周期感知型组件，可以实现自动取消长时间运行的操作，避免内存泄漏。本文将深入解析协程与生命周期的集成。 一、添加 KTX 依赖12345678&#x2F;&#x2F; ViewModelScopeimplementation(&quot;androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0&quot;)&#x2F;&#x2F; Lifecy">
-<meta property="og:locale" content="en_US">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/honjun/cdn@1.4/img/banner/about.jpg">
 <meta property="article:published_time" content="2026-04-04T00:50:00.000Z">
-<meta property="article:modified_time" content="2026-04-03T16:49:03.976Z">
+<meta property="article:modified_time" content="2026-04-04T07:34:34.104Z">
 <meta property="article:author" content="Wenyi">
 <meta property="article:tag" content="Android">
 <meta property="article:tag" content="Coroutines">
@@ -33,12 +34,15 @@
 <meta property="article:tag" content="lifecycleScope">
 <meta property="article:tag" content="viewModelScope">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/honjun/cdn@1.4/img/banner/about.jpg">
+  
+    <link rel="alternate" href="/blog/atom.xml" title="Wenyi's Blog 🌸" type="application/atom+xml">
   
   <!-- JSON-LD 结构化数据 -->
   
   
     <script type="application/ld+json">
-    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Android协程与生命周期感知型组件深度解析","description":"前言Kotlin 协程提供了异步编程的 API，结合生命周期感知型组件，可以实现自动取消长时间运行的操作，避免内存泄漏。本文将深入解析协程与生命周期的集成。","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-04T00:50:00.000Z","dateModified":"2026-04-03T16:49:03.976Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/04/Android%E5%8D%8F%E7%A8%8B%E4%B8%8E%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E6%84%9F%E7%9F%A5%E5%9E%8B%E7%BB%84%E4%BB%B6%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/"}}
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Android协程与生命周期感知型组件深度解析","description":"前言Kotlin 协程提供了异步编程的 API，结合生命周期感知型组件，可以实现自动取消长时间运行的操作，避免内存泄漏。本文将深入解析协程与生命周期的集成。","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog 🌸","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-04T00:50:00.000Z","dateModified":"2026-04-04T07:34:34.104Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/04/Android%E5%8D%8F%E7%A8%8B%E4%B8%8E%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E6%84%9F%E7%9F%A5%E5%9E%8B%E7%BB%84%E4%BB%B6%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/"}}
     </script>
   
   <!-- 关键 CSS 预加载 -->
@@ -115,7 +119,7 @@
             </header>
             <header id="kratos-mobile-topnav" class="kratos-topnav">
                 <div class="container">
-                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog 🌸</a></div>
                     <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
                         <a id="kratos-nav-toggle" class="kratos-nav-toggle">
                             <i></i>
@@ -129,8 +133,8 @@
             <div class="kratos-cover kratos-cover-2 text-center">
                 <div class="desc desc2 animate-box">
                     <a href="/blog/">
-                        <h2>Wenyi&#39;s Blog</h2> <br />
-                        <span></span>
+                        <h2>Wenyi&#39;s Blog 🌸</h2> <br />
+                        <span>学习笔记与技术分享</span>
                     </a>
                 </div>
             </div>
@@ -304,7 +308,7 @@
                     <a class="tag-none-link" href="/blog/tags/Android/" rel="tag">Android</a>, <a class="tag-none-link" href="/blog/tags/Coroutines/" rel="tag">Coroutines</a>, <a class="tag-none-link" href="/blog/tags/Lifecycle/" rel="tag">Lifecycle</a>, <a class="tag-none-link" href="/blog/tags/lifecycleScope/" rel="tag">lifecycleScope</a>, <a class="tag-none-link" href="/blog/tags/viewModelScope/" rel="tag">viewModelScope</a>
                 </div>
                 <div class="pull-date">
-                    <time datetime="2026-04-03T16:49:03.976Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                    <time datetime="2026-04-04T07:34:34.104Z" itemprop="dateModified">最后编辑：2026-04-04</time>
                 </div>
             </div>
         </footer>
@@ -359,7 +363,7 @@
                     </ul>
                     <ul class="kratos-copyright">
                         <div>
-                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>&copy; 2026 Wenyi's Blog 🌸 版权所有.</li>
                             <li>本站已运行<span id="kr-since">Loading...</span></li>
                         </div>
                         <div>

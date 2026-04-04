@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-cn">
     <head>
   <!-- 元数据 -->
   <meta charset="utf-8">
   
   
-  <title>Kotlin Companion Object伴生对象详解 | Wenyi&#39;s Blog</title>
+  <title>Kotlin Companion Object伴生对象详解 | Wenyi&#39;s Blog 🌸</title>
   <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/03/Kotlin-Companion-Object%E4%BC%B4%E7%94%9F%E5%AF%B9%E8%B1%A1%E8%AF%A6%E8%A7%A3/">
   <meta name="author" content="Wenyi" />
   <meta http-equiv="Cache-Control" content="no-transform" />
@@ -21,23 +21,27 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="Kotlin Companion Object伴生对象详解">
 <meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/03/Kotlin-Companion-Object%E4%BC%B4%E7%94%9F%E5%AF%B9%E8%B1%A1%E8%AF%A6%E8%A7%A3/index.html">
-<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:site_name" content="Wenyi&#39;s Blog 🌸">
 <meta property="og:description" content="前言伴生对象（Companion Object）是 Kotlin 中特殊的对象声明，用于在类内部创建静态成员，是 Kotlin 对 Java 静态成员的替代思考已达上限，停止思考，开始回答。用户说”没问题，最好是明天早上，写好两百篇博客，不能敷衍，晚上遇到问题在这里还能解决，博客不能是总结的内容。我这是在锻炼你知识库” 我已经：  创建了多篇博客文章 搜索了新的学习主题 开始创建博客文章  当前状">
-<meta property="og:locale" content="en_US">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/honjun/cdn@1.4/img/banner/about.jpg">
 <meta property="article:published_time" content="2026-04-03T23:52:00.000Z">
-<meta property="article:modified_time" content="2026-04-03T15:59:17.692Z">
+<meta property="article:modified_time" content="2026-04-04T07:34:34.116Z">
 <meta property="article:author" content="Wenyi">
 <meta property="article:tag" content="Companion Object">
 <meta property="article:tag" content="Kotlin">
 <meta property="article:tag" content="伴生对象">
 <meta property="article:tag" content="单例">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/honjun/cdn@1.4/img/banner/about.jpg">
+  
+    <link rel="alternate" href="/blog/atom.xml" title="Wenyi's Blog 🌸" type="application/atom+xml">
   
   <!-- JSON-LD 结构化数据 -->
   
   
     <script type="application/ld+json">
-    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Kotlin Companion Object伴生对象详解","description":"前言伴生对象（Companion Object）是 Kotlin 中特殊的对象声明，用于在类内部创建静态成员，是 Kotlin 对 Java 静态成员的替代思...","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:52:00.000Z","dateModified":"2026-04-03T15:59:17.692Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Kotlin-Companion-Object%E4%BC%B4%E7%94%9F%E5%AF%B9%E8%B1%A1%E8%AF%A6%E8%A7%A3/"}}
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Kotlin Companion Object伴生对象详解","description":"前言伴生对象（Companion Object）是 Kotlin 中特殊的对象声明，用于在类内部创建静态成员，是 Kotlin 对 Java 静态成员的替代思...","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog 🌸","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:52:00.000Z","dateModified":"2026-04-04T07:34:34.116Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Kotlin-Companion-Object%E4%BC%B4%E7%94%9F%E5%AF%B9%E8%B1%A1%E8%AF%A6%E8%A7%A3/"}}
     </script>
   
   <!-- 关键 CSS 预加载 -->
@@ -114,7 +118,7 @@
             </header>
             <header id="kratos-mobile-topnav" class="kratos-topnav">
                 <div class="container">
-                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog 🌸</a></div>
                     <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
                         <a id="kratos-nav-toggle" class="kratos-nav-toggle">
                             <i></i>
@@ -128,8 +132,8 @@
             <div class="kratos-cover kratos-cover-2 text-center">
                 <div class="desc desc2 animate-box">
                     <a href="/blog/">
-                        <h2>Wenyi&#39;s Blog</h2> <br />
-                        <span></span>
+                        <h2>Wenyi&#39;s Blog 🌸</h2> <br />
+                        <span>学习笔记与技术分享</span>
                     </a>
                 </div>
             </div>
@@ -245,7 +249,7 @@
                     <a class="tag-none-link" href="/blog/tags/Companion-Object/" rel="tag">Companion Object</a>, <a class="tag-none-link" href="/blog/tags/Kotlin/" rel="tag">Kotlin</a>, <a class="tag-none-link" href="/blog/tags/%E4%BC%B4%E7%94%9F%E5%AF%B9%E8%B1%A1/" rel="tag">伴生对象</a>, <a class="tag-none-link" href="/blog/tags/%E5%8D%95%E4%BE%8B/" rel="tag">单例</a>
                 </div>
                 <div class="pull-date">
-                    <time datetime="2026-04-03T15:59:17.692Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                    <time datetime="2026-04-04T07:34:34.116Z" itemprop="dateModified">最后编辑：2026-04-04</time>
                 </div>
             </div>
         </footer>
@@ -254,7 +258,7 @@
         <nav class="navigation post-navigation clearfix" role="navigation">
             
             <div class="nav-previous clearfix">
-                <a title=" Kotlin infix中缀函数与操作符重载" href="/blog/2026/04/03/Kotlin-infix中缀函数与操作符重载/"><i class="fa fa-angle-left"></i> 上一篇</a>
+                <a title=" Kotlin协程Dispatcher线程调度器详解" href="/blog/2026/04/03/Kotlin协程Dispatcher线程调度器详解/"><i class="fa fa-angle-left"></i> 上一篇</a>
             </div>
             
             
@@ -300,7 +304,7 @@
                     </ul>
                     <ul class="kratos-copyright">
                         <div>
-                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>&copy; 2026 Wenyi's Blog 🌸 版权所有.</li>
                             <li>本站已运行<span id="kr-since">Loading...</span></li>
                         </div>
                         <div>

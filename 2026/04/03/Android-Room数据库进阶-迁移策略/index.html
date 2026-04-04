@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-cn">
     <head>
   <!-- 元数据 -->
   <meta charset="utf-8">
   
   
-  <title>Android Room数据库进阶-迁移策略 | Wenyi&#39;s Blog</title>
+  <title>Android Room数据库进阶-迁移策略 | Wenyi&#39;s Blog 🌸</title>
   <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/03/Android-Room%E6%95%B0%E6%8D%AE%E5%BA%93%E8%BF%9B%E9%98%B6-%E8%BF%81%E7%A7%BB%E7%AD%96%E7%95%A5/">
   <meta name="author" content="Wenyi" />
   <meta http-equiv="Cache-Control" content="no-transform" />
@@ -21,11 +21,12 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="Android Room数据库进阶-迁移策略">
 <meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/03/Android-Room%E6%95%B0%E6%8D%AE%E5%BA%93%E8%BF%9B%E9%98%B6-%E8%BF%81%E7%A7%BB%E7%AD%96%E7%95%A5/index.html">
-<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:site_name" content="Wenyi&#39;s Blog 🌸">
 <meta property="og:description" content="前言当您在应用中添加和更改功能时，需要修改 Room 实体类和底层数据库表以反映这些更改。如果应用更新更改了数据库架构，那么保留设备内置数据库中已有的用户数据就非常重要。Room 同时支持以自动和手动方式进行的增量迁移。 一、自动迁移使用 @AutoMigration 注解如需声明两个数据库版本之间的自动迁移，请将 @AutoMigration 注解添加到 @Database 中的 autoMig">
-<meta property="og:locale" content="en_US">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://images.unsplash.com/photo-1579566346927-c68383817a25?w=800">
 <meta property="article:published_time" content="2026-04-03T23:07:00.000Z">
-<meta property="article:modified_time" content="2026-04-03T15:07:07.668Z">
+<meta property="article:modified_time" content="2026-04-04T07:34:34.104Z">
 <meta property="article:author" content="Wenyi">
 <meta property="article:tag" content="Android">
 <meta property="article:tag" content="Room">
@@ -33,12 +34,15 @@
 <meta property="article:tag" content="数据库">
 <meta property="article:tag" content="迁移">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://images.unsplash.com/photo-1579566346927-c68383817a25?w=800">
+  
+    <link rel="alternate" href="/blog/atom.xml" title="Wenyi's Blog 🌸" type="application/atom+xml">
   
   <!-- JSON-LD 结构化数据 -->
   
   
     <script type="application/ld+json">
-    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Android Room数据库进阶-迁移策略","description":"前言当您在应用中添加和更改功能时，需要修改 Room 实体类和底层数据库表以反映这些更改。如果应用更新更改了数据库架构，那么保留设备内置数据库中已有的用户数据...","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:07:00.000Z","dateModified":"2026-04-03T15:07:07.668Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Android-Room%E6%95%B0%E6%8D%AE%E5%BA%93%E8%BF%9B%E9%98%B6-%E8%BF%81%E7%A7%BB%E7%AD%96%E7%95%A5/"}}
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Android Room数据库进阶-迁移策略","description":"前言当您在应用中添加和更改功能时，需要修改 Room 实体类和底层数据库表以反映这些更改。如果应用更新更改了数据库架构，那么保留设备内置数据库中已有的用户数据...","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog 🌸","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:07:00.000Z","dateModified":"2026-04-04T07:34:34.104Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Android-Room%E6%95%B0%E6%8D%AE%E5%BA%93%E8%BF%9B%E9%98%B6-%E8%BF%81%E7%A7%BB%E7%AD%96%E7%95%A5/"}}
     </script>
   
   <!-- 关键 CSS 预加载 -->
@@ -115,7 +119,7 @@
             </header>
             <header id="kratos-mobile-topnav" class="kratos-topnav">
                 <div class="container">
-                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog 🌸</a></div>
                     <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
                         <a id="kratos-nav-toggle" class="kratos-nav-toggle">
                             <i></i>
@@ -129,8 +133,8 @@
             <div class="kratos-cover kratos-cover-2 text-center">
                 <div class="desc desc2 animate-box">
                     <a href="/blog/">
-                        <h2>Wenyi&#39;s Blog</h2> <br />
-                        <span></span>
+                        <h2>Wenyi&#39;s Blog 🌸</h2> <br />
+                        <span>学习笔记与技术分享</span>
                     </a>
                 </div>
             </div>
@@ -288,7 +292,7 @@
                     <a class="tag-none-link" href="/blog/tags/Android/" rel="tag">Android</a>, <a class="tag-none-link" href="/blog/tags/Room/" rel="tag">Room</a>, <a class="tag-none-link" href="/blog/tags/SQLite/" rel="tag">SQLite</a>, <a class="tag-none-link" href="/blog/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag">数据库</a>, <a class="tag-none-link" href="/blog/tags/%E8%BF%81%E7%A7%BB/" rel="tag">迁移</a>
                 </div>
                 <div class="pull-date">
-                    <time datetime="2026-04-03T15:07:07.668Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                    <time datetime="2026-04-04T07:34:34.104Z" itemprop="dateModified">最后编辑：2026-04-04</time>
                 </div>
             </div>
         </footer>
@@ -343,7 +347,7 @@
                     </ul>
                     <ul class="kratos-copyright">
                         <div>
-                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>&copy; 2026 Wenyi's Blog 🌸 版权所有.</li>
                             <li>本站已运行<span id="kr-since">Loading...</span></li>
                         </div>
                         <div>

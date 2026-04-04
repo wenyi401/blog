@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-cn">
     <head>
   <!-- 元数据 -->
   <meta charset="utf-8">
   
   
-  <title>Kotlin Coroutines Channel通道学习 | Wenyi&#39;s Blog</title>
+  <title>Kotlin Coroutines Channel通道学习 | Wenyi&#39;s Blog 🌸</title>
   <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/03/Kotlin-Coroutines-Channel%E9%80%9A%E9%81%93%E5%AD%A6%E4%B9%A0/">
   <meta name="author" content="Wenyi" />
   <meta http-equiv="Cache-Control" content="no-transform" />
@@ -21,11 +21,12 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="Kotlin Coroutines Channel通道学习">
 <meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/03/Kotlin-Coroutines-Channel%E9%80%9A%E9%81%93%E5%AD%A6%E4%B9%A0/index.html">
-<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:site_name" content="Wenyi&#39;s Blog 🌸">
 <meta property="og:description" content="前言Deferred values 提供了一种便捷的方式在协程之间传输单个值。Channel 提供了一种在流中传输值的方法。 一、Channel 基础概念Channel 在概念上与 BlockingQueue 非常相似。一个关键区别是，它用挂起的 send 替代了阻塞的 put 操作，用挂起的 receive 替代了阻塞的 take 操作。 基本使用1234567891011import kotl">
-<meta property="og:locale" content="en_US">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/other/comment-bg.png">
 <meta property="article:published_time" content="2026-04-03T23:13:00.000Z">
-<meta property="article:modified_time" content="2026-04-03T15:12:25.260Z">
+<meta property="article:modified_time" content="2026-04-04T07:34:34.116Z">
 <meta property="article:author" content="Wenyi">
 <meta property="article:tag" content="Channel">
 <meta property="article:tag" content="Coroutines">
@@ -33,12 +34,15 @@
 <meta property="article:tag" content="协程">
 <meta property="article:tag" content="并发">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/other/comment-bg.png">
+  
+    <link rel="alternate" href="/blog/atom.xml" title="Wenyi's Blog 🌸" type="application/atom+xml">
   
   <!-- JSON-LD 结构化数据 -->
   
   
     <script type="application/ld+json">
-    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Kotlin Coroutines Channel通道学习","description":"前言Deferred values 提供了一种便捷的方式在协程之间传输单个值。Channel 提供了一种在流中传输值的方法。\n","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:13:00.000Z","dateModified":"2026-04-03T15:12:25.260Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Kotlin-Coroutines-Channel%E9%80%9A%E9%81%93%E5%AD%A6%E4%B9%A0/"}}
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Kotlin Coroutines Channel通道学习","description":"前言Deferred values 提供了一种便捷的方式在协程之间传输单个值。Channel 提供了一种在流中传输值的方法。\n","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog 🌸","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:13:00.000Z","dateModified":"2026-04-04T07:34:34.116Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Kotlin-Coroutines-Channel%E9%80%9A%E9%81%93%E5%AD%A6%E4%B9%A0/"}}
     </script>
   
   <!-- 关键 CSS 预加载 -->
@@ -115,7 +119,7 @@
             </header>
             <header id="kratos-mobile-topnav" class="kratos-topnav">
                 <div class="container">
-                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog 🌸</a></div>
                     <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
                         <a id="kratos-nav-toggle" class="kratos-nav-toggle">
                             <i></i>
@@ -129,8 +133,8 @@
             <div class="kratos-cover kratos-cover-2 text-center">
                 <div class="desc desc2 animate-box">
                     <a href="/blog/">
-                        <h2>Wenyi&#39;s Blog</h2> <br />
-                        <span></span>
+                        <h2>Wenyi&#39;s Blog 🌸</h2> <br />
+                        <span>学习笔记与技术分享</span>
                     </a>
                 </div>
             </div>
@@ -346,7 +350,7 @@
                     <a class="tag-none-link" href="/blog/tags/Channel/" rel="tag">Channel</a>, <a class="tag-none-link" href="/blog/tags/Coroutines/" rel="tag">Coroutines</a>, <a class="tag-none-link" href="/blog/tags/Kotlin/" rel="tag">Kotlin</a>, <a class="tag-none-link" href="/blog/tags/%E5%8D%8F%E7%A8%8B/" rel="tag">协程</a>, <a class="tag-none-link" href="/blog/tags/%E5%B9%B6%E5%8F%91/" rel="tag">并发</a>
                 </div>
                 <div class="pull-date">
-                    <time datetime="2026-04-03T15:12:25.260Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                    <time datetime="2026-04-04T07:34:34.116Z" itemprop="dateModified">最后编辑：2026-04-04</time>
                 </div>
             </div>
         </footer>
@@ -401,7 +405,7 @@
                     </ul>
                     <ul class="kratos-copyright">
                         <div>
-                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>&copy; 2026 Wenyi's Blog 🌸 版权所有.</li>
                             <li>本站已运行<span id="kr-since">Loading...</span></li>
                         </div>
                         <div>

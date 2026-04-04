@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>Android LSPosed模块开发实战 - 构建能跑通的灵动岛应用 | Wenyi&#39;s Blog 🌸</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/05/Android-LSPosed%E6%A8%A1%E5%9D%97%E5%BC%80%E5%8F%91%E5%AE%9E%E6%88%98-%E6%9E%84%E5%BB%BA%E8%83%BD%E8%B7%91%E9%80%9A%E7%9A%84%E7%81%B5%E5%8A%A8%E5%B2%9B%E5%BA%94%E7%94%A8/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="Android, Hook, LSPosed, Xposed, 灵动岛" />
+  
+  <meta name="description" content="Android LSPosed 模块开发实战 - 构建能跑通的灵动岛应用 📅 学习时间: 2026-04-05🔧 修复版本: Build Successful! APK 生成于 app&#x2F;build&#x2F;outputs&#x2F;apk&#x2F;debug&#x2F;app-debug.apk (57MB)  前言上一篇文章记录了 LSPosed 和 Xposed 的基础知识学习。今天在尝试构建项目时，遇到了大量编译错误。通过">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android LSPosed模块开发实战 - 构建能跑通的灵动岛应用">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/05/Android-LSPosed%E6%A8%A1%E5%9D%97%E5%BC%80%E5%8F%91%E5%AE%9E%E6%88%98-%E6%9E%84%E5%BB%BA%E8%83%BD%E8%B7%91%E9%80%9A%E7%9A%84%E7%81%B5%E5%8A%A8%E5%B2%9B%E5%BA%94%E7%94%A8/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog 🌸">
+<meta property="og:description" content="Android LSPosed 模块开发实战 - 构建能跑通的灵动岛应用 📅 学习时间: 2026-04-05🔧 修复版本: Build Successful! APK 生成于 app&#x2F;build&#x2F;outputs&#x2F;apk&#x2F;debug&#x2F;app-debug.apk (57MB)  前言上一篇文章记录了 LSPosed 和 Xposed 的基础知识学习。今天在尝试构建项目时，遇到了大量编译错误。通过">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-04-05T01:30:00.000Z">
+<meta property="article:modified_time" content="2026-04-04T17:38:48.660Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="Hook">
+<meta property="article:tag" content="LSPosed">
+<meta property="article:tag" content="Xposed">
+<meta property="article:tag" content="灵动岛">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/blog/atom.xml" title="Wenyi's Blog 🌸" type="application/atom+xml">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Android LSPosed模块开发实战 - 构建能跑通的灵动岛应用","description":"","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog 🌸","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-05T01:30:00.000Z","dateModified":"2026-04-04T17:38:48.660Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/05/Android-LSPosed%E6%A8%A1%E5%9D%97%E5%BC%80%E5%8F%91%E5%AE%9E%E6%88%98-%E6%9E%84%E5%BB%BA%E8%83%BD%E8%B7%91%E9%80%9A%E7%9A%84%E7%81%B5%E5%8A%A8%E5%B2%9B%E5%BA%94%E7%94%A8/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog 🌸</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog 🌸</h2> <br />
+                        <span>学习笔记与技术分享</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/05/Android-LSPosed%E6%A8%A1%E5%9D%97%E5%BC%80%E5%8F%91%E5%AE%9E%E6%88%98-%E6%9E%84%E5%BB%BA%E8%83%BD%E8%B7%91%E9%80%9A%E7%9A%84%E7%81%B5%E5%8A%A8%E5%B2%9B%E5%BA%94%E7%94%A8/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Android LSPosed模块开发实战 - 构建能跑通的灵动岛应用</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-05T01:30:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-05</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~5.94K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h1 id="Android-LSPosed-模块开发实战-构建能跑通的灵动岛应用"><a href="#Android-LSPosed-模块开发实战-构建能跑通的灵动岛应用" class="headerlink" title="Android LSPosed 模块开发实战 - 构建能跑通的灵动岛应用"></a>Android LSPosed 模块开发实战 - 构建能跑通的灵动岛应用</h1><blockquote>
+<p>📅 学习时间: 2026-04-05<br>🔧 修复版本: Build Successful! APK 生成于 <code>app/build/outputs/apk/debug/app-debug.apk</code> (57MB)</p>
+</blockquote>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>上一篇文章记录了 LSPosed 和 Xposed 的基础知识学习。今天在尝试构建项目时，遇到了大量编译错误。通过深入分析每个错误的原因，成功将项目从编译失败修复为成功打包 APk。本文记录所有遇到的问题及解决方案。</p>
+<h2 id="问题汇总与修复"><a href="#问题汇总与修复" class="headerlink" title="问题汇总与修复"></a>问题汇总与修复</h2><h3 id="1-LSPosed-Zygisk-不支持资源-Hook-ResourceHook-kt"><a href="#1-LSPosed-Zygisk-不支持资源-Hook-ResourceHook-kt" class="headerlink" title="1. LSPosed Zygisk 不支持资源 Hook (ResourceHook.kt)"></a>1. LSPosed Zygisk 不支持资源 Hook (ResourceHook.kt)</h3><p><strong>错误:</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Unresolved reference: XC_LayoutInflated</span><br><span class="line">Unresolved reference: XposedBridge</span><br><span class="line">Unresolved reference: hookLayout</span><br></pre></td></tr></table></figure>
+
+<p><strong>原因:</strong> LSPosed 使用 Zygisk 架构，移除了 <code>IXposedHookInitPackageResources</code> 接口。资源 Hook 功能不再可用。</p>
+<p><strong>修复:</strong> 将 ResourceHook.kt 改为存根文件，添加 <code>@Deprecated</code> 注解说明替代方案：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.example.dynamicislandxposed.hook</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * LSPosed 资源 Hook 实现</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 注意: LSPosed (Zygisk) 移除了 IXposedHookInitPackageResources</span></span><br><span class="line"><span class="comment"> * 资源 Hook 在 Zygisk 环境下不可用</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 如需修改 SystemUI 资源，可以：</span></span><br><span class="line"><span class="comment"> * 1. 使用 Magisk 模块直接替换 system 分区资源</span></span><br><span class="line"><span class="comment"> * 2. 使用 SystemOverlay 方式动态加载自定义布局</span></span><br><span class="line"><span class="comment"> * 3. 在运行时通过反射修改 View 属性</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Deprecated(<span class="string">&quot;LSPosed Zygisk 不支持资源 Hook，请使用 Magisk 模块替代方案&quot;</span>)</span></span><br><span class="line"><span class="keyword">object</span> ResourceHook &#123;</span><br><span class="line">    <span class="comment">// 资源 Hook 功能已禁用</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-animateDpAsState-返回类型不匹配-DynamicIslandAnimations-kt"><a href="#2-animateDpAsState-返回类型不匹配-DynamicIslandAnimations-kt" class="headerlink" title="2. animateDpAsState 返回类型不匹配 (DynamicIslandAnimations.kt)"></a>2. animateDpAsState 返回类型不匹配 (DynamicIslandAnimations.kt)</h3><p><strong>错误:</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Return type mismatch: expected &#x27;Dp&#x27;, actual &#x27;State&lt;Dp&gt;&#x27;</span><br><span class="line">Return type mismatch: expected &#x27;Float&#x27;, actual &#x27;State&lt;Float&gt;&#x27;</span><br><span class="line">Unresolved reference: SpringDefaults</span><br></pre></td></tr></table></figure>
+
+<p><strong>原因:</strong> </p>
+<ul>
+<li><code>animateDpAsState()</code> 和 <code>animateFloatAsState()</code> 返回的是 <code>State&lt;Dp&gt;</code> 和 <code>State&lt;Float&gt;</code>，而不是直接返回值</li>
+<li><code>SpringDefaults</code> 嵌套在 <code>IslandAnimations</code> 对象内部，但代码中引用路径错误</li>
+</ul>
+<p><strong>修复:</strong> 在动画函数末尾添加 <code>.value</code> 解包，同时修正 <code>SpringDefaults</code> 的引用路径：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">object</span> IslandAnimations &#123;</span><br><span class="line">    <span class="keyword">object</span> SpringDefaults &#123;</span><br><span class="line">        <span class="keyword">const</span> <span class="keyword">val</span> DAMPING_RATIO_HIGH = <span class="number">0.8f</span></span><br><span class="line">        <span class="keyword">const</span> <span class="keyword">val</span> DAMPING_RATIO_MEDIUM = <span class="number">0.6f</span></span><br><span class="line">        <span class="keyword">const</span> <span class="keyword">val</span> DAMPING_RATIO_LOW = <span class="number">0.4f</span></span><br><span class="line">        <span class="keyword">const</span> <span class="keyword">val</span> STIFFNESS_HIGH = <span class="number">500f</span></span><br><span class="line">        <span class="keyword">const</span> <span class="keyword">val</span> STIFFNESS_MEDIUM = <span class="number">300f</span></span><br><span class="line">        <span class="keyword">const</span> <span class="keyword">val</span> STIFFNESS_LOW = <span class="number">100f</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Composable</span></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">expandedWidth</span><span class="params">(state: <span class="type">IslandState</span>)</span></span>: Dp &#123;</span><br><span class="line">    <span class="keyword">val</span> target = <span class="keyword">when</span> (state) &#123;</span><br><span class="line">        IslandState.HIDDEN -&gt; <span class="number">0.</span>dp</span><br><span class="line">        IslandState.COMPACT -&gt; IslandAnimations.COMPACT_WIDTH</span><br><span class="line">        IslandState.EXPANDED -&gt; IslandAnimations.EXPANDED_WIDTH</span><br><span class="line">        IslandState.MINIMAL -&gt; IslandAnimations.MINIMAL_SIZE</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> animateDpAsState(</span><br><span class="line">        targetValue = target,</span><br><span class="line">        animationSpec = spring(</span><br><span class="line">            dampingRatio = IslandAnimations.SpringDefaults.DAMPING_RATIO_HIGH,</span><br><span class="line">            stiffness = IslandAnimations.SpringDefaults.STIFFNESS_MEDIUM</span><br><span class="line">        ),</span><br><span class="line">        label = <span class="string">&quot;width&quot;</span></span><br><span class="line">    ).value  <span class="comment">// ← 添加 .value 解包</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-Notification-importance-不存在"><a href="#3-Notification-importance-不存在" class="headerlink" title="3. Notification.importance 不存在"></a>3. Notification.importance 不存在</h3><p><strong>错误:</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Unresolved reference &#x27;importance&#x27;</span><br></pre></td></tr></table></figure>
+
+<p><strong>原因:</strong> <code>StatusBarNotification</code> 在 Android SDK 中没有直接的 <code>importance</code> 属性可访问（尽管 <code>getImportance()</code> 方法存在于 API 30+）。</p>
+<p><strong>修复方案:</strong> 使用 <code>Notification.priority</code> 作为替代判断：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 检查通知重要性 - 使用 notification.priority 作为降级方案</span></span><br><span class="line"><span class="keyword">val</span> priority = sbn.notification.priority</span><br><span class="line"><span class="keyword">val</span> impliedImportance = <span class="keyword">when</span> &#123;</span><br><span class="line">    priority &gt;= <span class="number">1</span> -&gt; NotificationManager.IMPORTANCE_HIGH</span><br><span class="line">    priority &gt;= <span class="number">0</span> -&gt; NotificationManager.IMPORTANCE_DEFAULT</span><br><span class="line">    priority &gt;= -<span class="number">1</span> -&gt; NotificationManager.IMPORTANCE_LOW</span><br><span class="line">    <span class="keyword">else</span> -&gt; NotificationManager.IMPORTANCE_MIN</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">return</span> impliedImportance &gt;= NotificationManager.IMPORTANCE_LOW</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-ViewModelStoreOwner-未正确实现-DynamicIslandOverlayService-kt"><a href="#4-ViewModelStoreOwner-未正确实现-DynamicIslandOverlayService-kt" class="headerlink" title="4. ViewModelStoreOwner 未正确实现 (DynamicIslandOverlayService.kt)"></a>4. ViewModelStoreOwner 未正确实现 (DynamicIslandOverlayService.kt)</h3><p><strong>错误:</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">None of the following candidates is applicable: </span><br><span class="line">  constructor(owner: ViewModelStoreOwner): ViewModelProvider</span><br><span class="line">Conflicting declarations: val viewModelStore</span><br></pre></td></tr></table></figure>
+
+<p><strong>原因:</strong> </p>
+<ul>
+<li><code>Service</code> 实现了 <code>LifecycleOwner</code> 但没有实现 <code>ViewModelStoreOwner</code></li>
+<li>重复声明了 <code>viewModelStore</code> 属性</li>
+</ul>
+<p><strong>修复:</strong> 让 Service 同时实现 <code>ViewModelStoreOwner</code> 接口：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@AndroidEntryPoint</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">DynamicIslandOverlayService</span> : <span class="type">Service</span>(), </span><br><span class="line">    LifecycleOwner, </span><br><span class="line">    SavedStateRegistryOwner, </span><br><span class="line">    ViewModelStoreOwner &#123;  <span class="comment">// ← 添加此接口</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> vmStore = ViewModelStore()</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">override</span> <span class="keyword">val</span> viewModelStore: ViewModelStore</span><br><span class="line">        <span class="keyword">get</span>() = vmStore</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-Material-Icons-扩展包缺失"><a href="#5-Material-Icons-扩展包缺失" class="headerlink" title="5. Material Icons 扩展包缺失"></a>5. Material Icons 扩展包缺失</h3><p><strong>错误:</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Unresolved reference: Download</span><br><span class="line">Unresolved reference: MusicNote</span><br><span class="line">Unresolved reference: Stop</span><br><span class="line">Unresolved reference: Pause</span><br><span class="line">Unresolved reference: SkipNext</span><br><span class="line">Unresolved reference: SkipPrevious</span><br></pre></td></tr></table></figure>
+
+<p><strong>原因:</strong> 默认的 Material Icons 不包含 <code>Download</code>、<code>MusicNote</code>、<code>Pause</code> 等图标。</p>
+<p><strong>修复:</strong> 在 build.gradle.kts 中添加扩展图标库依赖：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">dependencies &#123;</span><br><span class="line">    implementation(<span class="string">&quot;androidx.compose.material:material-icons-extended&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="6-SpringDefaults-导入路径错误"><a href="#6-SpringDefaults-导入路径错误" class="headerlink" title="6. SpringDefaults 导入路径错误"></a>6. SpringDefaults 导入路径错误</h3><p><strong>错误:</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Unresolved reference: SpringDefaults</span><br></pre></td></tr></table></figure>
+
+<p><strong>原因:</strong> <code>SpringDefaults</code> 位于 <code>IslandAnimations</code> 内部，但某些组件错误地从 <code>ui.theme.SpringDefaults</code> 导入。</p>
+<p><strong>修复:</strong> 更正导入路径：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 错误 ❌</span></span><br><span class="line"><span class="keyword">import</span> com.example.dynamicislandxposed.ui.theme.SpringDefaults</span><br><span class="line"></span><br><span class="line"><span class="comment">// 正确 ✅</span></span><br><span class="line"><span class="keyword">import</span> com.example.dynamicislandxposed.ui.IslandAnimations</span><br><span class="line"><span class="comment">// 使用时: IslandAnimations.SpringDefaults.DAMPING_RATIO_HIGH</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="项目架构总结"><a href="#项目架构总结" class="headerlink" title="项目架构总结"></a>项目架构总结</h2><p>修复后的项目架构如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">app/src/main/java/com/example/dynamicislandxposed/</span><br><span class="line">├── hook/</span><br><span class="line">│   ├── NotificationHandler.kt    # 通知拦截与优先级处理</span><br><span class="line">│   └── ResourceHook.kt           # ⚠️ 已禁用（LSPosed Zygisk 不支持）</span><br><span class="line">├── service/</span><br><span class="line">│   ├── DynamicIslandNotificationService.kt  # NotificationListenerService</span><br><span class="line">│   └── DynamicIslandOverlayService.kt       # TYPE_APPLICATION_OVERLAY 悬浮窗</span><br><span class="line">├── ui/</span><br><span class="line">│   ├── MainActivity.kt           # 模块配置界面</span><br><span class="line">│   ├── DynamicIslandUi.kt        # 灵动岛主组件（Compose）</span><br><span class="line">│   ├── DynamicIslandAnimations.kt # 动画配置</span><br><span class="line">│   └── components/</span><br><span class="line">│       ├── MusicPlayingIsland.kt      # 音乐播放岛</span><br><span class="line">│       └── DownloadProgressIsland.kt   # 下载进度岛</span><br><span class="line">├── data/</span><br><span class="line">│   └── DynamicIslandData.kt      # 数据模型</span><br><span class="line">├── viewmodel/</span><br><span class="line">│   └── DynamicIslandViewModel.kt # UI 状态管理</span><br><span class="line">└── config/</span><br><span class="line">    └── ModuleConfig.kt           # SharedPreferences 配置</span><br></pre></td></tr></table></figure>
+
+<h2 id="关键技术点"><a href="#关键技术点" class="headerlink" title="关键技术点"></a>关键技术点</h2><h3 id="1-通知监听"><a href="#1-通知监听" class="headerlink" title="1. 通知监听"></a>1. 通知监听</h3><p>通过 <code>NotificationListenerService</code> 拦截所有通知，根据包名和类型（音乐&#x2F;下载&#x2F;普通）分配优先级。</p>
+<h3 id="2-悬浮窗显示"><a href="#2-悬浮窗显示" class="headerlink" title="2. 悬浮窗显示"></a>2. 悬浮窗显示</h3><p>使用 <code>WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY</code> 在状态栏区域显示 Compose UI。</p>
+<h3 id="3-LSPosed-特殊限制"><a href="#3-LSPosed-特殊限制" class="headerlink" title="3. LSPosed 特殊限制"></a>3. LSPosed 特殊限制</h3><ul>
+<li>✅ Method Hook (IXposedHookLoadPackage) - 可用</li>
+<li>❌ Resource Hook (IXposedHookInitPackageResources) - 不可用</li>
+<li>可通过 Magisk 资源替换模块弥补</li>
+</ul>
+<h2 id="构建成果"><a href="#构建成果" class="headerlink" title="构建成果"></a>构建成果</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">BUILD SUCCESSFUL in 1m 27s</span><br><span class="line">APK: app/build/outputs/apk/debug/app-debug.apk (57MB)</span><br></pre></td></tr></table></figure>
+
+<h2 id="下一步计划"><a href="#下一步计划" class="headerlink" title="下一步计划"></a>下一步计划</h2><ol>
+<li>✅ 修复编译错误 → 完成</li>
+<li>🔲 在真机上测试通知拦截功能</li>
+<li>🔲 完善音乐播放通知的媒体控制按钮</li>
+<li>🔲 添加更多灵动岛样式模板</li>
+<li>🔲 实现与 SystemUI 动画的同步</li>
+</ol>
+<hr>
+<blockquote>
+<p>💡 <strong>经验总结:</strong> LSPosed 模块开发需要特别注意 Zygisk 和 Riru 的 API 差异。资源 Hook 不可用是最大的限制，需要通过 Magisk 模块或其他方案解决。</p>
+</blockquote>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/Android/" rel="tag">Android</a>, <a class="tag-none-link" href="/blog/tags/Hook/" rel="tag">Hook</a>, <a class="tag-none-link" href="/blog/tags/LSPosed/" rel="tag">LSPosed</a>, <a class="tag-none-link" href="/blog/tags/Xposed/" rel="tag">Xposed</a>, <a class="tag-none-link" href="/blog/tags/%E7%81%B5%E5%8A%A8%E5%B2%9B/" rel="tag">灵动岛</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-04T17:38:48.660Z" itemprop="dateModified">最后编辑：2026-04-04</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Kotlin数据类Data Classes深度解析" href="/blog/2026/04/04/Kotlin数据类Data-Classes深度解析/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 🌸 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>

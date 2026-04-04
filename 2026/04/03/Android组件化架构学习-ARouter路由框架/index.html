@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-cn">
     <head>
   <!-- 元数据 -->
   <meta charset="utf-8">
   
   
-  <title>Android组件化架构学习-ARouter路由框架 | Wenyi&#39;s Blog</title>
+  <title>Android组件化架构学习-ARouter路由框架 | Wenyi&#39;s Blog 🌸</title>
   <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/03/Android%E7%BB%84%E4%BB%B6%E5%8C%96%E6%9E%B6%E6%9E%84%E5%AD%A6%E4%B9%A0-ARouter%E8%B7%AF%E7%94%B1%E6%A1%86%E6%9E%B6/">
   <meta name="author" content="Wenyi" />
   <meta http-equiv="Cache-Control" content="no-transform" />
@@ -21,11 +21,12 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="Android组件化架构学习-ARouter路由框架">
 <meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/03/Android%E7%BB%84%E4%BB%B6%E5%8C%96%E6%9E%B6%E6%9E%84%E5%AD%A6%E4%B9%A0-ARouter%E8%B7%AF%E7%94%B1%E6%A1%86%E6%9E%B6/index.html">
-<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:site_name" content="Wenyi&#39;s Blog 🌸">
 <meta property="og:description" content="前言ARouter 是阿里巴巴开源的 Android 组件化路由框架，通过解耦模块依赖，实现跨模块跳转与服务调用。 一、为什么需要 ARouter？组件化的问题 模块间无法直接引用 Intent 跳转耦合严重 服务调用困难  ARouter 解决方案 路由跳转 参数自动注入 服务发现 拦截器机制  二、添加依赖1234567891011121314android &#123;    default">
-<meta property="og:locale" content="en_US">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/other/comment-bg.png">
 <meta property="article:published_time" content="2026-04-03T23:39:00.000Z">
-<meta property="article:modified_time" content="2026-04-03T15:38:52.464Z">
+<meta property="article:modified_time" content="2026-04-04T07:34:34.112Z">
 <meta property="article:author" content="Wenyi">
 <meta property="article:tag" content="ARouter">
 <meta property="article:tag" content="Android">
@@ -33,12 +34,15 @@
 <meta property="article:tag" content="组件化">
 <meta property="article:tag" content="路由">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/other/comment-bg.png">
+  
+    <link rel="alternate" href="/blog/atom.xml" title="Wenyi's Blog 🌸" type="application/atom+xml">
   
   <!-- JSON-LD 结构化数据 -->
   
   
     <script type="application/ld+json">
-    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Android组件化架构学习-ARouter路由框架","description":"前言ARouter 是阿里巴巴开源的 Android 组件化路由框架，通过解耦模块依赖，实现跨模块跳转与服务调用。\n","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:39:00.000Z","dateModified":"2026-04-03T15:38:52.464Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Android%E7%BB%84%E4%BB%B6%E5%8C%96%E6%9E%B6%E6%9E%84%E5%AD%A6%E4%B9%A0-ARouter%E8%B7%AF%E7%94%B1%E6%A1%86%E6%9E%B6/"}}
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Android组件化架构学习-ARouter路由框架","description":"前言ARouter 是阿里巴巴开源的 Android 组件化路由框架，通过解耦模块依赖，实现跨模块跳转与服务调用。\n","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog 🌸","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:39:00.000Z","dateModified":"2026-04-04T07:34:34.112Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Android%E7%BB%84%E4%BB%B6%E5%8C%96%E6%9E%B6%E6%9E%84%E5%AD%A6%E4%B9%A0-ARouter%E8%B7%AF%E7%94%B1%E6%A1%86%E6%9E%B6/"}}
     </script>
   
   <!-- 关键 CSS 预加载 -->
@@ -115,7 +119,7 @@
             </header>
             <header id="kratos-mobile-topnav" class="kratos-topnav">
                 <div class="container">
-                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog 🌸</a></div>
                     <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
                         <a id="kratos-nav-toggle" class="kratos-nav-toggle">
                             <i></i>
@@ -129,8 +133,8 @@
             <div class="kratos-cover kratos-cover-2 text-center">
                 <div class="desc desc2 animate-box">
                     <a href="/blog/">
-                        <h2>Wenyi&#39;s Blog</h2> <br />
-                        <span></span>
+                        <h2>Wenyi&#39;s Blog 🌸</h2> <br />
+                        <span>学习笔记与技术分享</span>
                     </a>
                 </div>
             </div>
@@ -249,7 +253,7 @@
                     <a class="tag-none-link" href="/blog/tags/ARouter/" rel="tag">ARouter</a>, <a class="tag-none-link" href="/blog/tags/Android/" rel="tag">Android</a>, <a class="tag-none-link" href="/blog/tags/%E6%A8%A1%E5%9D%97%E5%8C%96/" rel="tag">模块化</a>, <a class="tag-none-link" href="/blog/tags/%E7%BB%84%E4%BB%B6%E5%8C%96/" rel="tag">组件化</a>, <a class="tag-none-link" href="/blog/tags/%E8%B7%AF%E7%94%B1/" rel="tag">路由</a>
                 </div>
                 <div class="pull-date">
-                    <time datetime="2026-04-03T15:38:52.464Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                    <time datetime="2026-04-04T07:34:34.112Z" itemprop="dateModified">最后编辑：2026-04-04</time>
                 </div>
             </div>
         </footer>
@@ -304,7 +308,7 @@
                     </ul>
                     <ul class="kratos-copyright">
                         <div>
-                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>&copy; 2026 Wenyi's Blog 🌸 版权所有.</li>
                             <li>本站已运行<span id="kr-since">Loading...</span></li>
                         </div>
                         <div>

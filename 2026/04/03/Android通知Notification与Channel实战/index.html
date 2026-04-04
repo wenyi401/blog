@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-cn">
     <head>
   <!-- 元数据 -->
   <meta charset="utf-8">
   
   
-  <title>Android通知Notification与Channel实战 | Wenyi&#39;s Blog</title>
+  <title>Android通知Notification与Channel实战 | Wenyi&#39;s Blog 🌸</title>
   <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/03/Android%E9%80%9A%E7%9F%A5Notification%E4%B8%8EChannel%E5%AE%9E%E6%88%98/">
   <meta name="author" content="Wenyi" />
   <meta http-equiv="Cache-Control" content="no-transform" />
@@ -21,23 +21,27 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="Android通知Notification与Channel实战">
 <meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/03/Android%E9%80%9A%E7%9F%A5Notification%E4%B8%8EChannel%E5%AE%9E%E6%88%98/index.html">
-<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:site_name" content="Wenyi&#39;s Blog 🌸">
 <meta property="og:description" content="前言通知是 Android 应用与用户交互的重要方式，用于告知用户重要事件、下载进度等。从 Android 8.0 开始，通知必须设置 Channel。 一、创建通知渠道1234567891011121314private fun createNotificationChannel() &#123;    if (Build.VERSION.SDK_INT &gt;&#x3D; Build.VERSION_">
-<meta property="og:locale" content="en_US">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/honjun/cdn@1.4/img/banner/about.jpg">
 <meta property="article:published_time" content="2026-04-03T23:52:00.000Z">
-<meta property="article:modified_time" content="2026-04-03T15:59:17.692Z">
+<meta property="article:modified_time" content="2026-04-04T07:34:34.112Z">
 <meta property="article:author" content="Wenyi">
 <meta property="article:tag" content="Android">
 <meta property="article:tag" content="Channel">
 <meta property="article:tag" content="Notification">
 <meta property="article:tag" content="通知">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/honjun/cdn@1.4/img/banner/about.jpg">
+  
+    <link rel="alternate" href="/blog/atom.xml" title="Wenyi's Blog 🌸" type="application/atom+xml">
   
   <!-- JSON-LD 结构化数据 -->
   
   
     <script type="application/ld+json">
-    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Android通知Notification与Channel实战","description":"前言通知是 Android 应用与用户交互的重要方式，用于告知用户重要事件、下载进度等。从 Android 8.0 开始，通知必须设置 Channel。","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:52:00.000Z","dateModified":"2026-04-03T15:59:17.692Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Android%E9%80%9A%E7%9F%A5Notification%E4%B8%8EChannel%E5%AE%9E%E6%88%98/"}}
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Android通知Notification与Channel实战","description":"前言通知是 Android 应用与用户交互的重要方式，用于告知用户重要事件、下载进度等。从 Android 8.0 开始，通知必须设置 Channel。","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog 🌸","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:52:00.000Z","dateModified":"2026-04-04T07:34:34.112Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Android%E9%80%9A%E7%9F%A5Notification%E4%B8%8EChannel%E5%AE%9E%E6%88%98/"}}
     </script>
   
   <!-- 关键 CSS 预加载 -->
@@ -114,7 +118,7 @@
             </header>
             <header id="kratos-mobile-topnav" class="kratos-topnav">
                 <div class="container">
-                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog 🌸</a></div>
                     <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
                         <a id="kratos-nav-toggle" class="kratos-nav-toggle">
                             <i></i>
@@ -128,8 +132,8 @@
             <div class="kratos-cover kratos-cover-2 text-center">
                 <div class="desc desc2 animate-box">
                     <a href="/blog/">
-                        <h2>Wenyi&#39;s Blog</h2> <br />
-                        <span></span>
+                        <h2>Wenyi&#39;s Blog 🌸</h2> <br />
+                        <span>学习笔记与技术分享</span>
                     </a>
                 </div>
             </div>
@@ -214,7 +218,7 @@
                     <a class="tag-none-link" href="/blog/tags/Android/" rel="tag">Android</a>, <a class="tag-none-link" href="/blog/tags/Channel/" rel="tag">Channel</a>, <a class="tag-none-link" href="/blog/tags/Notification/" rel="tag">Notification</a>, <a class="tag-none-link" href="/blog/tags/%E9%80%9A%E7%9F%A5/" rel="tag">通知</a>
                 </div>
                 <div class="pull-date">
-                    <time datetime="2026-04-03T15:59:17.692Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                    <time datetime="2026-04-04T07:34:34.112Z" itemprop="dateModified">最后编辑：2026-04-04</time>
                 </div>
             </div>
         </footer>
@@ -269,7 +273,7 @@
                     </ul>
                     <ul class="kratos-copyright">
                         <div>
-                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>&copy; 2026 Wenyi's Blog 🌸 版权所有.</li>
                             <li>本站已运行<span id="kr-since">Loading...</span></li>
                         </div>
                         <div>

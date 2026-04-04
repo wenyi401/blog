@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-cn">
     <head>
   <!-- 元数据 -->
   <meta charset="utf-8">
   
   
-  <title>Android依赖注入框架对比-Hilt vs Koin | Wenyi&#39;s Blog</title>
+  <title>Android依赖注入框架对比-Hilt vs Koin | Wenyi&#39;s Blog 🌸</title>
   <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/03/Android%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5%E6%A1%86%E6%9E%B6%E5%AF%B9%E6%AF%94-Hilt-vs-Koin/">
   <meta name="author" content="Wenyi" />
   <meta http-equiv="Cache-Control" content="no-transform" />
@@ -21,11 +21,12 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="Android依赖注入框架对比-Hilt vs Koin">
 <meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/03/Android%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5%E6%A1%86%E6%9E%B6%E5%AF%B9%E6%AF%94-Hilt-vs-Koin/index.html">
-<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:site_name" content="Wenyi&#39;s Blog 🌸">
 <meta property="og:description" content="前言在现代 Android 开发中，依赖注入（Dependency Injection）已成为大型项目的基石。Google 官方推出的 Hilt 和社区热门框架 Koin 是两个主流选择。 一、依赖注入概述什么是依赖注入？依赖注入是一种设计模式，通过外部提供对象依赖而非内部创建。 为什么需要依赖注入？ 解耦代码：降低模块间依赖 提高可测试性：方便 Mock 测试 提高可维护性：集中管理依赖 提高复">
-<meta property="og:locale" content="en_US">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/other/comment-bg.png">
 <meta property="article:published_time" content="2026-04-03T23:44:00.000Z">
-<meta property="article:modified_time" content="2026-04-03T15:46:33.532Z">
+<meta property="article:modified_time" content="2026-04-04T07:34:34.104Z">
 <meta property="article:author" content="Wenyi">
 <meta property="article:tag" content="Android">
 <meta property="article:tag" content="Dagger">
@@ -33,12 +34,15 @@
 <meta property="article:tag" content="Koin">
 <meta property="article:tag" content="依赖注入">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/other/comment-bg.png">
+  
+    <link rel="alternate" href="/blog/atom.xml" title="Wenyi's Blog 🌸" type="application/atom+xml">
   
   <!-- JSON-LD 结构化数据 -->
   
   
     <script type="application/ld+json">
-    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Android依赖注入框架对比-Hilt vs Koin","description":"前言在现代 Android 开发中，依赖注入（Dependency Injection）已成为大型项目的基石。Google 官方推出的 Hilt 和社区热门框...","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:44:00.000Z","dateModified":"2026-04-03T15:46:33.532Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Android%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5%E6%A1%86%E6%9E%B6%E5%AF%B9%E6%AF%94-Hilt-vs-Koin/"}}
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Android依赖注入框架对比-Hilt vs Koin","description":"前言在现代 Android 开发中，依赖注入（Dependency Injection）已成为大型项目的基石。Google 官方推出的 Hilt 和社区热门框...","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog 🌸","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:44:00.000Z","dateModified":"2026-04-04T07:34:34.104Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Android%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5%E6%A1%86%E6%9E%B6%E5%AF%B9%E6%AF%94-Hilt-vs-Koin/"}}
     </script>
   
   <!-- 关键 CSS 预加载 -->
@@ -115,7 +119,7 @@
             </header>
             <header id="kratos-mobile-topnav" class="kratos-topnav">
                 <div class="container">
-                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog 🌸</a></div>
                     <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
                         <a id="kratos-nav-toggle" class="kratos-nav-toggle">
                             <i></i>
@@ -129,8 +133,8 @@
             <div class="kratos-cover kratos-cover-2 text-center">
                 <div class="desc desc2 animate-box">
                     <a href="/blog/">
-                        <h2>Wenyi&#39;s Blog</h2> <br />
-                        <span></span>
+                        <h2>Wenyi&#39;s Blog 🌸</h2> <br />
+                        <span>学习笔记与技术分享</span>
                     </a>
                 </div>
             </div>
@@ -362,7 +366,7 @@
                     <a class="tag-none-link" href="/blog/tags/Android/" rel="tag">Android</a>, <a class="tag-none-link" href="/blog/tags/Dagger/" rel="tag">Dagger</a>, <a class="tag-none-link" href="/blog/tags/Hilt/" rel="tag">Hilt</a>, <a class="tag-none-link" href="/blog/tags/Koin/" rel="tag">Koin</a>, <a class="tag-none-link" href="/blog/tags/%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5/" rel="tag">依赖注入</a>
                 </div>
                 <div class="pull-date">
-                    <time datetime="2026-04-03T15:46:33.532Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                    <time datetime="2026-04-04T07:34:34.104Z" itemprop="dateModified">最后编辑：2026-04-04</time>
                 </div>
             </div>
         </footer>
@@ -417,7 +421,7 @@
                     </ul>
                     <ul class="kratos-copyright">
                         <div>
-                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>&copy; 2026 Wenyi's Blog 🌸 版权所有.</li>
                             <li>本站已运行<span id="kr-since">Loading...</span></li>
                         </div>
                         <div>

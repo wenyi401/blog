@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-cn">
     <head>
   <!-- 元数据 -->
   <meta charset="utf-8">
   
   
-  <title>Android应用资源Resource深度解析 | Wenyi&#39;s Blog</title>
+  <title>Android应用资源Resource深度解析 | Wenyi&#39;s Blog 🌸</title>
   <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/04/Android%E5%BA%94%E7%94%A8%E8%B5%84%E6%BA%90Resource%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/">
   <meta name="author" content="Wenyi" />
   <meta http-equiv="Cache-Control" content="no-transform" />
@@ -21,23 +21,27 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="Android应用资源Resource深度解析">
 <meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/04/Android%E5%BA%94%E7%94%A8%E8%B5%84%E6%BA%90Resource%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/index.html">
-<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:site_name" content="Wenyi&#39;s Blog 🌸">
 <meta property="og:description" content="前言资源是代码使用的附加文件和静态内容，例如位图、布局定义、界面字符串等。将应用资源与代码分离，便于独立维护和为特定设备配置提供备用资源。 一、资源类型   目录 资源类型    animator&#x2F; 属性动画   anim&#x2F; 补间动画   color&#x2F; 颜色状态列表   drawable&#x2F; 位图、形状等   mipmap&#x2F; 启动器图标   layo">
-<meta property="og:locale" content="en_US">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://images.unsplash.com/photo-1579566346927-c68383817a25?w=800">
 <meta property="article:published_time" content="2026-04-04T06:50:00.000Z">
-<meta property="article:modified_time" content="2026-04-03T22:48:06.756Z">
+<meta property="article:modified_time" content="2026-04-04T07:34:34.108Z">
 <meta property="article:author" content="Wenyi">
 <meta property="article:tag" content="Android">
 <meta property="article:tag" content="Resource">
 <meta property="article:tag" content="资源">
 <meta property="article:tag" content="限定符">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://images.unsplash.com/photo-1579566346927-c68383817a25?w=800">
+  
+    <link rel="alternate" href="/blog/atom.xml" title="Wenyi's Blog 🌸" type="application/atom+xml">
   
   <!-- JSON-LD 结构化数据 -->
   
   
     <script type="application/ld+json">
-    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Android应用资源Resource深度解析","description":"前言资源是代码使用的附加文件和静态内容，例如位图、布局定义、界面字符串等。将应用资源与代码分离，便于独立维护和为特定设备配置提供备用资源。\n","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-04T06:50:00.000Z","dateModified":"2026-04-03T22:48:06.756Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/04/Android%E5%BA%94%E7%94%A8%E8%B5%84%E6%BA%90Resource%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/"}}
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Android应用资源Resource深度解析","description":"前言资源是代码使用的附加文件和静态内容，例如位图、布局定义、界面字符串等。将应用资源与代码分离，便于独立维护和为特定设备配置提供备用资源。\n","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog 🌸","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-04T06:50:00.000Z","dateModified":"2026-04-04T07:34:34.108Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/04/Android%E5%BA%94%E7%94%A8%E8%B5%84%E6%BA%90Resource%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/"}}
     </script>
   
   <!-- 关键 CSS 预加载 -->
@@ -114,7 +118,7 @@
             </header>
             <header id="kratos-mobile-topnav" class="kratos-topnav">
                 <div class="container">
-                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog 🌸</a></div>
                     <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
                         <a id="kratos-nav-toggle" class="kratos-nav-toggle">
                             <i></i>
@@ -128,8 +132,8 @@
             <div class="kratos-cover kratos-cover-2 text-center">
                 <div class="desc desc2 animate-box">
                     <a href="/blog/">
-                        <h2>Wenyi&#39;s Blog</h2> <br />
-                        <span></span>
+                        <h2>Wenyi&#39;s Blog 🌸</h2> <br />
+                        <span>学习笔记与技术分享</span>
                     </a>
                 </div>
             </div>
@@ -305,7 +309,7 @@
                     <a class="tag-none-link" href="/blog/tags/Android/" rel="tag">Android</a>, <a class="tag-none-link" href="/blog/tags/Resource/" rel="tag">Resource</a>, <a class="tag-none-link" href="/blog/tags/%E8%B5%84%E6%BA%90/" rel="tag">资源</a>, <a class="tag-none-link" href="/blog/tags/%E9%99%90%E5%AE%9A%E7%AC%A6/" rel="tag">限定符</a>
                 </div>
                 <div class="pull-date">
-                    <time datetime="2026-04-03T22:48:06.756Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                    <time datetime="2026-04-04T07:34:34.108Z" itemprop="dateModified">最后编辑：2026-04-04</time>
                 </div>
             </div>
         </footer>
@@ -360,7 +364,7 @@
                     </ul>
                     <ul class="kratos-copyright">
                         <div>
-                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>&copy; 2026 Wenyi's Blog 🌸 版权所有.</li>
                             <li>本站已运行<span id="kr-since">Loading...</span></li>
                         </div>
                         <div>

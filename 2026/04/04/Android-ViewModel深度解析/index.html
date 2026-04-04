@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-cn">
     <head>
   <!-- 元数据 -->
   <meta charset="utf-8">
   
   
-  <title>Android ViewModel深度解析 | Wenyi&#39;s Blog</title>
+  <title>Android ViewModel深度解析 | Wenyi&#39;s Blog 🌸</title>
   <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/04/Android-ViewModel%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/">
   <meta name="author" content="Wenyi" />
   <meta http-equiv="Cache-Control" content="no-transform" />
@@ -21,23 +21,27 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="Android ViewModel深度解析">
 <meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/04/Android-ViewModel%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/index.html">
-<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:site_name" content="Wenyi&#39;s Blog 🌸">
 <meta property="og:description" content="前言ViewModel 类是业务逻辑或屏幕级状态容器，用于将状态公开给界面，并封装相关的业务逻辑。它的主要优点是可以缓存状态，并可在配置更改后持久保留相应状态。 一、ViewModel 的优势1. 持久性ViewModel 允许数据在配置更改（如屏幕旋转）后持久存在，无需重新提取数据。 2. 业务逻辑访问ViewModel 是在界面层处理业务逻辑的正确位置，负责处理事件并委托给其他层。 二、Vie">
-<meta property="og:locale" content="en_US">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://images.unsplash.com/photo-1578632767115-351597cf2477?w=800">
 <meta property="article:published_time" content="2026-04-04T02:20:00.000Z">
-<meta property="article:modified_time" content="2026-04-03T18:18:56.472Z">
+<meta property="article:modified_time" content="2026-04-04T07:34:34.104Z">
 <meta property="article:author" content="Wenyi">
 <meta property="article:tag" content="Android">
 <meta property="article:tag" content="Jetpack">
 <meta property="article:tag" content="ViewModel">
 <meta property="article:tag" content="状态管理">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://images.unsplash.com/photo-1578632767115-351597cf2477?w=800">
+  
+    <link rel="alternate" href="/blog/atom.xml" title="Wenyi's Blog 🌸" type="application/atom+xml">
   
   <!-- JSON-LD 结构化数据 -->
   
   
     <script type="application/ld+json">
-    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Android ViewModel深度解析","description":"前言ViewModel 类是业务逻辑或屏幕级状态容器，用于将状态公开给界面，并封装相关的业务逻辑。它的主要优点是可以缓存状态，并可在配置更改后持久保留相应状态...","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-04T02:20:00.000Z","dateModified":"2026-04-03T18:18:56.472Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/04/Android-ViewModel%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/"}}
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Android ViewModel深度解析","description":"前言ViewModel 类是业务逻辑或屏幕级状态容器，用于将状态公开给界面，并封装相关的业务逻辑。它的主要优点是可以缓存状态，并可在配置更改后持久保留相应状态...","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog 🌸","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-04T02:20:00.000Z","dateModified":"2026-04-04T07:34:34.104Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/04/Android-ViewModel%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/"}}
     </script>
   
   <!-- 关键 CSS 预加载 -->
@@ -114,7 +118,7 @@
             </header>
             <header id="kratos-mobile-topnav" class="kratos-topnav">
                 <div class="container">
-                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog 🌸</a></div>
                     <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
                         <a id="kratos-nav-toggle" class="kratos-nav-toggle">
                             <i></i>
@@ -128,8 +132,8 @@
             <div class="kratos-cover kratos-cover-2 text-center">
                 <div class="desc desc2 animate-box">
                     <a href="/blog/">
-                        <h2>Wenyi&#39;s Blog</h2> <br />
-                        <span></span>
+                        <h2>Wenyi&#39;s Blog 🌸</h2> <br />
+                        <span>学习笔记与技术分享</span>
                     </a>
                 </div>
             </div>
@@ -265,7 +269,7 @@
                     <a class="tag-none-link" href="/blog/tags/Android/" rel="tag">Android</a>, <a class="tag-none-link" href="/blog/tags/Jetpack/" rel="tag">Jetpack</a>, <a class="tag-none-link" href="/blog/tags/ViewModel/" rel="tag">ViewModel</a>, <a class="tag-none-link" href="/blog/tags/%E7%8A%B6%E6%80%81%E7%AE%A1%E7%90%86/" rel="tag">状态管理</a>
                 </div>
                 <div class="pull-date">
-                    <time datetime="2026-04-03T18:18:56.472Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                    <time datetime="2026-04-04T07:34:34.104Z" itemprop="dateModified">最后编辑：2026-04-04</time>
                 </div>
             </div>
         </footer>
@@ -320,7 +324,7 @@
                     </ul>
                     <ul class="kratos-copyright">
                         <div>
-                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>&copy; 2026 Wenyi's Blog 🌸 版权所有.</li>
                             <li>本站已运行<span id="kr-since">Loading...</span></li>
                         </div>
                         <div>

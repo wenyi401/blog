@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-cn">
     <head>
   <!-- 元数据 -->
   <meta charset="utf-8">
   
   
-  <title>Kotlin Flow操作符实战-map filter transform | Wenyi&#39;s Blog</title>
+  <title>Kotlin Flow操作符实战-map filter transform | Wenyi&#39;s Blog 🌸</title>
   <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/03/Kotlin-Flow%E6%93%8D%E4%BD%9C%E7%AC%A6%E5%AE%9E%E6%88%98-map-filter-transform/">
   <meta name="author" content="Wenyi" />
   <meta http-equiv="Cache-Control" content="no-transform" />
@@ -21,11 +21,12 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="Kotlin Flow操作符实战-map filter transform">
 <meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/03/Kotlin-Flow%E6%93%8D%E4%BD%9C%E7%AC%A6%E5%AE%9E%E6%88%98-map-filter-transform/index.html">
-<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:site_name" content="Wenyi&#39;s Blog 🌸">
 <meta property="og:description" content="前言Kotlin Flow 操作符是处理异步数据流的核心工具。本文将详细介绍常用的转换和过滤操作符，包括 map、filter、transform 等。 一、操作符分类   类别 操作符    转换 map, mapLatest, transform, transformLatest   过滤 filter, filterNot, filterNotNull, take, drop   组合 zi">
-<meta property="og:locale" content="en_US">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/other/comment-bg.png">
 <meta property="article:published_time" content="2026-04-03T23:42:00.000Z">
-<meta property="article:modified_time" content="2026-04-03T15:43:03.292Z">
+<meta property="article:modified_time" content="2026-04-04T07:34:34.116Z">
 <meta property="article:author" content="Wenyi">
 <meta property="article:tag" content="Flow">
 <meta property="article:tag" content="Kotlin">
@@ -34,12 +35,15 @@
 <meta property="article:tag" content="transform">
 <meta property="article:tag" content="操作符">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/other/comment-bg.png">
+  
+    <link rel="alternate" href="/blog/atom.xml" title="Wenyi's Blog 🌸" type="application/atom+xml">
   
   <!-- JSON-LD 结构化数据 -->
   
   
     <script type="application/ld+json">
-    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Kotlin Flow操作符实战-map filter transform","description":"前言Kotlin Flow 操作符是处理异步数据流的核心工具。本文将详细介绍常用的转换和过滤操作符，包括 map、filter、transform 等。","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:42:00.000Z","dateModified":"2026-04-03T15:43:03.292Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Kotlin-Flow%E6%93%8D%E4%BD%9C%E7%AC%A6%E5%AE%9E%E6%88%98-map-filter-transform/"}}
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Kotlin Flow操作符实战-map filter transform","description":"前言Kotlin Flow 操作符是处理异步数据流的核心工具。本文将详细介绍常用的转换和过滤操作符，包括 map、filter、transform 等。","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog 🌸","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:42:00.000Z","dateModified":"2026-04-04T07:34:34.116Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Kotlin-Flow%E6%93%8D%E4%BD%9C%E7%AC%A6%E5%AE%9E%E6%88%98-map-filter-transform/"}}
     </script>
   
   <!-- 关键 CSS 预加载 -->
@@ -116,7 +120,7 @@
             </header>
             <header id="kratos-mobile-topnav" class="kratos-topnav">
                 <div class="container">
-                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog 🌸</a></div>
                     <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
                         <a id="kratos-nav-toggle" class="kratos-nav-toggle">
                             <i></i>
@@ -130,8 +134,8 @@
             <div class="kratos-cover kratos-cover-2 text-center">
                 <div class="desc desc2 animate-box">
                     <a href="/blog/">
-                        <h2>Wenyi&#39;s Blog</h2> <br />
-                        <span></span>
+                        <h2>Wenyi&#39;s Blog 🌸</h2> <br />
+                        <span>学习笔记与技术分享</span>
                     </a>
                 </div>
             </div>
@@ -312,7 +316,7 @@
                     <a class="tag-none-link" href="/blog/tags/Flow/" rel="tag">Flow</a>, <a class="tag-none-link" href="/blog/tags/Kotlin/" rel="tag">Kotlin</a>, <a class="tag-none-link" href="/blog/tags/filter/" rel="tag">filter</a>, <a class="tag-none-link" href="/blog/tags/map/" rel="tag">map</a>, <a class="tag-none-link" href="/blog/tags/transform/" rel="tag">transform</a>, <a class="tag-none-link" href="/blog/tags/%E6%93%8D%E4%BD%9C%E7%AC%A6/" rel="tag">操作符</a>
                 </div>
                 <div class="pull-date">
-                    <time datetime="2026-04-03T15:43:03.292Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                    <time datetime="2026-04-04T07:34:34.116Z" itemprop="dateModified">最后编辑：2026-04-04</time>
                 </div>
             </div>
         </footer>
@@ -367,7 +371,7 @@
                     </ul>
                     <ul class="kratos-copyright">
                         <div>
-                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>&copy; 2026 Wenyi's Blog 🌸 版权所有.</li>
                             <li>本站已运行<span id="kr-since">Loading...</span></li>
                         </div>
                         <div>

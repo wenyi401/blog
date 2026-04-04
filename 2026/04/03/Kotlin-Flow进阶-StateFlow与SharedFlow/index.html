@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-cn">
     <head>
   <!-- 元数据 -->
   <meta charset="utf-8">
   
   
-  <title>Kotlin Flow进阶-StateFlow与SharedFlow | Wenyi&#39;s Blog</title>
+  <title>Kotlin Flow进阶-StateFlow与SharedFlow | Wenyi&#39;s Blog 🌸</title>
   <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/03/Kotlin-Flow%E8%BF%9B%E9%98%B6-StateFlow%E4%B8%8ESharedFlow/">
   <meta name="author" content="Wenyi" />
   <meta http-equiv="Cache-Control" content="no-transform" />
@@ -21,11 +21,12 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="Kotlin Flow进阶-StateFlow与SharedFlow">
 <meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/03/Kotlin-Flow%E8%BF%9B%E9%98%B6-StateFlow%E4%B8%8ESharedFlow/index.html">
-<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:site_name" content="Wenyi&#39;s Blog 🌸">
 <meta property="og:description" content="前言Kotlin Flow 是协程库中用于处理异步数据流的核心组件。除了普通的冷流 Flow 之外，还提供了热流 StateFlow 和 SharedFlow，用于状态管理和事件分发。 一、冷流 vs 热流冷流（Cold Flow） 定义：只有当订阅者发起订阅时，事件的发送者才会开始发送事件 特点：每个订阅者都会收到独立的数据流 代表：Flow  12345678910fun produceFlo">
-<meta property="og:locale" content="en_US">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://images.unsplash.com/photo-1578632767115-351597cf2477?w=800">
 <meta property="article:published_time" content="2026-04-03T23:10:00.000Z">
-<meta property="article:modified_time" content="2026-04-03T15:09:14.804Z">
+<meta property="article:modified_time" content="2026-04-04T07:34:34.120Z">
 <meta property="article:author" content="Wenyi">
 <meta property="article:tag" content="Flow">
 <meta property="article:tag" content="Kotlin">
@@ -33,12 +34,15 @@
 <meta property="article:tag" content="StateFlow">
 <meta property="article:tag" content="协程">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://images.unsplash.com/photo-1578632767115-351597cf2477?w=800">
+  
+    <link rel="alternate" href="/blog/atom.xml" title="Wenyi's Blog 🌸" type="application/atom+xml">
   
   <!-- JSON-LD 结构化数据 -->
   
   
     <script type="application/ld+json">
-    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Kotlin Flow进阶-StateFlow与SharedFlow","description":"前言Kotlin Flow 是协程库中用于处理异步数据流的核心组件。除了普通的冷流 Flow 之外，还提供了热流 StateFlow 和 SharedFlow...","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:10:00.000Z","dateModified":"2026-04-03T15:09:14.804Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Kotlin-Flow%E8%BF%9B%E9%98%B6-StateFlow%E4%B8%8ESharedFlow/"}}
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Kotlin Flow进阶-StateFlow与SharedFlow","description":"前言Kotlin Flow 是协程库中用于处理异步数据流的核心组件。除了普通的冷流 Flow 之外，还提供了热流 StateFlow 和 SharedFlow...","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog 🌸","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:10:00.000Z","dateModified":"2026-04-04T07:34:34.120Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Kotlin-Flow%E8%BF%9B%E9%98%B6-StateFlow%E4%B8%8ESharedFlow/"}}
     </script>
   
   <!-- 关键 CSS 预加载 -->
@@ -115,7 +119,7 @@
             </header>
             <header id="kratos-mobile-topnav" class="kratos-topnav">
                 <div class="container">
-                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog 🌸</a></div>
                     <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
                         <a id="kratos-nav-toggle" class="kratos-nav-toggle">
                             <i></i>
@@ -129,8 +133,8 @@
             <div class="kratos-cover kratos-cover-2 text-center">
                 <div class="desc desc2 animate-box">
                     <a href="/blog/">
-                        <h2>Wenyi&#39;s Blog</h2> <br />
-                        <span></span>
+                        <h2>Wenyi&#39;s Blog 🌸</h2> <br />
+                        <span>学习笔记与技术分享</span>
                     </a>
                 </div>
             </div>
@@ -367,7 +371,7 @@
                     <a class="tag-none-link" href="/blog/tags/Flow/" rel="tag">Flow</a>, <a class="tag-none-link" href="/blog/tags/Kotlin/" rel="tag">Kotlin</a>, <a class="tag-none-link" href="/blog/tags/SharedFlow/" rel="tag">SharedFlow</a>, <a class="tag-none-link" href="/blog/tags/StateFlow/" rel="tag">StateFlow</a>, <a class="tag-none-link" href="/blog/tags/%E5%8D%8F%E7%A8%8B/" rel="tag">协程</a>
                 </div>
                 <div class="pull-date">
-                    <time datetime="2026-04-03T15:09:14.804Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                    <time datetime="2026-04-04T07:34:34.120Z" itemprop="dateModified">最后编辑：2026-04-04</time>
                 </div>
             </div>
         </footer>
@@ -422,7 +426,7 @@
                     </ul>
                     <ul class="kratos-copyright">
                         <div>
-                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>&copy; 2026 Wenyi's Blog 🌸 版权所有.</li>
                             <li>本站已运行<span id="kr-since">Loading...</span></li>
                         </div>
                         <div>

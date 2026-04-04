@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-cn">
     <head>
   <!-- 元数据 -->
   <meta charset="utf-8">
   
   
-  <title>Kotlin Coroutines Select表达式学习 | Wenyi&#39;s Blog</title>
+  <title>Kotlin Coroutines Select表达式学习 | Wenyi&#39;s Blog 🌸</title>
   <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/03/Kotlin-Coroutines-Select%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%AD%A6%E4%B9%A0/">
   <meta name="author" content="Wenyi" />
   <meta http-equiv="Cache-Control" content="no-transform" />
@@ -21,11 +21,12 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="Kotlin Coroutines Select表达式学习">
 <meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/03/Kotlin-Coroutines-Select%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%AD%A6%E4%B9%A0/index.html">
-<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:site_name" content="Wenyi&#39;s Blog 🌸">
 <meta property="og:description" content="前言Select 表达式允许同时等待多个挂起函数，并选择第一个可用的。类似于 IO 多路复用，在 Kotlin 协程中提供了强大的并发选择能力。 一、基本概念什么是 Select？Select 表达式是 kotlinx.coroutines 的实验性功能，允许：  同时等待多个挂起函数 选择第一个可用的结果 实现多路复用模式  二、从通道中选择基本示例12345678910111213141516">
-<meta property="og:locale" content="en_US">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://images.unsplash.com/photo-1578632767115-351597cf2477?w=800">
 <meta property="article:published_time" content="2026-04-03T23:37:00.000Z">
-<meta property="article:modified_time" content="2026-04-03T15:37:44.248Z">
+<meta property="article:modified_time" content="2026-04-04T07:34:34.116Z">
 <meta property="article:author" content="Wenyi">
 <meta property="article:tag" content="Coroutines">
 <meta property="article:tag" content="Kotlin">
@@ -33,12 +34,15 @@
 <meta property="article:tag" content="多路复用">
 <meta property="article:tag" content="并发">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://images.unsplash.com/photo-1578632767115-351597cf2477?w=800">
+  
+    <link rel="alternate" href="/blog/atom.xml" title="Wenyi's Blog 🌸" type="application/atom+xml">
   
   <!-- JSON-LD 结构化数据 -->
   
   
     <script type="application/ld+json">
-    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Kotlin Coroutines Select表达式学习","description":"前言Select 表达式允许同时等待多个挂起函数，并选择第一个可用的。类似于 IO 多路复用，在 Kotlin 协程中提供了强大的并发选择能力。\n","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:37:00.000Z","dateModified":"2026-04-03T15:37:44.248Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Kotlin-Coroutines-Select%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%AD%A6%E4%B9%A0/"}}
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Kotlin Coroutines Select表达式学习","description":"前言Select 表达式允许同时等待多个挂起函数，并选择第一个可用的。类似于 IO 多路复用，在 Kotlin 协程中提供了强大的并发选择能力。\n","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog 🌸","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:37:00.000Z","dateModified":"2026-04-04T07:34:34.116Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Kotlin-Coroutines-Select%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%AD%A6%E4%B9%A0/"}}
     </script>
   
   <!-- 关键 CSS 预加载 -->
@@ -115,7 +119,7 @@
             </header>
             <header id="kratos-mobile-topnav" class="kratos-topnav">
                 <div class="container">
-                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog 🌸</a></div>
                     <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
                         <a id="kratos-nav-toggle" class="kratos-nav-toggle">
                             <i></i>
@@ -129,8 +133,8 @@
             <div class="kratos-cover kratos-cover-2 text-center">
                 <div class="desc desc2 animate-box">
                     <a href="/blog/">
-                        <h2>Wenyi&#39;s Blog</h2> <br />
-                        <span></span>
+                        <h2>Wenyi&#39;s Blog 🌸</h2> <br />
+                        <span>学习笔记与技术分享</span>
                     </a>
                 </div>
             </div>
@@ -301,7 +305,7 @@
                     <a class="tag-none-link" href="/blog/tags/Coroutines/" rel="tag">Coroutines</a>, <a class="tag-none-link" href="/blog/tags/Kotlin/" rel="tag">Kotlin</a>, <a class="tag-none-link" href="/blog/tags/Select/" rel="tag">Select</a>, <a class="tag-none-link" href="/blog/tags/%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8/" rel="tag">多路复用</a>, <a class="tag-none-link" href="/blog/tags/%E5%B9%B6%E5%8F%91/" rel="tag">并发</a>
                 </div>
                 <div class="pull-date">
-                    <time datetime="2026-04-03T15:37:44.248Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                    <time datetime="2026-04-04T07:34:34.116Z" itemprop="dateModified">最后编辑：2026-04-04</time>
                 </div>
             </div>
         </footer>
@@ -356,7 +360,7 @@
                     </ul>
                     <ul class="kratos-copyright">
                         <div>
-                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>&copy; 2026 Wenyi's Blog 🌸 版权所有.</li>
                             <li>本站已运行<span id="kr-since">Loading...</span></li>
                         </div>
                         <div>

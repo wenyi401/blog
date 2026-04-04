@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-cn">
     <head>
   <!-- 元数据 -->
   <meta charset="utf-8">
   
   
-  <title>Android JNI NDK Native开发学习 | Wenyi&#39;s Blog</title>
+  <title>Android JNI NDK Native开发学习 | Wenyi&#39;s Blog 🌸</title>
   <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/03/Android-JNI-NDK-Native%E5%BC%80%E5%8F%91%E5%AD%A6%E4%B9%A0/">
   <meta name="author" content="Wenyi" />
   <meta http-equiv="Cache-Control" content="no-transform" />
@@ -21,11 +21,12 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="Android JNI NDK Native开发学习">
 <meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/03/Android-JNI-NDK-Native%E5%BC%80%E5%8F%91%E5%AD%A6%E4%B9%A0/index.html">
-<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:site_name" content="Wenyi&#39;s Blog 🌸">
 <meta property="og:description" content="前言Android NDK（Native Development Kit）是一套工具，允许在 Android 应用中使用 C 和 C++ 代码。JNI（Java Native Interface）是 Java 和 Native 代码之间的桥梁。 一、NDK 概述什么是 NDK？ 用于编译 C&#x2F;C++ 代码的工具集 生成 .so 动态库 支持 ARM、x86 等架构  为什么使用 NDK？">
-<meta property="og:locale" content="en_US">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/honjun/cdn@1.4/img/banner/about.jpg">
 <meta property="article:published_time" content="2026-04-03T23:42:00.000Z">
-<meta property="article:modified_time" content="2026-04-03T15:43:03.292Z">
+<meta property="article:modified_time" content="2026-04-04T07:34:34.096Z">
 <meta property="article:author" content="Wenyi">
 <meta property="article:tag" content="Android">
 <meta property="article:tag" content="C++">
@@ -33,12 +34,15 @@
 <meta property="article:tag" content="NDK">
 <meta property="article:tag" content="Native">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/honjun/cdn@1.4/img/banner/about.jpg">
+  
+    <link rel="alternate" href="/blog/atom.xml" title="Wenyi's Blog 🌸" type="application/atom+xml">
   
   <!-- JSON-LD 结构化数据 -->
   
   
     <script type="application/ld+json">
-    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Android JNI NDK Native开发学习","description":"前言Android NDK（Native Development Kit）是一套工具，允许在 Android 应用中使用 C 和 C++ 代码。JNI（Jav...","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:42:00.000Z","dateModified":"2026-04-03T15:43:03.292Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Android-JNI-NDK-Native%E5%BC%80%E5%8F%91%E5%AD%A6%E4%B9%A0/"}}
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Android JNI NDK Native开发学习","description":"前言Android NDK（Native Development Kit）是一套工具，允许在 Android 应用中使用 C 和 C++ 代码。JNI（Jav...","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog 🌸","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:42:00.000Z","dateModified":"2026-04-04T07:34:34.096Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Android-JNI-NDK-Native%E5%BC%80%E5%8F%91%E5%AD%A6%E4%B9%A0/"}}
     </script>
   
   <!-- 关键 CSS 预加载 -->
@@ -115,7 +119,7 @@
             </header>
             <header id="kratos-mobile-topnav" class="kratos-topnav">
                 <div class="container">
-                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog 🌸</a></div>
                     <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
                         <a id="kratos-nav-toggle" class="kratos-nav-toggle">
                             <i></i>
@@ -129,8 +133,8 @@
             <div class="kratos-cover kratos-cover-2 text-center">
                 <div class="desc desc2 animate-box">
                     <a href="/blog/">
-                        <h2>Wenyi&#39;s Blog</h2> <br />
-                        <span></span>
+                        <h2>Wenyi&#39;s Blog 🌸</h2> <br />
+                        <span>学习笔记与技术分享</span>
                     </a>
                 </div>
             </div>
@@ -379,7 +383,7 @@
                     <a class="tag-none-link" href="/blog/tags/Android/" rel="tag">Android</a>, <a class="tag-none-link" href="/blog/tags/C/" rel="tag">C++</a>, <a class="tag-none-link" href="/blog/tags/JNI/" rel="tag">JNI</a>, <a class="tag-none-link" href="/blog/tags/NDK/" rel="tag">NDK</a>, <a class="tag-none-link" href="/blog/tags/Native/" rel="tag">Native</a>
                 </div>
                 <div class="pull-date">
-                    <time datetime="2026-04-03T15:43:03.292Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                    <time datetime="2026-04-04T07:34:34.096Z" itemprop="dateModified">最后编辑：2026-04-04</time>
                 </div>
             </div>
         </footer>
@@ -434,7 +438,7 @@
                     </ul>
                     <ul class="kratos-copyright">
                         <div>
-                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>&copy; 2026 Wenyi's Blog 🌸 版权所有.</li>
                             <li>本站已运行<span id="kr-since">Loading...</span></li>
                         </div>
                         <div>
