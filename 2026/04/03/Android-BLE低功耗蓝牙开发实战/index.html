@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>Android BLE低功耗蓝牙开发实战 | Wenyi&#39;s Blog</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/03/Android-BLE%E4%BD%8E%E5%8A%9F%E8%80%97%E8%93%9D%E7%89%99%E5%BC%80%E5%8F%91%E5%AE%9E%E6%88%98/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="Android, BLE, 低功耗, 蓝牙" />
+  
+  <meta name="description" content="前言Android 内置了对低功耗蓝牙 (BLE) 的平台支持，使应用能够发现设备、查询服务并高效传输少量数据，适用于近距离感应和健康监控等场景。 一、BLE 概述BLE vs 经典蓝牙   特性 BLE 经典蓝牙    功耗 极低 较高   传输速率 低 高   连接时间 毫秒级 秒级   适用场景 传感器、健康设备 音频、文件传输   角色 中央设备 (Central)：扫描并连接外设 外设">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android BLE低功耗蓝牙开发实战">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/03/Android-BLE%E4%BD%8E%E5%8A%9F%E8%80%97%E8%93%9D%E7%89%99%E5%BC%80%E5%8F%91%E5%AE%9E%E6%88%98/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:description" content="前言Android 内置了对低功耗蓝牙 (BLE) 的平台支持，使应用能够发现设备、查询服务并高效传输少量数据，适用于近距离感应和健康监控等场景。 一、BLE 概述BLE vs 经典蓝牙   特性 BLE 经典蓝牙    功耗 极低 较高   传输速率 低 高   连接时间 毫秒级 秒级   适用场景 传感器、健康设备 音频、文件传输   角色 中央设备 (Central)：扫描并连接外设 外设">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-04-03T23:52:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T15:54:57.636Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="BLE">
+<meta property="article:tag" content="低功耗">
+<meta property="article:tag" content="蓝牙">
+<meta name="twitter:card" content="summary">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Android BLE低功耗蓝牙开发实战","description":"前言Android 内置了对低功耗蓝牙 (BLE) 的平台支持，使应用能够发现设备、查询服务并高效传输少量数据，适用于近距离感应和健康监控等场景。\n","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:52:00.000Z","dateModified":"2026-04-03T15:54:57.636Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Android-BLE%E4%BD%8E%E5%8A%9F%E8%80%97%E8%93%9D%E7%89%99%E5%BC%80%E5%8F%91%E5%AE%9E%E6%88%98/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/03/Android-BLE%E4%BD%8E%E5%8A%9F%E8%80%97%E8%93%9D%E7%89%99%E5%BC%80%E5%8F%91%E5%AE%9E%E6%88%98/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Android BLE低功耗蓝牙开发实战</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-03T23:52:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-03</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~4.93K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Android 内置了对低功耗蓝牙 (BLE) 的平台支持，使应用能够发现设备、查询服务并高效传输少量数据，适用于近距离感应和健康监控等场景。</p>
+<h2 id="一、BLE-概述"><a href="#一、BLE-概述" class="headerlink" title="一、BLE 概述"></a>一、BLE 概述</h2><h3 id="BLE-vs-经典蓝牙"><a href="#BLE-vs-经典蓝牙" class="headerlink" title="BLE vs 经典蓝牙"></a>BLE vs 经典蓝牙</h3><table>
+<thead>
+<tr>
+<th>特性</th>
+<th>BLE</th>
+<th>经典蓝牙</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>功耗</strong></td>
+<td>极低</td>
+<td>较高</td>
+</tr>
+<tr>
+<td><strong>传输速率</strong></td>
+<td>低</td>
+<td>高</td>
+</tr>
+<tr>
+<td><strong>连接时间</strong></td>
+<td>毫秒级</td>
+<td>秒级</td>
+</tr>
+<tr>
+<td><strong>适用场景</strong></td>
+<td>传感器、健康设备</td>
+<td>音频、文件传输</td>
+</tr>
+</tbody></table>
+<h3 id="角色"><a href="#角色" class="headerlink" title="角色"></a>角色</h3><ul>
+<li><strong>中央设备 (Central)</strong>：扫描并连接外设</li>
+<li><strong>外设 (Peripheral)</strong>：广播并接受连接</li>
+</ul>
+<h2 id="二、添加权限"><a href="#二、添加权限" class="headerlink" title="二、添加权限"></a>二、添加权限</h2><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">&quot;android.permission.BLUETOOTH&quot;</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">&quot;android.permission.BLUETOOTH_ADMIN&quot;</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">&quot;android.permission.BLUETOOTH_SCAN&quot;</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">&quot;android.permission.BLUETOOTH_CONNECT&quot;</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">&quot;android.permission.ACCESS_FINE_LOCATION&quot;</span> /&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="三、扫描设备"><a href="#三、扫描设备" class="headerlink" title="三、扫描设备"></a>三、扫描设备</h2><h3 id="获取-BluetoothAdapter"><a href="#获取-BluetoothAdapter" class="headerlink" title="获取 BluetoothAdapter"></a>获取 BluetoothAdapter</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">val</span> bluetoothAdapter: BluetoothAdapter <span class="keyword">by</span> lazy &#123;</span><br><span class="line">    <span class="keyword">val</span> bluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) <span class="keyword">as</span> BluetoothManager</span><br><span class="line">    bluetoothManager.adapter</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="开始扫描"><a href="#开始扫描" class="headerlink" title="开始扫描"></a>开始扫描</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">val</span> leScanCallback = <span class="keyword">object</span> : ScanCallback() &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onScanResult</span><span class="params">(callbackType: <span class="type">Int</span>, result: <span class="type">ScanResult</span>)</span></span> &#123;</span><br><span class="line">        <span class="keyword">val</span> device = result.device</span><br><span class="line">        <span class="keyword">val</span> rssi = result.rssi</span><br><span class="line">        Log.d(TAG, <span class="string">&quot;Found device: <span class="subst">$&#123;device.name&#125;</span> - <span class="subst">$&#123;device.address&#125;</span>&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onScanFailed</span><span class="params">(errorCode: <span class="type">Int</span>)</span></span> &#123;</span><br><span class="line">        Log.e(TAG, <span class="string">&quot;Scan failed: <span class="variable">$errorCode</span>&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">startScan</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">val</span> filters = listOf(</span><br><span class="line">        ScanFilter.Builder()</span><br><span class="line">            .setDeviceName(<span class="string">&quot;MyDevice&quot;</span>)</span><br><span class="line">            .build()</span><br><span class="line">    )</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">val</span> settings = ScanSettings.Builder()</span><br><span class="line">        .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)</span><br><span class="line">        .build()</span><br><span class="line">    </span><br><span class="line">    bluetoothAdapter.bluetoothLeScanner.startScan(filters, settings, leScanCallback)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">stopScan</span><span class="params">()</span></span> &#123;</span><br><span class="line">    bluetoothAdapter.bluetoothLeScanner.stopScan(leScanCallback)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、连接设备"><a href="#四、连接设备" class="headerlink" title="四、连接设备"></a>四、连接设备</h2><h3 id="BluetoothGattCallback"><a href="#BluetoothGattCallback" class="headerlink" title="BluetoothGattCallback"></a>BluetoothGattCallback</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">val</span> gattCallback = <span class="keyword">object</span> : BluetoothGattCallback() &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onConnectionStateChange</span><span class="params">(gatt: <span class="type">BluetoothGatt</span>, status: <span class="type">Int</span>, newState: <span class="type">Int</span>)</span></span> &#123;</span><br><span class="line">        <span class="keyword">when</span> (newState) &#123;</span><br><span class="line">            BluetoothProfile.STATE_CONNECTED -&gt; &#123;</span><br><span class="line">                Log.d(TAG, <span class="string">&quot;Connected to GATT server&quot;</span>)</span><br><span class="line">                gatt.discoverServices()</span><br><span class="line">            &#125;</span><br><span class="line">            BluetoothProfile.STATE_DISCONNECTED -&gt; &#123;</span><br><span class="line">                Log.d(TAG, <span class="string">&quot;Disconnected from GATT server&quot;</span>)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onServicesDiscovered</span><span class="params">(gatt: <span class="type">BluetoothGatt</span>, status: <span class="type">Int</span>)</span></span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (status == BluetoothGatt.GATT_SUCCESS) &#123;</span><br><span class="line">            <span class="keyword">val</span> services = gatt.services</span><br><span class="line">            Log.d(TAG, <span class="string">&quot;Discovered <span class="subst">$&#123;services.size&#125;</span> services&quot;</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="连接"><a href="#连接" class="headerlink" title="连接"></a>连接</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">var</span> bluetoothGatt: BluetoothGatt? = <span class="literal">null</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">connect</span><span class="params">(device: <span class="type">BluetoothDevice</span>)</span></span> &#123;</span><br><span class="line">    bluetoothGatt = device.connectGatt(<span class="keyword">this</span>, <span class="literal">false</span>, gattCallback)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">disconnect</span><span class="params">()</span></span> &#123;</span><br><span class="line">    bluetoothGatt?.disconnect()</span><br><span class="line">    bluetoothGatt?.close()</span><br><span class="line">    bluetoothGatt = <span class="literal">null</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="五、读写特征值"><a href="#五、读写特征值" class="headerlink" title="五、读写特征值"></a>五、读写特征值</h2><h3 id="读取特征值"><a href="#读取特征值" class="headerlink" title="读取特征值"></a>读取特征值</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">readCharacteristic</span><span class="params">(characteristic: <span class="type">BluetoothGattCharacteristic</span>)</span></span> &#123;</span><br><span class="line">    bluetoothGatt?.readCharacteristic(characteristic)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onCharacteristicRead</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">    gatt: <span class="type">BluetoothGatt</span>,</span></span></span><br><span class="line"><span class="params"><span class="function">    characteristic: <span class="type">BluetoothGattCharacteristic</span>,</span></span></span><br><span class="line"><span class="params"><span class="function">    status: <span class="type">Int</span></span></span></span><br><span class="line"><span class="params"><span class="function">)</span></span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (status == BluetoothGatt.GATT_SUCCESS) &#123;</span><br><span class="line">        <span class="keyword">val</span> value = characteristic.value</span><br><span class="line">        Log.d(TAG, <span class="string">&quot;Read value: <span class="subst">$&#123;String(value)&#125;</span>&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="写入特征值"><a href="#写入特征值" class="headerlink" title="写入特征值"></a>写入特征值</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">writeCharacteristic</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">    characteristic: <span class="type">BluetoothGattCharacteristic</span>,</span></span></span><br><span class="line"><span class="params"><span class="function">    value: <span class="type">ByteArray</span></span></span></span><br><span class="line"><span class="params"><span class="function">)</span></span> &#123;</span><br><span class="line">    characteristic.value = value</span><br><span class="line">    bluetoothGatt?.writeCharacteristic(characteristic)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onCharacteristicWrite</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">    gatt: <span class="type">BluetoothGatt</span>,</span></span></span><br><span class="line"><span class="params"><span class="function">    characteristic: <span class="type">BluetoothGattCharacteristic</span>,</span></span></span><br><span class="line"><span class="params"><span class="function">    status: <span class="type">Int</span></span></span></span><br><span class="line"><span class="params"><span class="function">)</span></span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (status == BluetoothGatt.GATT_SUCCESS) &#123;</span><br><span class="line">        Log.d(TAG, <span class="string">&quot;Write successful&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="六、启用通知"><a href="#六、启用通知" class="headerlink" title="六、启用通知"></a>六、启用通知</h2><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">enableNotification</span><span class="params">(characteristic: <span class="type">BluetoothGattCharacteristic</span>)</span></span> &#123;</span><br><span class="line">    bluetoothGatt?.setCharacteristicNotification(characteristic, <span class="literal">true</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">val</span> descriptor = characteristic.getDescriptor(UUID_DESCRIPTOR)</span><br><span class="line">    descriptor.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE</span><br><span class="line">    bluetoothGatt?.writeDescriptor(descriptor)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onCharacteristicChanged</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">    gatt: <span class="type">BluetoothGatt</span>,</span></span></span><br><span class="line"><span class="params"><span class="function">    characteristic: <span class="type">BluetoothGattCharacteristic</span></span></span></span><br><span class="line"><span class="params"><span class="function">)</span></span> &#123;</span><br><span class="line">    <span class="keyword">val</span> value = characteristic.value</span><br><span class="line">    Log.d(TAG, <span class="string">&quot;Received: <span class="subst">$&#123;String(value)&#125;</span>&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="七、GATT-服务结构"><a href="#七、GATT-服务结构" class="headerlink" title="七、GATT 服务结构"></a>七、GATT 服务结构</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Service (UUID)</span><br><span class="line">├── Characteristic (UUID)</span><br><span class="line">│   ├── Value</span><br><span class="line">│   ├── Properties (Read/Write/Notify)</span><br><span class="line">│   └── Descriptor (UUID)</span><br><span class="line">└── Characteristic (UUID)</span><br><span class="line">    └── ...</span><br></pre></td></tr></table></figure>
+
+<h2 id="八、最佳实践"><a href="#八、最佳实践" class="headerlink" title="八、最佳实践"></a>八、最佳实践</h2><ol>
+<li><strong>权限检查</strong>：运行时权限请求</li>
+<li><strong>超时处理</strong>：设置连接和操作超时</li>
+<li><strong>队列管理</strong>：串行化 GATT 操作</li>
+<li><strong>错误重试</strong>：合理重试失败的请求</li>
+<li><strong>资源释放</strong>：及时关闭 GATT 连接</li>
+</ol>
+<h2 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://developer.android.google.cn/develop/connectivity/bluetooth/ble/ble-overview?hl=zh-cn">低功耗蓝牙 | Android Developers</a></li>
+<li><a target="_blank" rel="noopener" href="https://developer.aliyun.com/article/1295768">Android开发低功耗蓝牙BLE扫描连接与通信</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_38950819/article/details/103067487">Android 蓝牙开发——BLE（附完整Demo）</a></li>
+</ul>
+<hr>
+<p><em>持续学习中…</em></p>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/Android/" rel="tag">Android</a>, <a class="tag-none-link" href="/blog/tags/BLE/" rel="tag">BLE</a>, <a class="tag-none-link" href="/blog/tags/%E4%BD%8E%E5%8A%9F%E8%80%97/" rel="tag">低功耗</a>, <a class="tag-none-link" href="/blog/tags/%E8%93%9D%E7%89%99/" rel="tag">蓝牙</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-03T15:54:57.636Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Android EncryptedSharedPreferences加密存储" href="/blog/2026/04/03/Android-EncryptedSharedPreferences加密存储/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" Android DownloadManager下载管理实战" href="/blog/2026/04/03/Android-DownloadManager下载管理实战/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>

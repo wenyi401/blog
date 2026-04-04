@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>Android Room数据库迁移Migration深度解析 | Wenyi&#39;s Blog</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/04/Android-Room%E6%95%B0%E6%8D%AE%E5%BA%93%E8%BF%81%E7%A7%BBMigration%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="Android, Migration, Room, 数据库迁移, 架构" />
+  
+  <meta name="description" content="前言当应用更新改变数据库架构时，需要保留设备上已有的用户数据。Room 支持自动迁移和手动迁移两种方式。本文将深入解析 Room 数据库迁移的核心概念、实战技巧和最佳实践。 一、为什么需要数据库迁移？在应用开发过程中，数据库结构会随着业务需求不断变化：  添加新表 添加&#x2F;删除&#x2F;重命名列 添加&#x2F;删除&#x2F;重命名表 修改表之间的关系  如果直接修改 Entity 类">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android Room数据库迁移Migration深度解析">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/04/Android-Room%E6%95%B0%E6%8D%AE%E5%BA%93%E8%BF%81%E7%A7%BBMigration%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:description" content="前言当应用更新改变数据库架构时，需要保留设备上已有的用户数据。Room 支持自动迁移和手动迁移两种方式。本文将深入解析 Room 数据库迁移的核心概念、实战技巧和最佳实践。 一、为什么需要数据库迁移？在应用开发过程中，数据库结构会随着业务需求不断变化：  添加新表 添加&#x2F;删除&#x2F;重命名列 添加&#x2F;删除&#x2F;重命名表 修改表之间的关系  如果直接修改 Entity 类">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-04-04T00:10:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T16:09:01.340Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="Migration">
+<meta property="article:tag" content="Room">
+<meta property="article:tag" content="数据库迁移">
+<meta property="article:tag" content="架构">
+<meta name="twitter:card" content="summary">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Android Room数据库迁移Migration深度解析","description":"前言当应用更新改变数据库架构时，需要保留设备上已有的用户数据。Room 支持自动迁移和手动迁移两种方式。本文将深入解析 Room 数据库迁移的核心概念、实战技...","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-04T00:10:00.000Z","dateModified":"2026-04-03T16:09:01.340Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/04/Android-Room%E6%95%B0%E6%8D%AE%E5%BA%93%E8%BF%81%E7%A7%BBMigration%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/04/Android-Room%E6%95%B0%E6%8D%AE%E5%BA%93%E8%BF%81%E7%A7%BBMigration%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Android Room数据库迁移Migration深度解析</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-04T00:10:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-04</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~8.30K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>当应用更新改变数据库架构时，需要保留设备上已有的用户数据。Room 支持自动迁移和手动迁移两种方式。本文将深入解析 Room 数据库迁移的核心概念、实战技巧和最佳实践。</p>
+<h2 id="一、为什么需要数据库迁移？"><a href="#一、为什么需要数据库迁移？" class="headerlink" title="一、为什么需要数据库迁移？"></a>一、为什么需要数据库迁移？</h2><p>在应用开发过程中，数据库结构会随着业务需求不断变化：</p>
+<ul>
+<li>添加新表</li>
+<li>添加&#x2F;删除&#x2F;重命名列</li>
+<li>添加&#x2F;删除&#x2F;重命名表</li>
+<li>修改表之间的关系</li>
+</ul>
+<p>如果直接修改 Entity 类而不处理迁移，应用会崩溃。因此，必须为每次数据库版本变更定义迁移策略。</p>
+<h2 id="二、自动迁移"><a href="#二、自动迁移" class="headerlink" title="二、自动迁移"></a>二、自动迁移</h2><p>Room 2.4.0-alpha01 及更高版本支持自动迁移。适用于大多数基本架构更改。</p>
+<h3 id="基本用法"><a href="#基本用法" class="headerlink" title="基本用法"></a>基本用法</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 更新前 - 版本 1</span></span><br><span class="line"><span class="meta">@Database(</span></span><br><span class="line"><span class="meta">    version = 1,</span></span><br><span class="line"><span class="meta">    entities = [User::class]</span></span><br><span class="line"><span class="meta">)</span></span><br><span class="line"><span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title class_">AppDatabase</span> : <span class="type">RoomDatabase</span>() &#123;</span><br><span class="line">    <span class="keyword">abstract</span> <span class="function"><span class="keyword">fun</span> <span class="title">userDao</span><span class="params">()</span></span>: UserDao</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 更新后 - 版本 2</span></span><br><span class="line"><span class="meta">@Database(</span></span><br><span class="line"><span class="meta">    version = 2,</span></span><br><span class="line"><span class="meta">    entities = [User::class],</span></span><br><span class="line"><span class="meta">    autoMigrations = [</span></span><br><span class="line"><span class="meta">        AutoMigration(from = 1, to = 2)</span></span><br><span class="line"><span class="meta">    ]</span></span><br><span class="line"><span class="meta">)</span></span><br><span class="line"><span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title class_">AppDatabase</span> : <span class="type">RoomDatabase</span>() &#123;</span><br><span class="line">    <span class="keyword">abstract</span> <span class="function"><span class="keyword">fun</span> <span class="title">userDao</span><span class="params">()</span></span>: UserDao</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="自动迁移规范-AutoMigrationSpec"><a href="#自动迁移规范-AutoMigrationSpec" class="headerlink" title="自动迁移规范 AutoMigrationSpec"></a>自动迁移规范 AutoMigrationSpec</h3><p>当 Room 无法自动确定迁移计划时，需要提供 AutoMigrationSpec。常见场景：</p>
+<ul>
+<li>删除或重命名表</li>
+<li>删除或重命名列</li>
+</ul>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Database(</span></span><br><span class="line"><span class="meta">    version = 2,</span></span><br><span class="line"><span class="meta">    entities = [AppUser::class],</span></span><br><span class="line"><span class="meta">    autoMigrations = [</span></span><br><span class="line"><span class="meta">        AutoMigration(</span></span><br><span class="line"><span class="meta">            from = 1,</span></span><br><span class="line"><span class="meta">            to = 2,</span></span><br><span class="line"><span class="meta">            spec = AppDatabase.MyAutoMigration::class</span></span><br><span class="line"><span class="meta">        )</span></span><br><span class="line"><span class="meta">    ]</span></span><br><span class="line"><span class="meta">)</span></span><br><span class="line"><span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title class_">AppDatabase</span> : <span class="type">RoomDatabase</span>() &#123;</span><br><span class="line">    <span class="meta">@RenameTable(fromTableName = <span class="string">&quot;User&quot;</span>, toTableName = <span class="string">&quot;AppUser&quot;</span>)</span></span><br><span class="line">    <span class="keyword">class</span> <span class="title class_">MyAutoMigration</span> : <span class="type">AutoMigrationSpec</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 迁移完成后的回调</span></span><br><span class="line">    <span class="meta">@DeleteTable(tableName = <span class="string">&quot;OldTable&quot;</span>)</span></span><br><span class="line">    <span class="keyword">class</span> <span class="title class_">DeleteOldTableMigration</span> : <span class="type">AutoMigrationSpec</span> &#123;</span><br><span class="line">        <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onPostMigrate</span><span class="params">(db: <span class="type">SupportSQLiteDatabase</span>)</span></span> &#123;</span><br><span class="line">            <span class="comment">// 执行数据清理或其他操作</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="可用的迁移注解"><a href="#可用的迁移注解" class="headerlink" title="可用的迁移注解"></a>可用的迁移注解</h3><table>
+<thead>
+<tr>
+<th>注解</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>@DeleteTable</td>
+<td>删除表</td>
+</tr>
+<tr>
+<td>@RenameTable</td>
+<td>重命名表</td>
+</tr>
+<tr>
+<td>@DeleteColumn</td>
+<td>删除列</td>
+</tr>
+<tr>
+<td>@RenameColumn</td>
+<td>重命名列</td>
+</tr>
+</tbody></table>
+<h2 id="三、手动迁移"><a href="#三、手动迁移" class="headerlink" title="三、手动迁移"></a>三、手动迁移</h2><p>对于复杂的架构更改，Room 无法自动生成迁移路径，需要手动定义。</p>
+<h3 id="定义迁移"><a href="#定义迁移" class="headerlink" title="定义迁移"></a>定义迁移</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> MIGRATION_1_2 = <span class="keyword">object</span> : Migration(<span class="number">1</span>, <span class="number">2</span>) &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">migrate</span><span class="params">(database: <span class="type">SupportSQLiteDatabase</span>)</span></span> &#123;</span><br><span class="line">        <span class="comment">// 创建新表</span></span><br><span class="line">        database.execSQL(<span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">            CREATE TABLE IF NOT EXISTS `Fruit` (</span></span><br><span class="line"><span class="string">                `id` INTEGER PRIMARY KEY NOT NULL,</span></span><br><span class="line"><span class="string">                `name` TEXT</span></span><br><span class="line"><span class="string">            )</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> MIGRATION_2_3 = <span class="keyword">object</span> : Migration(<span class="number">2</span>, <span class="number">3</span>) &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">migrate</span><span class="params">(database: <span class="type">SupportSQLiteDatabase</span>)</span></span> &#123;</span><br><span class="line">        <span class="comment">// 添加新列</span></span><br><span class="line">        database.execSQL(<span class="string">&quot;ALTER TABLE Book ADD COLUMN pub_year INTEGER&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 注册迁移</span></span><br><span class="line">Room.databaseBuilder(applicationContext, AppDatabase::<span class="keyword">class</span>.java, <span class="string">&quot;app.db&quot;</span>)</span><br><span class="line">    .addMigrations(MIGRATION_1_2, MIGRATION_2_3)</span><br><span class="line">    .build()</span><br></pre></td></tr></table></figure>
+
+<h3 id="混合使用自动和手动迁移"><a href="#混合使用自动和手动迁移" class="headerlink" title="混合使用自动和手动迁移"></a>混合使用自动和手动迁移</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Database(</span></span><br><span class="line"><span class="meta">    version = 3,</span></span><br><span class="line"><span class="meta">    entities = [User::class, Book::class],</span></span><br><span class="line"><span class="meta">    autoMigrations = [</span></span><br><span class="line"><span class="meta">        AutoMigration(from = 1, to = 2)  // 自动迁移</span></span><br><span class="line"><span class="meta">    ]</span></span><br><span class="line"><span class="meta">)</span></span><br><span class="line"><span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title class_">AppDatabase</span> : <span class="type">RoomDatabase</span>() &#123;</span><br><span class="line">    <span class="keyword">abstract</span> <span class="function"><span class="keyword">fun</span> <span class="title">userDao</span><span class="params">()</span></span>: UserDao</span><br><span class="line">    <span class="keyword">abstract</span> <span class="function"><span class="keyword">fun</span> <span class="title">bookDao</span><span class="params">()</span></span>: BookDao()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 手动迁移</span></span><br><span class="line"><span class="keyword">val</span> MIGRATION_2_3 = <span class="keyword">object</span> : Migration(<span class="number">2</span>, <span class="number">3</span>) &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">migrate</span><span class="params">(database: <span class="type">SupportSQLiteDatabase</span>)</span></span> &#123;</span><br><span class="line">        <span class="comment">// 复杂的数据拆分逻辑</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 如果同时定义了自动和手动迁移，Room 会使用手动迁移</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="四、导出架构"><a href="#四、导出架构" class="headerlink" title="四、导出架构"></a>四、导出架构</h2><p>Room 可以在编译时将数据库架构导出为 JSON 文件，用于测试和版本控制。</p>
+<h3 id="使用-Room-Gradle-插件（推荐）"><a href="#使用-Room-Gradle-插件（推荐）" class="headerlink" title="使用 Room Gradle 插件（推荐）"></a>使用 Room Gradle 插件（推荐）</h3><figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// build.gradle.kts</span></span><br><span class="line">plugins &#123;</span><br><span class="line">    id(<span class="string">&quot;androidx.room&quot;</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">room &#123;</span><br><span class="line">    schemaDirectory(<span class="string">&quot;$projectDir/schemas&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="多变体配置"><a href="#多变体配置" class="headerlink" title="多变体配置"></a>多变体配置</h3><figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">room &#123;</span><br><span class="line">    <span class="comment">// 只适用于 &#x27;demoDebug&#x27;</span></span><br><span class="line">    schemaDirectory(<span class="string">&quot;demoDebug&quot;</span>, <span class="string">&quot;$projectDir/schemas/demoDebug&quot;</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 适用于 &#x27;demoDebug&#x27; 和 &#x27;demoRelease&#x27;</span></span><br><span class="line">    schemaDirectory(<span class="string">&quot;demo&quot;</span>, <span class="string">&quot;$projectDir/schemas/demo&quot;</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 适用于 &#x27;demoDebug&#x27; 和 &#x27;fullDebug&#x27;</span></span><br><span class="line">    schemaDirectory(<span class="string">&quot;debug&quot;</span>, <span class="string">&quot;$projectDir/schemas/debug&quot;</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 默认配置</span></span><br><span class="line">    schemaDirectory(<span class="string">&quot;$projectDir/schemas&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="使用注解处理器选项（旧版本）"><a href="#使用注解处理器选项（旧版本）" class="headerlink" title="使用注解处理器选项（旧版本）"></a>使用注解处理器选项（旧版本）</h3><figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">android &#123;</span><br><span class="line">    defaultConfig &#123;</span><br><span class="line">        javaCompileOptions &#123;</span><br><span class="line">            annotationProcessorOptions &#123;</span><br><span class="line">                compilerArgumentProviders(</span><br><span class="line">                    RoomSchemaArgProvider(<span class="keyword">File</span>(projectDir, <span class="string">&quot;schemas&quot;</span>))</span><br><span class="line">                )</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> RoomSchemaArgProvider(</span><br><span class="line">    @get:InputDirectory</span><br><span class="line">    @get:PathSensitive(PathSensitivity.RELATIVE)</span><br><span class="line">    val schemaDir: <span class="keyword">File</span></span><br><span class="line">) : CommandLineArgumentProvider &#123;</span><br><span class="line">    override fun asArguments(): Iterable&lt;String&gt; &#123;</span><br><span class="line">        <span class="keyword">return</span> listOf(<span class="string">&quot;room.schemaLocation=$&#123;schemaDir.path&#125;&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="五、测试迁移"><a href="#五、测试迁移" class="headerlink" title="五、测试迁移"></a>五、测试迁移</h2><p>迁移逻辑复杂，容易出错。Room 提供了测试工具来验证迁移。</p>
+<h3 id="添加测试依赖"><a href="#添加测试依赖" class="headerlink" title="添加测试依赖"></a>添加测试依赖</h3><figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">android &#123;</span><br><span class="line">    <span class="keyword">sourceSets</span> &#123;</span><br><span class="line">        getByName(<span class="string">&quot;androidTest&quot;</span>).assets.srcDir(<span class="string">&quot;$projectDir/schemas&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">dependencies</span> &#123;</span><br><span class="line">    androidTestImplementation(<span class="string">&quot;androidx.room:room-testing:2.8.4&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="测试单次迁移"><a href="#测试单次迁移" class="headerlink" title="测试单次迁移"></a>测试单次迁移</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RunWith(AndroidJUnit4::class)</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MigrationTest</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> TEST_DB = <span class="string">&quot;migration-test&quot;</span></span><br><span class="line">    </span><br><span class="line">    <span class="meta">@get:Rule</span></span><br><span class="line">    <span class="keyword">val</span> helper: MigrationTestHelper = MigrationTestHelper(</span><br><span class="line">        InstrumentationRegistry.getInstrumentation(),</span><br><span class="line">        AppDatabase::<span class="keyword">class</span>.java.canonicalName,</span><br><span class="line">        FrameworkSQLiteOpenHelperFactory()</span><br><span class="line">    )</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">migrate1To2</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="comment">// 创建版本 1 的数据库</span></span><br><span class="line">        <span class="keyword">var</span> db = helper.createDatabase(TEST_DB, <span class="number">1</span>).apply &#123;</span><br><span class="line">            <span class="comment">// 使用 SQL 插入测试数据</span></span><br><span class="line">            execSQL(<span class="string">&quot;INSERT INTO User (id, name) VALUES (1, &#x27;Alice&#x27;)&quot;</span>)</span><br><span class="line">            close()</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 执行迁移到版本 2</span></span><br><span class="line">        db = helper.runMigrationsAndValidate(TEST_DB, <span class="number">2</span>, <span class="literal">true</span>, MIGRATION_1_2)</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 验证数据是否正确迁移</span></span><br><span class="line">        <span class="comment">// 注意：此时不能使用 DAO，因为 DAO 期望最新的架构</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="测试所有迁移"><a href="#测试所有迁移" class="headerlink" title="测试所有迁移"></a>测试所有迁移</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">migrateAll</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="comment">// 创建最早版本的数据库</span></span><br><span class="line">    helper.createDatabase(TEST_DB, <span class="number">1</span>).apply &#123;</span><br><span class="line">        close()</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 打开最新版本，Room 会自动执行所有迁移并验证架构</span></span><br><span class="line">    Room.databaseBuilder(</span><br><span class="line">        InstrumentationRegistry.getInstrumentation().targetContext,</span><br><span class="line">        AppDatabase::<span class="keyword">class</span>.java,</span><br><span class="line">        TEST_DB</span><br><span class="line">    )</span><br><span class="line">        .addMigrations(*ALL_MIGRATIONS)</span><br><span class="line">        .build()</span><br><span class="line">        .apply &#123;</span><br><span class="line">            openHelper.writableDatabase.close()</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="六、处理缺失的迁移路径"><a href="#六、处理缺失的迁移路径" class="headerlink" title="六、处理缺失的迁移路径"></a>六、处理缺失的迁移路径</h2><p>如果 Room 找不到迁移路径，会抛出 IllegalStateException。</p>
+<h3 id="破坏性迁移（开发阶段）"><a href="#破坏性迁移（开发阶段）" class="headerlink" title="破坏性迁移（开发阶段）"></a>破坏性迁移（开发阶段）</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Room.databaseBuilder(applicationContext, AppDatabase::<span class="keyword">class</span>.java, <span class="string">&quot;app.db&quot;</span>)</span><br><span class="line">    .fallbackToDestructiveMigration()  <span class="comment">// 允许删除数据重建表</span></span><br><span class="line">    .build()</span><br></pre></td></tr></table></figure>
+
+<h3 id="最佳实践"><a href="#最佳实践" class="headerlink" title="最佳实践"></a>最佳实践</h3><ol>
+<li><strong>生产环境不要使用 fallbackToDestructiveMigration</strong> - 会丢失用户数据</li>
+<li><strong>开发阶段可以使用</strong> - 快速迭代</li>
+<li><strong>始终导出架构文件</strong> - 用于测试和版本追踪</li>
+<li><strong>测试所有迁移路径</strong> - 确保数据完整性</li>
+<li><strong>版本号连续</strong> - 避免跳过版本</li>
+</ol>
+<h2 id="七、常见迁移场景"><a href="#七、常见迁移场景" class="headerlink" title="七、常见迁移场景"></a>七、常见迁移场景</h2><h3 id="场景-1：添加新列"><a href="#场景-1：添加新列" class="headerlink" title="场景 1：添加新列"></a>场景 1：添加新列</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> MIGRATION_1_2 = <span class="keyword">object</span> : Migration(<span class="number">1</span>, <span class="number">2</span>) &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">migrate</span><span class="params">(database: <span class="type">SupportSQLiteDatabase</span>)</span></span> &#123;</span><br><span class="line">        database.execSQL(<span class="string">&quot;ALTER TABLE User ADD COLUMN age INTEGER NOT NULL DEFAULT 0&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="场景-2：创建新表"><a href="#场景-2：创建新表" class="headerlink" title="场景 2：创建新表"></a>场景 2：创建新表</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> MIGRATION_2_3 = <span class="keyword">object</span> : Migration(<span class="number">2</span>, <span class="number">3</span>) &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">migrate</span><span class="params">(database: <span class="type">SupportSQLiteDatabase</span>)</span></span> &#123;</span><br><span class="line">        database.execSQL(<span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">            CREATE TABLE IF NOT EXISTS `Book` (</span></span><br><span class="line"><span class="string">                `id` INTEGER PRIMARY KEY NOT NULL,</span></span><br><span class="line"><span class="string">                `title` TEXT,</span></span><br><span class="line"><span class="string">                `author` TEXT</span></span><br><span class="line"><span class="string">            )</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="场景-3：数据迁移"><a href="#场景-3：数据迁移" class="headerlink" title="场景 3：数据迁移"></a>场景 3：数据迁移</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> MIGRATION_3_4 = <span class="keyword">object</span> : Migration(<span class="number">3</span>, <span class="number">4</span>) &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">migrate</span><span class="params">(database: <span class="type">SupportSQLiteDatabase</span>)</span></span> &#123;</span><br><span class="line">        <span class="comment">// 创建新表</span></span><br><span class="line">        database.execSQL(<span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">            CREATE TABLE IF NOT EXISTS `User_New` (</span></span><br><span class="line"><span class="string">                `id` INTEGER PRIMARY KEY NOT NULL,</span></span><br><span class="line"><span class="string">                `first_name` TEXT,</span></span><br><span class="line"><span class="string">                `last_name` TEXT</span></span><br><span class="line"><span class="string">            )</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span>)</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 迁移数据</span></span><br><span class="line">        database.execSQL(<span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">            INSERT INTO User_New (id, first_name, last_name)</span></span><br><span class="line"><span class="string">            SELECT id, </span></span><br><span class="line"><span class="string">                   SUBSTR(name, 1, INSTR(name, &#x27; &#x27;) - 1),</span></span><br><span class="line"><span class="string">                   SUBSTR(name, INSTR(name, &#x27; &#x27;) + 1)</span></span><br><span class="line"><span class="string">            FROM User</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span>)</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 删除旧表</span></span><br><span class="line">        database.execSQL(<span class="string">&quot;DROP TABLE User&quot;</span>)</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 重命名新表</span></span><br><span class="line">        database.execSQL(<span class="string">&quot;ALTER TABLE User_New RENAME TO User&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="八、常见问题"><a href="#八、常见问题" class="headerlink" title="八、常见问题"></a>八、常见问题</h2><h3 id="问题-1：迁移后数据丢失"><a href="#问题-1：迁移后数据丢失" class="headerlink" title="问题 1：迁移后数据丢失"></a>问题 1：迁移后数据丢失</h3><p><strong>原因</strong>：使用了 fallbackToDestructiveMigration 或迁移逻辑错误。</p>
+<p><strong>解决方案</strong>：</p>
+<ol>
+<li>测试迁移逻辑</li>
+<li>不使用破坏性迁移</li>
+<li>备份数据</li>
+</ol>
+<h3 id="问题-2：IllegalStateException-A-migration-from-X-to-Y-was-required"><a href="#问题-2：IllegalStateException-A-migration-from-X-to-Y-was-required" class="headerlink" title="问题 2：IllegalStateException: A migration from X to Y was required"></a>问题 2：IllegalStateException: A migration from X to Y was required</h3><p><strong>原因</strong>：缺少迁移路径。</p>
+<p><strong>解决方案</strong>：</p>
+<ol>
+<li>定义迁移</li>
+<li>或使用 fallbackToDestructiveMigration（仅开发阶段）</li>
+</ol>
+<h3 id="问题-3：编译错误：Cannot-find-the-schema-file"><a href="#问题-3：编译错误：Cannot-find-the-schema-file" class="headerlink" title="问题 3：编译错误：Cannot find the schema file"></a>问题 3：编译错误：Cannot find the schema file</h3><p><strong>原因</strong>：未配置架构导出。</p>
+<p><strong>解决方案</strong>：</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">room &#123;</span><br><span class="line">    schemaDirectory(<span class="string">&quot;$projectDir/schemas&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://developer.android.google.cn/training/data-storage/room/migrating-db-versions?hl=zh-cn">迁移 Room 数据库 | Android Developers</a></li>
+<li><a target="_blank" rel="noopener" href="https://juejin.cn/post/7416651336361902119">Android Room 数据库自动升级与迁移策略</a></li>
+<li><a target="_blank" rel="noopener" href="https://developer.android.google.cn/jetpack/androidx/releases/room?hl=zh-cn#gradle-plugin">Room Gradle Plugin</a></li>
+</ul>
+<hr>
+<p><em>深入学习中…</em></p>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/Android/" rel="tag">Android</a>, <a class="tag-none-link" href="/blog/tags/Migration/" rel="tag">Migration</a>, <a class="tag-none-link" href="/blog/tags/Room/" rel="tag">Room</a>, <a class="tag-none-link" href="/blog/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%E8%BF%81%E7%A7%BB/" rel="tag">数据库迁移</a>, <a class="tag-none-link" href="/blog/tags/%E6%9E%B6%E6%9E%84/" rel="tag">架构</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-03T16:09:01.340Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Android CameraX相机开发实战" href="/blog/2026/04/03/Android-CameraX相机开发实战/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" Kotlin协程上下文与调度器深度解析" href="/blog/2026/04/04/Kotlin协程上下文与调度器深度解析/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>

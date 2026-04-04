@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>Kotlin Sealed Classes密封类深度解析 | Wenyi&#39;s Blog</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/04/Kotlin-Sealed-Classes%E5%AF%86%E5%B0%81%E7%B1%BB%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="Kotlin, Sealed Class, when表达式, 密封类" />
+  
+  <meta name="description" content="前言密封类和接口提供受控的类层次结构继承。密封类的所有直接子类在编译时已知，不能在定义密封类的模块和包之外创建其他子类。结合 when 表达式使用时，可以覆盖所有可能的子类行为。 一、声明密封类和接口使用 sealed 修饰符： 123456789101112&#x2F;&#x2F; 密封接口sealed interface Error&#x2F;&#x2F; 密封类实现密封接口sealed class IOError() : Erro">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kotlin Sealed Classes密封类深度解析">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/04/Kotlin-Sealed-Classes%E5%AF%86%E5%B0%81%E7%B1%BB%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:description" content="前言密封类和接口提供受控的类层次结构继承。密封类的所有直接子类在编译时已知，不能在定义密封类的模块和包之外创建其他子类。结合 when 表达式使用时，可以覆盖所有可能的子类行为。 一、声明密封类和接口使用 sealed 修饰符： 123456789101112&#x2F;&#x2F; 密封接口sealed interface Error&#x2F;&#x2F; 密封类实现密封接口sealed class IOError() : Erro">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-04-04T01:50:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T17:48:59.980Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="Kotlin">
+<meta property="article:tag" content="Sealed Class">
+<meta property="article:tag" content="when表达式">
+<meta property="article:tag" content="密封类">
+<meta name="twitter:card" content="summary">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Kotlin Sealed Classes密封类深度解析","description":"前言密封类和接口提供受控的类层次结构继承。密封类的所有直接子类在编译时已知，不能在定义密封类的模块和包之外创建其他子类。结合 when 表达式使用时，可以覆盖...","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-04T01:50:00.000Z","dateModified":"2026-04-03T17:48:59.980Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/04/Kotlin-Sealed-Classes%E5%AF%86%E5%B0%81%E7%B1%BB%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/04/Kotlin-Sealed-Classes%E5%AF%86%E5%B0%81%E7%B1%BB%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Kotlin Sealed Classes密封类深度解析</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-04T01:50:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-04</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~6.70K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>密封类和接口提供受控的类层次结构继承。密封类的所有直接子类在编译时已知，不能在定义密封类的模块和包之外创建其他子类。结合 when 表达式使用时，可以覆盖所有可能的子类行为。</p>
+<h2 id="一、声明密封类和接口"><a href="#一、声明密封类和接口" class="headerlink" title="一、声明密封类和接口"></a>一、声明密封类和接口</h2><p>使用 sealed 修饰符：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 密封接口</span></span><br><span class="line"><span class="keyword">sealed</span> <span class="keyword">interface</span> <span class="title class_">Error</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 密封类实现密封接口</span></span><br><span class="line"><span class="keyword">sealed</span> <span class="keyword">class</span> <span class="title class_">IOError</span>() : Error</span><br><span class="line"></span><br><span class="line"><span class="comment">// 子类扩展密封类</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">FileReadError</span>(<span class="keyword">val</span> file: File) : IOError()</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">DatabaseError</span>(<span class="keyword">val</span> source: DataSource) : IOError()</span><br><span class="line"></span><br><span class="line"><span class="comment">// 单例对象实现密封接口</span></span><br><span class="line"><span class="keyword">object</span> RuntimeError : Error</span><br></pre></td></tr></table></figure>
+
+<h2 id="二、构造函数"><a href="#二、构造函数" class="headerlink" title="二、构造函数"></a>二、构造函数</h2><p>密封类本身是抽象类，不能直接实例化。</p>
+<h3 id="基本用法"><a href="#基本用法" class="headerlink" title="基本用法"></a>基本用法</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">sealed</span> <span class="keyword">class</span> <span class="title class_">Error</span>(<span class="keyword">val</span> message: String) &#123;</span><br><span class="line">    <span class="keyword">class</span> <span class="title class_">NetworkError</span> : <span class="type">Error</span>(<span class="string">&quot;Network failure&quot;</span>)</span><br><span class="line">    <span class="keyword">class</span> <span class="title class_">DatabaseError</span> : <span class="type">Error</span>(<span class="string">&quot;Database cannot be reached&quot;</span>)</span><br><span class="line">    <span class="keyword">class</span> <span class="title class_">UnknownError</span> : <span class="type">Error</span>(<span class="string">&quot;An unknown error has occurred&quot;</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">val</span> errors = listOf(Error.NetworkError(), Error.DatabaseError(), Error.UnknownError())</span><br><span class="line">    errors.forEach &#123; println(it.message) &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="与枚举结合"><a href="#与枚举结合" class="headerlink" title="与枚举结合"></a>与枚举结合</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">enum</span> <span class="keyword">class</span> <span class="title class_">ErrorSeverity</span> &#123; MINOR, MAJOR, CRITICAL &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">sealed</span> <span class="keyword">class</span> <span class="title class_">Error</span>(<span class="keyword">val</span> severity: ErrorSeverity) &#123;</span><br><span class="line">    <span class="keyword">class</span> <span class="title class_">FileReadError</span>(<span class="keyword">val</span> file: File) : Error(ErrorSeverity.MAJOR)</span><br><span class="line">    <span class="keyword">class</span> <span class="title class_">DatabaseError</span>(<span class="keyword">val</span> source: DataSource) : Error(ErrorSeverity.CRITICAL)</span><br><span class="line">    <span class="keyword">object</span> RuntimeError : Error(ErrorSeverity.CRITICAL)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="构造函数可见性"><a href="#构造函数可见性" class="headerlink" title="构造函数可见性"></a>构造函数可见性</h3><p>密封类构造函数只能为 protected（默认）或 private：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">sealed</span> <span class="keyword">class</span> <span class="title class_">IOError</span> &#123;</span><br><span class="line">    <span class="comment">// protected 可见性（默认）</span></span><br><span class="line">    <span class="keyword">constructor</span>() &#123; &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// private 构造函数</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">constructor</span>(description: String) : <span class="keyword">this</span>() &#123; &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 错误：不允许 public 或 internal</span></span><br><span class="line">    <span class="comment">// public constructor(code: Int) : this() &#123;&#125;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="三、继承规则"><a href="#三、继承规则" class="headerlink" title="三、继承规则"></a>三、继承规则</h2><h3 id="直接子类"><a href="#直接子类" class="headerlink" title="直接子类"></a>直接子类</h3><p>直接子类必须在同一包中声明：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 密封接口</span></span><br><span class="line"><span class="keyword">sealed</span> <span class="keyword">interface</span> <span class="title class_">Error</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 密封类扩展接口</span></span><br><span class="line"><span class="keyword">sealed</span> <span class="keyword">class</span> <span class="title class_">IOError</span>() : Error</span><br><span class="line"></span><br><span class="line"><span class="comment">// 开放类可以任意扩展</span></span><br><span class="line"><span class="keyword">open</span> <span class="keyword">class</span> <span class="title class_">CustomError</span>() : Error</span><br></pre></td></tr></table></figure>
+
+<h3 id="子类限制"><a href="#子类限制" class="headerlink" title="子类限制"></a>子类限制</h3><ul>
+<li>子类必须有正确的限定名</li>
+<li>不能是局部类或匿名对象</li>
+<li>可以有任意可见性</li>
+</ul>
+<h3 id="多平台项目"><a href="#多平台项目" class="headerlink" title="多平台项目"></a>多平台项目</h3><p>在多平台项目中，直接子类必须在同一源集：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// common 源集</span></span><br><span class="line"><span class="keyword">expect</span> <span class="keyword">sealed</span> <span class="keyword">class</span> <span class="title class_">Error</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 平台源集</span></span><br><span class="line"><span class="keyword">actual</span> <span class="keyword">sealed</span> <span class="keyword">class</span> <span class="title class_">Error</span> &#123;</span><br><span class="line">    <span class="keyword">class</span> <span class="title class_">NetworkError</span> : <span class="type">Error</span>()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、与-when-表达式配合"><a href="#四、与-when-表达式配合" class="headerlink" title="四、与 when 表达式配合"></a>四、与 when 表达式配合</h2><p>这是密封类的关键优势：编译器检查穷尽性。</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">sealed</span> <span class="keyword">class</span> <span class="title class_">Error</span> &#123;</span><br><span class="line">    <span class="keyword">class</span> <span class="title class_">FileReadError</span>(<span class="keyword">val</span> file: String) : Error()</span><br><span class="line">    <span class="keyword">class</span> <span class="title class_">DatabaseError</span>(<span class="keyword">val</span> source: String) : Error()</span><br><span class="line">    <span class="keyword">object</span> RuntimeError : Error()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">log</span><span class="params">(e: <span class="type">Error</span>)</span></span> = <span class="keyword">when</span>(e) &#123;</span><br><span class="line">    <span class="keyword">is</span> Error.FileReadError -&gt; println(<span class="string">&quot;Error while reading file <span class="subst">$&#123;e.file&#125;</span>&quot;</span>)</span><br><span class="line">    <span class="keyword">is</span> Error.DatabaseError -&gt; println(<span class="string">&quot;Error while reading from database <span class="subst">$&#123;e.source&#125;</span>&quot;</span>)</span><br><span class="line">    Error.RuntimeError -&gt; println(<span class="string">&quot;Runtime error&quot;</span>)</span><br><span class="line">    <span class="comment">// 不需要 else 子句</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>关键点</strong>：</p>
+<ul>
+<li>编译器验证所有情况都已覆盖</li>
+<li>不需要 else 子句</li>
+<li>添加新子类时，编译器会提示更新</li>
+</ul>
+<h3 id="Guard-条件"><a href="#Guard-条件" class="headerlink" title="Guard 条件"></a>Guard 条件</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">sealed</span> <span class="keyword">class</span> <span class="title class_">Error</span> &#123;</span><br><span class="line">    <span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">HttpError</span>(<span class="keyword">val</span> code: <span class="built_in">Int</span>) : Error()</span><br><span class="line">    <span class="keyword">object</span> NetworkError : Error()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">handle</span><span class="params">(e: <span class="type">Error</span>)</span></span> = <span class="keyword">when</span>(e) &#123;</span><br><span class="line">    <span class="keyword">is</span> Error.HttpError <span class="keyword">if</span> e.code == <span class="number">404</span> -&gt; println(<span class="string">&quot;Not found&quot;</span>)</span><br><span class="line">    <span class="keyword">is</span> Error.HttpError <span class="keyword">if</span> e.code == <span class="number">500</span> -&gt; println(<span class="string">&quot;Server error&quot;</span>)</span><br><span class="line">    <span class="keyword">is</span> Error.HttpError -&gt; println(<span class="string">&quot;HTTP error: <span class="subst">$&#123;e.code&#125;</span>&quot;</span>)</span><br><span class="line">    Error.NetworkError -&gt; println(<span class="string">&quot;Network error&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="五、用例场景"><a href="#五、用例场景" class="headerlink" title="五、用例场景"></a>五、用例场景</h2><h3 id="1-UI-状态管理"><a href="#1-UI-状态管理" class="headerlink" title="1. UI 状态管理"></a>1. UI 状态管理</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">sealed</span> <span class="keyword">class</span> <span class="title class_">UIState</span> &#123;</span><br><span class="line">    <span class="keyword">data</span> <span class="keyword">object</span> Loading : UIState()</span><br><span class="line">    <span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">Success</span>(<span class="keyword">val</span> <span class="keyword">data</span>: String) : UIState()</span><br><span class="line">    <span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">Error</span>(<span class="keyword">val</span> exception: Exception) : UIState()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">updateUI</span><span class="params">(state: <span class="type">UIState</span>)</span></span> &#123;</span><br><span class="line">    <span class="keyword">when</span> (state) &#123;</span><br><span class="line">        <span class="keyword">is</span> UIState.Loading -&gt; showLoadingIndicator()</span><br><span class="line">        <span class="keyword">is</span> UIState.Success -&gt; showData(state.<span class="keyword">data</span>)</span><br><span class="line">        <span class="keyword">is</span> UIState.Error -&gt; showError(state.exception)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-支付方法处理"><a href="#2-支付方法处理" class="headerlink" title="2. 支付方法处理"></a>2. 支付方法处理</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">sealed</span> <span class="keyword">class</span> <span class="title class_">Payment</span> &#123;</span><br><span class="line">    <span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">CreditCard</span>(<span class="keyword">val</span> number: String, <span class="keyword">val</span> expiryDate: String) : Payment()</span><br><span class="line">    <span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">PayPal</span>(<span class="keyword">val</span> email: String) : Payment()</span><br><span class="line">    <span class="keyword">data</span> <span class="keyword">object</span> Cash : Payment()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">processPayment</span><span class="params">(payment: <span class="type">Payment</span>)</span></span> &#123;</span><br><span class="line">    <span class="keyword">when</span> (payment) &#123;</span><br><span class="line">        <span class="keyword">is</span> Payment.CreditCard -&gt; processCreditCardPayment(payment.number, payment.expiryDate)</span><br><span class="line">        <span class="keyword">is</span> Payment.PayPal -&gt; processPayPalPayment(payment.email)</span><br><span class="line">        <span class="keyword">is</span> Payment.Cash -&gt; processCashPayment()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-API-请求响应处理"><a href="#3-API-请求响应处理" class="headerlink" title="3. API 请求响应处理"></a>3. API 请求响应处理</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 密封接口定义请求类型</span></span><br><span class="line"><span class="keyword">sealed</span> <span class="keyword">interface</span> <span class="title class_">ApiRequest</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@Serializable</span></span><br><span class="line"><span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">LoginRequest</span>(<span class="keyword">val</span> username: String, <span class="keyword">val</span> password: String) : ApiRequest</span><br><span class="line"></span><br><span class="line"><span class="keyword">object</span> LogoutRequest : ApiRequest</span><br><span class="line"></span><br><span class="line"><span class="comment">// 密封类定义响应类型</span></span><br><span class="line"><span class="keyword">sealed</span> <span class="keyword">class</span> <span class="title class_">ApiResponse</span> &#123;</span><br><span class="line">    <span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">UserSuccess</span>(<span class="keyword">val</span> user: UserData) : ApiResponse()</span><br><span class="line">    <span class="keyword">data</span> <span class="keyword">object</span> UserNotFound : ApiResponse()</span><br><span class="line">    <span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">Error</span>(<span class="keyword">val</span> message: String) : ApiResponse()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">handleRequest</span><span class="params">(request: <span class="type">ApiRequest</span>)</span></span>: ApiResponse &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">when</span> (request) &#123;</span><br><span class="line">        <span class="keyword">is</span> LoginRequest -&gt; &#123;</span><br><span class="line">            <span class="keyword">if</span> (isValidUser(request.username, request.password)) &#123;</span><br><span class="line">                ApiResponse.UserSuccess(UserData(<span class="string">&quot;userId&quot;</span>, <span class="string">&quot;userName&quot;</span>, <span class="string">&quot;userEmail&quot;</span>))</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                ApiResponse.Error(<span class="string">&quot;Invalid username or password&quot;</span>)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">is</span> LogoutRequest -&gt; &#123;</span><br><span class="line">            ApiResponse.UserSuccess(UserData(<span class="string">&quot;userId&quot;</span>, <span class="string">&quot;userName&quot;</span>, <span class="string">&quot;userEmail&quot;</span>))</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="六、密封类-vs-枚举"><a href="#六、密封类-vs-枚举" class="headerlink" title="六、密封类 vs 枚举"></a>六、密封类 vs 枚举</h2><table>
+<thead>
+<tr>
+<th>特性</th>
+<th>密封类</th>
+<th>枚举</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>实例</td>
+<td>多个实例</td>
+<td>单例</td>
+</tr>
+<tr>
+<td>状态</td>
+<td>可持有状态</td>
+<td>固定值</td>
+</tr>
+<tr>
+<td>继承</td>
+<td>可扩展</td>
+<td>不可扩展</td>
+</tr>
+<tr>
+<td>类型</td>
+<td>类型安全</td>
+<td>值安全</td>
+</tr>
+</tbody></table>
+<h3 id="选择建议"><a href="#选择建议" class="headerlink" title="选择建议"></a>选择建议</h3><ul>
+<li><strong>使用枚举</strong>：固定常量集合，无需状态</li>
+<li><strong>使用密封类</strong>：有限类型集合，需要状态或扩展</li>
+</ul>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 枚举适合：固定常量</span></span><br><span class="line"><span class="keyword">enum</span> <span class="keyword">class</span> <span class="title class_">Direction</span> &#123; NORTH, SOUTH, EAST, WEST &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 密封类适合：有状态的类型</span></span><br><span class="line"><span class="keyword">sealed</span> <span class="keyword">class</span> <span class="title class_">Result</span> &#123;</span><br><span class="line">    <span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">Success</span>(<span class="keyword">val</span> <span class="keyword">data</span>: String) : Result()</span><br><span class="line">    <span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">Error</span>(<span class="keyword">val</span> exception: Exception) : Result()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="七、最佳实践"><a href="#七、最佳实践" class="headerlink" title="七、最佳实践"></a>七、最佳实践</h2><h3 id="1-使用-data-class-和-data-object"><a href="#1-使用-data-class-和-data-object" class="headerlink" title="1. 使用 data class 和 data object"></a>1. 使用 data class 和 data object</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">sealed</span> <span class="keyword">class</span> <span class="title class_">Result</span> &#123;</span><br><span class="line">    <span class="keyword">data</span> <span class="keyword">object</span> Loading : Result()</span><br><span class="line">    <span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">Success</span>(<span class="keyword">val</span> <span class="keyword">data</span>: String) : Result()</span><br><span class="line">    <span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">Error</span>(<span class="keyword">val</span> message: String) : Result()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-在-ViewModel-中使用"><a href="#2-在-ViewModel-中使用" class="headerlink" title="2. 在 ViewModel 中使用"></a>2. 在 ViewModel 中使用</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MyViewModel</span> : <span class="type">ViewModel</span>() &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> _state = MutableStateFlow&lt;UIState&gt;(UIState.Loading)</span><br><span class="line">    <span class="keyword">val</span> state: StateFlow&lt;UIState&gt; = _state</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">loadData</span><span class="params">()</span></span> &#123;</span><br><span class="line">        viewModelScope.launch &#123;</span><br><span class="line">            _state.value = UIState.Loading</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="keyword">val</span> <span class="keyword">data</span> = repository.fetchData()</span><br><span class="line">                _state.value = UIState.Success(<span class="keyword">data</span>)</span><br><span class="line">            &#125; <span class="keyword">catch</span> (e: Exception) &#123;</span><br><span class="line">                _state.value = UIState.Error(e)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-在-Repository-中使用"><a href="#3-在-Repository-中使用" class="headerlink" title="3. 在 Repository 中使用"></a>3. 在 Repository 中使用</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">sealed</span> <span class="keyword">class</span> <span class="title class_">NetworkResult</span>&lt;<span class="type">out T</span>&gt; &#123;</span><br><span class="line">    <span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">Success</span>&lt;<span class="type">T</span>&gt;(<span class="keyword">val</span> <span class="keyword">data</span>: T) : NetworkResult&lt;T&gt;()</span><br><span class="line">    <span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">Error</span>(<span class="keyword">val</span> exception: Exception) : NetworkResult&lt;<span class="built_in">Nothing</span>&gt;()</span><br><span class="line">    <span class="keyword">data</span> <span class="keyword">object</span> Loading : NetworkResult&lt;<span class="built_in">Nothing</span>&gt;()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">suspend</span> <span class="function"><span class="keyword">fun</span> <span class="type">&lt;T&gt;</span> <span class="title">safeApiCall</span><span class="params">(call: <span class="type">suspend</span> () -&gt; <span class="type">T</span>)</span></span>: NetworkResult&lt;T&gt; &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">try</span> &#123;</span><br><span class="line">        NetworkResult.Success(call())</span><br><span class="line">    &#125; <span class="keyword">catch</span> (e: Exception) &#123;</span><br><span class="line">        NetworkResult.Error(e)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://kotlinlang.org/docs/sealed-classes.html">Sealed classes and interfaces | Kotlin Documentation</a></li>
+<li><a target="_blank" rel="noopener" href="https://juejin.cn/post/7606621855853314048">Kotlin Enum vs Sealed Class</a></li>
+</ul>
+<hr>
+<p><em>深入学习中…</em></p>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/Kotlin/" rel="tag">Kotlin</a>, <a class="tag-none-link" href="/blog/tags/Sealed-Class/" rel="tag">Sealed Class</a>, <a class="tag-none-link" href="/blog/tags/when%E8%A1%A8%E8%BE%BE%E5%BC%8F/" rel="tag">when表达式</a>, <a class="tag-none-link" href="/blog/tags/%E5%AF%86%E5%B0%81%E7%B1%BB/" rel="tag">密封类</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-03T17:48:59.980Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Kotlin Flow异步流深度解析" href="/blog/2026/04/04/Kotlin-Flow异步流深度解析/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" Android Activity生命周期深度解析" href="/blog/2026/04/04/Android-Activity生命周期深度解析/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>

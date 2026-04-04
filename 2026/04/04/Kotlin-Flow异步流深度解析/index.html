@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>Kotlin Flow异步流深度解析 | Wenyi&#39;s Blog</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/04/Kotlin-Flow%E5%BC%82%E6%AD%A5%E6%B5%81%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="Flow, Kotlin, 协程, 异步流" />
+  
+  <meta name="description" content="前言挂起函数异步返回单个值，但如何返回多个异步计算的值？这就是 Kotlin Flow 的用武之地。Flow 是冷流，类似于序列，只有在被收集时才执行。 一、表示多个值集合12345fun simple(): List&lt;Int&gt; &#x3D; listOf(1, 2, 3)fun main() &#123;    simple().forEach &#123; value -&gt; print">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kotlin Flow异步流深度解析">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/04/Kotlin-Flow%E5%BC%82%E6%AD%A5%E6%B5%81%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:description" content="前言挂起函数异步返回单个值，但如何返回多个异步计算的值？这就是 Kotlin Flow 的用武之地。Flow 是冷流，类似于序列，只有在被收集时才执行。 一、表示多个值集合12345fun simple(): List&lt;Int&gt; &#x3D; listOf(1, 2, 3)fun main() &#123;    simple().forEach &#123; value -&gt; print">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-04-04T01:20:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T17:18:30.304Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="Flow">
+<meta property="article:tag" content="Kotlin">
+<meta property="article:tag" content="协程">
+<meta property="article:tag" content="异步流">
+<meta name="twitter:card" content="summary">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Kotlin Flow异步流深度解析","description":"前言挂起函数异步返回单个值，但如何返回多个异步计算的值？这就是 Kotlin Flow 的用武之地。Flow 是冷流，类似于序列，只有在被收集时才执行。","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-04T01:20:00.000Z","dateModified":"2026-04-03T17:18:30.304Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/04/Kotlin-Flow%E5%BC%82%E6%AD%A5%E6%B5%81%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/04/Kotlin-Flow%E5%BC%82%E6%AD%A5%E6%B5%81%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Kotlin Flow异步流深度解析</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-04T01:20:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-04</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~8.17K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>挂起函数异步返回单个值，但如何返回多个异步计算的值？这就是 Kotlin Flow 的用武之地。Flow 是冷流，类似于序列，只有在被收集时才执行。</p>
+<h2 id="一、表示多个值"><a href="#一、表示多个值" class="headerlink" title="一、表示多个值"></a>一、表示多个值</h2><h3 id="集合"><a href="#集合" class="headerlink" title="集合"></a>集合</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">simple</span><span class="params">()</span></span>: List&lt;<span class="built_in">Int</span>&gt; = listOf(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    simple().forEach &#123; value -&gt; println(value) &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="序列"><a href="#序列" class="headerlink" title="序列"></a>序列</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">simple</span><span class="params">()</span></span>: Sequence&lt;<span class="built_in">Int</span>&gt; = sequence &#123;</span><br><span class="line">    <span class="keyword">for</span> (i <span class="keyword">in</span> <span class="number">1.</span><span class="number">.3</span>) &#123;</span><br><span class="line">        Thread.sleep(<span class="number">100</span>) <span class="comment">// 阻塞</span></span><br><span class="line">        yield(i)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="挂起函数"><a href="#挂起函数" class="headerlink" title="挂起函数"></a>挂起函数</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">suspend</span> <span class="function"><span class="keyword">fun</span> <span class="title">simple</span><span class="params">()</span></span>: List&lt;<span class="built_in">Int</span>&gt; &#123;</span><br><span class="line">    delay(<span class="number">1000</span>)</span><br><span class="line">    <span class="keyword">return</span> listOf(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Flow"><a href="#Flow" class="headerlink" title="Flow"></a>Flow</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">simple</span><span class="params">()</span></span>: Flow&lt;<span class="built_in">Int</span>&gt; = flow &#123;</span><br><span class="line">    <span class="keyword">for</span> (i <span class="keyword">in</span> <span class="number">1.</span><span class="number">.3</span>) &#123;</span><br><span class="line">        delay(<span class="number">100</span>) <span class="comment">// 不阻塞</span></span><br><span class="line">        emit(i)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> = runBlocking&lt;<span class="built_in">Unit</span>&gt; &#123;</span><br><span class="line">    launch &#123;</span><br><span class="line">        <span class="keyword">for</span> (k <span class="keyword">in</span> <span class="number">1.</span><span class="number">.3</span>) &#123;</span><br><span class="line">            println(<span class="string">&quot;I&#x27;m not blocked <span class="variable">$k</span>&quot;</span>)</span><br><span class="line">            delay(<span class="number">100</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    simple().collect &#123; value -&gt; println(value) &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>Flow 的关键特性</strong>：</p>
+<ul>
+<li>flow { … } 构建器</li>
+<li>代码可以挂起</li>
+<li>使用 emit() 发射值</li>
+<li>使用 collect() 收集值</li>
+</ul>
+<h2 id="二、Flow-是冷的"><a href="#二、Flow-是冷的" class="headerlink" title="二、Flow 是冷的"></a>二、Flow 是冷的</h2><p>Flow 是冷流，代码在 flow { … } 构建器中不会运行，直到被收集：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">simple</span><span class="params">()</span></span>: Flow&lt;<span class="built_in">Int</span>&gt; = flow &#123;</span><br><span class="line">    println(<span class="string">&quot;Flow started&quot;</span>)</span><br><span class="line">    <span class="keyword">for</span> (i <span class="keyword">in</span> <span class="number">1.</span><span class="number">.3</span>) &#123;</span><br><span class="line">        delay(<span class="number">100</span>)</span><br><span class="line">        emit(i)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> = runBlocking&lt;<span class="built_in">Unit</span>&gt; &#123;</span><br><span class="line">    println(<span class="string">&quot;Calling simple function...&quot;</span>)</span><br><span class="line">    <span class="keyword">val</span> flow = simple()</span><br><span class="line">    println(<span class="string">&quot;Calling collect...&quot;</span>)</span><br><span class="line">    flow.collect &#123; value -&gt; println(value) &#125;</span><br><span class="line">    println(<span class="string">&quot;Calling collect again...&quot;</span>)</span><br><span class="line">    flow.collect &#123; value -&gt; println(value) &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">Calling simple function...</span><br><span class="line">Calling collect...</span><br><span class="line">Flow started</span><br><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">Calling collect again...</span><br><span class="line">Flow started</span><br><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td></tr></table></figure>
+
+<h2 id="三、Flow-取消"><a href="#三、Flow-取消" class="headerlink" title="三、Flow 取消"></a>三、Flow 取消</h2><p>Flow 遵循协程的协作式取消：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">simple</span><span class="params">()</span></span>: Flow&lt;<span class="built_in">Int</span>&gt; = flow &#123;</span><br><span class="line">    <span class="keyword">for</span> (i <span class="keyword">in</span> <span class="number">1.</span><span class="number">.3</span>) &#123;</span><br><span class="line">        delay(<span class="number">100</span>)</span><br><span class="line">        println(<span class="string">&quot;Emitting <span class="variable">$i</span>&quot;</span>)</span><br><span class="line">        emit(i)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> = runBlocking&lt;<span class="built_in">Unit</span>&gt; &#123;</span><br><span class="line">    withTimeoutOrNull(<span class="number">250</span>) &#123;</span><br><span class="line">        simple().collect &#123; value -&gt; println(value) &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    println(<span class="string">&quot;Done&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Emitting 1</span><br><span class="line">1</span><br><span class="line">Emitting 2</span><br><span class="line">2</span><br><span class="line">Done</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、Flow-构建器"><a href="#四、Flow-构建器" class="headerlink" title="四、Flow 构建器"></a>四、Flow 构建器</h2><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// flowOf 构建器</span></span><br><span class="line">flowOf(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// asFlow 扩展</span></span><br><span class="line">(<span class="number">1.</span><span class="number">.3</span>).asFlow()</span><br></pre></td></tr></table></figure>
+
+<h2 id="五、中间操作符"><a href="#五、中间操作符" class="headerlink" title="五、中间操作符"></a>五、中间操作符</h2><h3 id="map-和-filter"><a href="#map-和-filter" class="headerlink" title="map 和 filter"></a>map 和 filter</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">suspend</span> <span class="function"><span class="keyword">fun</span> <span class="title">performRequest</span><span class="params">(request: <span class="type">Int</span>)</span></span>: String &#123;</span><br><span class="line">    delay(<span class="number">1000</span>)</span><br><span class="line">    <span class="keyword">return</span> <span class="string">&quot;response <span class="variable">$request</span>&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">(<span class="number">1.</span><span class="number">.3</span>).asFlow()</span><br><span class="line">    .map &#123; request -&gt; performRequest(request) &#125;</span><br><span class="line">    .collect &#123; response -&gt; println(response) &#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="transform"><a href="#transform" class="headerlink" title="transform"></a>transform</h3><p>最通用的转换操作符：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">(<span class="number">1.</span><span class="number">.3</span>).asFlow()</span><br><span class="line">    .transform &#123; request -&gt;</span><br><span class="line">        emit(<span class="string">&quot;Making request <span class="variable">$request</span>&quot;</span>)</span><br><span class="line">        emit(performRequest(request))</span><br><span class="line">    &#125;</span><br><span class="line">    .collect &#123; response -&gt; println(response) &#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="限制大小"><a href="#限制大小" class="headerlink" title="限制大小"></a>限制大小</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">numbers</span><span class="params">()</span></span>: Flow&lt;<span class="built_in">Int</span>&gt; = flow &#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        emit(<span class="number">1</span>)</span><br><span class="line">        emit(<span class="number">2</span>)</span><br><span class="line">        println(<span class="string">&quot;This line will not execute&quot;</span>)</span><br><span class="line">        emit(<span class="number">3</span>)</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        println(<span class="string">&quot;Finally in numbers&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">numbers()</span><br><span class="line">    .take(<span class="number">2</span>)</span><br><span class="line">    .collect &#123; value -&gt; println(value) &#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">Finally in numbers</span><br></pre></td></tr></table></figure>
+
+<h2 id="六、终端操作符"><a href="#六、终端操作符" class="headerlink" title="六、终端操作符"></a>六、终端操作符</h2><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 转换为集合</span></span><br><span class="line"><span class="keyword">val</span> list = flow.toList()</span><br><span class="line"><span class="keyword">val</span> <span class="keyword">set</span> = flow.toSet()</span><br><span class="line"></span><br><span class="line"><span class="comment">// 获取单个值</span></span><br><span class="line"><span class="keyword">val</span> first = flow.first()</span><br><span class="line"><span class="keyword">val</span> single = flow.single()</span><br><span class="line"></span><br><span class="line"><span class="comment">// 归约</span></span><br><span class="line"><span class="keyword">val</span> sum = (<span class="number">1.</span><span class="number">.5</span>).asFlow()</span><br><span class="line">    .map &#123; it * it &#125;</span><br><span class="line">    .reduce &#123; a, b -&gt; a + b &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="七、Flow-是顺序的"><a href="#七、Flow-是顺序的" class="headerlink" title="七、Flow 是顺序的"></a>七、Flow 是顺序的</h2><p>默认情况下，每个值的处理是顺序的：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">(<span class="number">1.</span><span class="number">.5</span>).asFlow()</span><br><span class="line">    .filter &#123;</span><br><span class="line">        println(<span class="string">&quot;Filter <span class="variable">$it</span>&quot;</span>)</span><br><span class="line">        it % <span class="number">2</span> == <span class="number">0</span></span><br><span class="line">    &#125;</span><br><span class="line">    .map &#123;</span><br><span class="line">        println(<span class="string">&quot;Map <span class="variable">$it</span>&quot;</span>)</span><br><span class="line">        <span class="string">&quot;string <span class="variable">$it</span>&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">    .collect &#123;</span><br><span class="line">        println(<span class="string">&quot;Collect <span class="variable">$it</span>&quot;</span>)</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Filter 1</span><br><span class="line">Filter 2</span><br><span class="line">Map 2</span><br><span class="line">Collect string 2</span><br><span class="line">Filter 3</span><br><span class="line">Filter 4</span><br><span class="line">Map 4</span><br><span class="line">Collect string 4</span><br><span class="line">Filter 5</span><br></pre></td></tr></table></figure>
+
+<h2 id="八、Flow-上下文"><a href="#八、Flow-上下文" class="headerlink" title="八、Flow 上下文"></a>八、Flow 上下文</h2><h3 id="上下文保留"><a href="#上下文保留" class="headerlink" title="上下文保留"></a>上下文保留</h3><p>Flow 收集总是在调用协程的上下文中执行：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">simple</span><span class="params">()</span></span>: Flow&lt;<span class="built_in">Int</span>&gt; = flow &#123;</span><br><span class="line">    log(<span class="string">&quot;Started simple flow&quot;</span>)</span><br><span class="line">    <span class="keyword">for</span> (i <span class="keyword">in</span> <span class="number">1.</span><span class="number">.3</span>) &#123;</span><br><span class="line">        emit(i)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> = runBlocking&lt;<span class="built_in">Unit</span>&gt; &#123;</span><br><span class="line">    simple().collect &#123; value -&gt; log(<span class="string">&quot;Collected <span class="variable">$value</span>&quot;</span>) &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="flowOn-操作符"><a href="#flowOn-操作符" class="headerlink" title="flowOn 操作符"></a>flowOn 操作符</h3><p>使用 flowOn 改变 Flow 的发射上下文：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">simple</span><span class="params">()</span></span>: Flow&lt;<span class="built_in">Int</span>&gt; = flow &#123;</span><br><span class="line">    <span class="keyword">for</span> (i <span class="keyword">in</span> <span class="number">1.</span><span class="number">.3</span>) &#123;</span><br><span class="line">        Thread.sleep(<span class="number">100</span>)</span><br><span class="line">        log(<span class="string">&quot;Emitting <span class="variable">$i</span>&quot;</span>)</span><br><span class="line">        emit(i)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;.flowOn(Dispatchers.Default)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> = runBlocking&lt;<span class="built_in">Unit</span>&gt; &#123;</span><br><span class="line">    simple().collect &#123; value -&gt;</span><br><span class="line">        log(<span class="string">&quot;Collected <span class="variable">$value</span>&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[DefaultDispatcher-worker-1 @coroutine#2] Emitting 1</span><br><span class="line">[main @coroutine#1] Collected 1</span><br><span class="line">[DefaultDispatcher-worker-1 @coroutine#2] Emitting 2</span><br><span class="line">[main @coroutine#1] Collected 2</span><br><span class="line">[DefaultDispatcher-worker-1 @coroutine#2] Emitting 3</span><br><span class="line">[main @coroutine#1] Collected 3</span><br></pre></td></tr></table></figure>
+
+<h2 id="九、缓冲"><a href="#九、缓冲" class="headerlink" title="九、缓冲"></a>九、缓冲</h2><h3 id="buffer-操作符"><a href="#buffer-操作符" class="headerlink" title="buffer 操作符"></a>buffer 操作符</h3><p>当发射器和收集器都较慢时，使用缓冲：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">simple</span><span class="params">()</span></span>: Flow&lt;<span class="built_in">Int</span>&gt; = flow &#123;</span><br><span class="line">    <span class="keyword">for</span> (i <span class="keyword">in</span> <span class="number">1.</span><span class="number">.3</span>) &#123;</span><br><span class="line">        delay(<span class="number">100</span>)</span><br><span class="line">        emit(i)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 无缓冲：约 1200 ms</span></span><br><span class="line">simple().collect &#123; value -&gt;</span><br><span class="line">    delay(<span class="number">300</span>)</span><br><span class="line">    println(value)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 有缓冲：约 1000 ms</span></span><br><span class="line">simple()</span><br><span class="line">    .buffer()</span><br><span class="line">    .collect &#123; value -&gt;</span><br><span class="line">        delay(<span class="number">300</span>)</span><br><span class="line">        println(value)</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="conflate-操作符"><a href="#conflate-操作符" class="headerlink" title="conflate 操作符"></a>conflate 操作符</h3><p>跳过中间值，只处理最新的：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">simple()</span><br><span class="line">    .conflate()</span><br><span class="line">    .collect &#123; value -&gt;</span><br><span class="line">        delay(<span class="number">300</span>)</span><br><span class="line">        println(value)</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1</span><br><span class="line">3</span><br></pre></td></tr></table></figure>
+
+<h3 id="collectLatest-操作符"><a href="#collectLatest-操作符" class="headerlink" title="collectLatest 操作符"></a>collectLatest 操作符</h3><p>取消慢收集器并重启：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">simple()</span><br><span class="line">    .collectLatest &#123; value -&gt;</span><br><span class="line">        println(<span class="string">&quot;Collecting <span class="variable">$value</span>&quot;</span>)</span><br><span class="line">        delay(<span class="number">300</span>)</span><br><span class="line">        println(<span class="string">&quot;Done <span class="variable">$value</span>&quot;</span>)</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Collecting 1</span><br><span class="line">Collecting 2</span><br><span class="line">Collecting 3</span><br><span class="line">Done 3</span><br></pre></td></tr></table></figure>
+
+<h2 id="十、组合多个-Flow"><a href="#十、组合多个-Flow" class="headerlink" title="十、组合多个 Flow"></a>十、组合多个 Flow</h2><h3 id="zip"><a href="#zip" class="headerlink" title="zip"></a>zip</h3><p>组合两个 Flow 的对应值：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> nums = (<span class="number">1.</span><span class="number">.3</span>).asFlow()</span><br><span class="line"><span class="keyword">val</span> strs = flowOf(<span class="string">&quot;one&quot;</span>, <span class="string">&quot;two&quot;</span>, <span class="string">&quot;three&quot;</span>)</span><br><span class="line"></span><br><span class="line">nums.zip(strs) &#123; a, b -&gt; <span class="string">&quot;<span class="variable">$a</span> -&gt; <span class="variable">$b</span>&quot;</span> &#125;</span><br><span class="line">    .collect &#123; println(it) &#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1 -&gt; one</span><br><span class="line">2 -&gt; two</span><br><span class="line">3 -&gt; three</span><br></pre></td></tr></table></figure>
+
+<h3 id="combine"><a href="#combine" class="headerlink" title="combine"></a>combine</h3><p>当任一 Flow 发射时重新计算：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> nums = (<span class="number">1.</span><span class="number">.3</span>).asFlow().onEach &#123; delay(<span class="number">300</span>) &#125;</span><br><span class="line"><span class="keyword">val</span> strs = flowOf(<span class="string">&quot;one&quot;</span>, <span class="string">&quot;two&quot;</span>, <span class="string">&quot;three&quot;</span>).onEach &#123; delay(<span class="number">400</span>) &#125;</span><br><span class="line"></span><br><span class="line">nums.combine(strs) &#123; a, b -&gt; <span class="string">&quot;<span class="variable">$a</span> -&gt; <span class="variable">$b</span>&quot;</span> &#125;</span><br><span class="line">    .collect &#123; println(it) &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="十一、展平-Flow"><a href="#十一、展平-Flow" class="headerlink" title="十一、展平 Flow"></a>十一、展平 Flow</h2><h3 id="flatMapConcat"><a href="#flatMapConcat" class="headerlink" title="flatMapConcat"></a>flatMapConcat</h3><p>顺序展平：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">requestFlow</span><span class="params">(i: <span class="type">Int</span>)</span></span>: Flow&lt;String&gt; = flow &#123;</span><br><span class="line">    emit(<span class="string">&quot;<span class="variable">$i</span>: First&quot;</span>)</span><br><span class="line">    delay(<span class="number">500</span>)</span><br><span class="line">    emit(<span class="string">&quot;<span class="variable">$i</span>: Second&quot;</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">(<span class="number">1.</span><span class="number">.3</span>).asFlow()</span><br><span class="line">    .flatMapConcat &#123; requestFlow(it) &#125;</span><br><span class="line">    .collect &#123; println(it) &#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="flatMapMerge"><a href="#flatMapMerge" class="headerlink" title="flatMapMerge"></a>flatMapMerge</h3><p>并发展平：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(<span class="number">1.</span><span class="number">.3</span>).asFlow()</span><br><span class="line">    .flatMapMerge &#123; requestFlow(it) &#125;</span><br><span class="line">    .collect &#123; println(it) &#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="flatMapLatest"><a href="#flatMapLatest" class="headerlink" title="flatMapLatest"></a>flatMapLatest</h3><p>取消前一个 Flow：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(<span class="number">1.</span><span class="number">.3</span>).asFlow()</span><br><span class="line">    .flatMapLatest &#123; requestFlow(it) &#125;</span><br><span class="line">    .collect &#123; println(it) &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="十二、Flow-异常"><a href="#十二、Flow-异常" class="headerlink" title="十二、Flow 异常"></a>十二、Flow 异常</h2><h3 id="try-catch"><a href="#try-catch" class="headerlink" title="try-catch"></a>try-catch</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    simple().collect &#123; value -&gt;</span><br><span class="line">        println(value)</span><br><span class="line">        check(value &lt;= <span class="number">1</span>) &#123; <span class="string">&quot;Collected <span class="variable">$value</span>&quot;</span> &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125; <span class="keyword">catch</span> (e: Throwable) &#123;</span><br><span class="line">    println(<span class="string">&quot;Caught <span class="variable">$e</span>&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="catch-操作符"><a href="#catch-操作符" class="headerlink" title="catch 操作符"></a>catch 操作符</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">simple()</span><br><span class="line">    .<span class="keyword">catch</span> &#123; e -&gt; emit(<span class="string">&quot;Caught <span class="variable">$e</span>&quot;</span>) &#125;</span><br><span class="line">    .collect &#123; value -&gt; println(value) &#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>注意</strong>：catch 只捕获上游异常。</p>
+<h2 id="十三、Flow-完成"><a href="#十三、Flow-完成" class="headerlink" title="十三、Flow 完成"></a>十三、Flow 完成</h2><h3 id="finally-块"><a href="#finally-块" class="headerlink" title="finally 块"></a>finally 块</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    simple().collect &#123; value -&gt; println(value) &#125;</span><br><span class="line">&#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">    println(<span class="string">&quot;Done&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="onCompletion-操作符"><a href="#onCompletion-操作符" class="headerlink" title="onCompletion 操作符"></a>onCompletion 操作符</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">simple()</span><br><span class="line">    .onCompletion &#123; cause -&gt;</span><br><span class="line">        <span class="keyword">if</span> (cause != <span class="literal">null</span>) println(<span class="string">&quot;Flow completed exceptionally&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    .<span class="keyword">catch</span> &#123; cause -&gt; println(<span class="string">&quot;Caught exception&quot;</span>) &#125;</span><br><span class="line">    .collect &#123; value -&gt; println(value) &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="十四、启动-Flow"><a href="#十四、启动-Flow" class="headerlink" title="十四、启动 Flow"></a>十四、启动 Flow</h2><h3 id="launchIn-操作符"><a href="#launchIn-操作符" class="headerlink" title="launchIn 操作符"></a>launchIn 操作符</h3><p>在单独的协程中启动 Flow 收集：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">events</span><span class="params">()</span></span>: Flow&lt;<span class="built_in">Int</span>&gt; = (<span class="number">1.</span><span class="number">.3</span>).asFlow().onEach &#123; delay(<span class="number">100</span>) &#125;</span><br><span class="line"></span><br><span class="line">events()</span><br><span class="line">    .onEach &#123; event -&gt; println(<span class="string">&quot;Event: <span class="variable">$event</span>&quot;</span>) &#125;</span><br><span class="line">    .launchIn(<span class="keyword">this</span>)</span><br><span class="line"></span><br><span class="line">println(<span class="string">&quot;Done&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Done</span><br><span class="line">Event: 1</span><br><span class="line">Event: 2</span><br><span class="line">Event: 3</span><br></pre></td></tr></table></figure>
+
+<h2 id="十五、Flow-取消检查"><a href="#十五、Flow-取消检查" class="headerlink" title="十五、Flow 取消检查"></a>十五、Flow 取消检查</h2><h3 id="自动检查"><a href="#自动检查" class="headerlink" title="自动检查"></a>自动检查</h3><p>flow 构建器在每个发射值时检查取消：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">foo</span><span class="params">()</span></span>: Flow&lt;<span class="built_in">Int</span>&gt; = flow &#123;</span><br><span class="line">    <span class="keyword">for</span> (i <span class="keyword">in</span> <span class="number">1.</span><span class="number">.5</span>) &#123;</span><br><span class="line">        println(<span class="string">&quot;Emitting <span class="variable">$i</span>&quot;</span>)</span><br><span class="line">        emit(i)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">foo().collect &#123; value -&gt;</span><br><span class="line">    <span class="keyword">if</span> (value == <span class="number">3</span>) cancel()</span><br><span class="line">    println(value)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="cancellable-操作符"><a href="#cancellable-操作符" class="headerlink" title="cancellable 操作符"></a>cancellable 操作符</h3><p>对于繁忙循环，使用 cancellable：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">(<span class="number">1.</span><span class="number">.5</span>).asFlow()</span><br><span class="line">    .cancellable()</span><br><span class="line">    .collect &#123; value -&gt;</span><br><span class="line">        <span class="keyword">if</span> (value == <span class="number">3</span>) cancel()</span><br><span class="line">        println(value)</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://kotlinlang.org/docs/flow.html">Asynchronous Flow | Kotlin Documentation</a></li>
+<li><a target="_blank" rel="noopener" href="https://juejin.cn/post/7078587415748673543">彻底搞懂Kotlin Flow</a></li>
+</ul>
+<hr>
+<p><em>深入学习中…</em></p>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/Flow/" rel="tag">Flow</a>, <a class="tag-none-link" href="/blog/tags/Kotlin/" rel="tag">Kotlin</a>, <a class="tag-none-link" href="/blog/tags/%E5%8D%8F%E7%A8%8B/" rel="tag">协程</a>, <a class="tag-none-link" href="/blog/tags/%E5%BC%82%E6%AD%A5%E6%B5%81/" rel="tag">异步流</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-03T17:18:30.304Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Android协程与生命周期感知型组件深度解析" href="/blog/2026/04/04/Android协程与生命周期感知型组件深度解析/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" Kotlin Sealed Classes密封类深度解析" href="/blog/2026/04/04/Kotlin-Sealed-Classes密封类深度解析/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>

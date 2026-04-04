@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>Kotlin数据类与when表达式实战 | Wenyi&#39;s Blog</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/03/Kotlin%E6%95%B0%E6%8D%AE%E7%B1%BB%E4%B8%8Ewhen%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%AE%9E%E6%88%98/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="Data Class, Kotlin, Sealed Class, when, 模式匹配" />
+  
+  <meta name="description" content="前言Kotlin 的数据类（Data Class）和 when 表达式结合使用，配合密封类（Sealed Class），可以实现编译时安全的模式匹配。 一、Data Class基本定义1data class User(val name: String, val age: Int)  自动生成的函数   函数 描述    equals() 比较属性值   hashCode() 基于属性生成哈希">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kotlin数据类与when表达式实战">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/03/Kotlin%E6%95%B0%E6%8D%AE%E7%B1%BB%E4%B8%8Ewhen%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%AE%9E%E6%88%98/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:description" content="前言Kotlin 的数据类（Data Class）和 when 表达式结合使用，配合密封类（Sealed Class），可以实现编译时安全的模式匹配。 一、Data Class基本定义1data class User(val name: String, val age: Int)  自动生成的函数   函数 描述    equals() 比较属性值   hashCode() 基于属性生成哈希">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-04-03T23:41:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T15:41:18.944Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="Data Class">
+<meta property="article:tag" content="Kotlin">
+<meta property="article:tag" content="Sealed Class">
+<meta property="article:tag" content="when">
+<meta property="article:tag" content="模式匹配">
+<meta name="twitter:card" content="summary">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Kotlin数据类与when表达式实战","description":"前言Kotlin 的数据类（Data Class）和 when 表达式结合使用，配合密封类（Sealed Class），可以实现编译时安全的模式匹配。...","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:41:00.000Z","dateModified":"2026-04-03T15:41:18.944Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Kotlin%E6%95%B0%E6%8D%AE%E7%B1%BB%E4%B8%8Ewhen%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%AE%9E%E6%88%98/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/03/Kotlin%E6%95%B0%E6%8D%AE%E7%B1%BB%E4%B8%8Ewhen%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%AE%9E%E6%88%98/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Kotlin数据类与when表达式实战</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-03T23:41:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-03</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~6.50K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Kotlin 的数据类（Data Class）和 when 表达式结合使用，配合密封类（Sealed Class），可以实现编译时安全的模式匹配。</p>
+<h2 id="一、Data-Class"><a href="#一、Data-Class" class="headerlink" title="一、Data Class"></a>一、Data Class</h2><h3 id="基本定义"><a href="#基本定义" class="headerlink" title="基本定义"></a>基本定义</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">User</span>(<span class="keyword">val</span> name: String, <span class="keyword">val</span> age: <span class="built_in">Int</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="自动生成的函数"><a href="#自动生成的函数" class="headerlink" title="自动生成的函数"></a>自动生成的函数</h3><table>
+<thead>
+<tr>
+<th>函数</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>equals()</code></td>
+<td>比较属性值</td>
+</tr>
+<tr>
+<td><code>hashCode()</code></td>
+<td>基于属性生成哈希</td>
+</tr>
+<tr>
+<td><code>toString()</code></td>
+<td>返回 “User(name&#x3D;John, age&#x3D;30)”</td>
+</tr>
+<tr>
+<td><code>componentN()</code></td>
+<td>解构声明</td>
+</tr>
+<tr>
+<td><code>copy()</code></td>
+<td>复制并修改部分属性</td>
+</tr>
+</tbody></table>
+<h3 id="解构声明"><a href="#解构声明" class="headerlink" title="解构声明"></a>解构声明</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> user = User(<span class="string">&quot;Alice&quot;</span>, <span class="number">25</span>)</span><br><span class="line"><span class="keyword">val</span> (name, age) = user</span><br><span class="line"></span><br><span class="line">println(name)  <span class="comment">// Alice</span></span><br><span class="line">println(age)   <span class="comment">// 25</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="copy-函数"><a href="#copy-函数" class="headerlink" title="copy 函数"></a>copy 函数</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> user = User(<span class="string">&quot;Alice&quot;</span>, <span class="number">25</span>)</span><br><span class="line"><span class="keyword">val</span> olderUser = user.copy(age = <span class="number">26</span>)</span><br><span class="line"></span><br><span class="line">println(olderUser)  <span class="comment">// User(name=Alice, age=26)</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="二、when-表达式"><a href="#二、when-表达式" class="headerlink" title="二、when 表达式"></a>二、when 表达式</h2><h3 id="基本语法"><a href="#基本语法" class="headerlink" title="基本语法"></a>基本语法</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> result = <span class="keyword">when</span> (x) &#123;</span><br><span class="line">    <span class="number">1</span> -&gt; <span class="string">&quot;One&quot;</span></span><br><span class="line">    <span class="number">2</span> -&gt; <span class="string">&quot;Two&quot;</span></span><br><span class="line">    <span class="number">3</span>, <span class="number">4</span> -&gt; <span class="string">&quot;Three or Four&quot;</span></span><br><span class="line">    <span class="keyword">in</span> <span class="number">5.</span><span class="number">.10</span> -&gt; <span class="string">&quot;Five to Ten&quot;</span></span><br><span class="line">    <span class="keyword">else</span> -&gt; <span class="string">&quot;Unknown&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="类型检查"><a href="#类型检查" class="headerlink" title="类型检查"></a>类型检查</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">describe</span><span class="params">(obj: <span class="type">Any</span>)</span></span>: String = <span class="keyword">when</span> (obj) &#123;</span><br><span class="line">    <span class="keyword">is</span> String -&gt; <span class="string">&quot;String of length <span class="subst">$&#123;obj.length&#125;</span>&quot;</span></span><br><span class="line">    <span class="keyword">is</span> <span class="built_in">Int</span> -&gt; <span class="string">&quot;Integer: <span class="variable">$obj</span>&quot;</span></span><br><span class="line">    <span class="keyword">is</span> List&lt;*&gt; -&gt; <span class="string">&quot;List with <span class="subst">$&#123;obj.size&#125;</span> elements&quot;</span></span><br><span class="line">    <span class="keyword">else</span> -&gt; <span class="string">&quot;Unknown type&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="范围匹配"><a href="#范围匹配" class="headerlink" title="范围匹配"></a>范围匹配</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">describeNumber</span><span class="params">(n: <span class="type">Int</span>)</span></span>: String = <span class="keyword">when</span> &#123;</span><br><span class="line">    n &lt; <span class="number">0</span> -&gt; <span class="string">&quot;Negative&quot;</span></span><br><span class="line">    n == <span class="number">0</span> -&gt; <span class="string">&quot;Zero&quot;</span></span><br><span class="line">    n <span class="keyword">in</span> <span class="number">1.</span><span class="number">.10</span> -&gt; <span class="string">&quot;Small&quot;</span></span><br><span class="line">    n <span class="keyword">in</span> <span class="number">11.</span><span class="number">.100</span> -&gt; <span class="string">&quot;Medium&quot;</span></span><br><span class="line">    <span class="keyword">else</span> -&gt; <span class="string">&quot;Large&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="三、Sealed-Class-when"><a href="#三、Sealed-Class-when" class="headerlink" title="三、Sealed Class + when"></a>三、Sealed Class + when</h2><h3 id="完整覆盖"><a href="#完整覆盖" class="headerlink" title="完整覆盖"></a>完整覆盖</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">sealed</span> <span class="keyword">class</span> <span class="title class_">Result</span> &#123;</span><br><span class="line">    <span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">Success</span>(<span class="keyword">val</span> <span class="keyword">data</span>: String) : Result()</span><br><span class="line">    <span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">Error</span>(<span class="keyword">val</span> message: String) : Result()</span><br><span class="line">    <span class="keyword">object</span> Loading : Result()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">handleResult</span><span class="params">(result: <span class="type">Result</span>)</span></span>: String = <span class="keyword">when</span> (result) &#123;</span><br><span class="line">    <span class="keyword">is</span> Result.Success -&gt; <span class="string">&quot;Data: <span class="subst">$&#123;result.data&#125;</span>&quot;</span></span><br><span class="line">    <span class="keyword">is</span> Result.Error -&gt; <span class="string">&quot;Error: <span class="subst">$&#123;result.message&#125;</span>&quot;</span></span><br><span class="line">    Result.Loading -&gt; <span class="string">&quot;Loading...&quot;</span></span><br><span class="line">    <span class="comment">// 不需要 else 分支！</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="智能转换"><a href="#智能转换" class="headerlink" title="智能转换"></a>智能转换</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">processResult</span><span class="params">(result: <span class="type">Result</span>)</span></span> &#123;</span><br><span class="line">    <span class="keyword">when</span> (result) &#123;</span><br><span class="line">        <span class="keyword">is</span> Result.Success -&gt; &#123;</span><br><span class="line">            <span class="comment">// result 智能转换为 Result.Success</span></span><br><span class="line">            println(result.<span class="keyword">data</span>)</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">is</span> Result.Error -&gt; &#123;</span><br><span class="line">            <span class="comment">// result 智能转换为 Result.Error</span></span><br><span class="line">            println(result.message)</span><br><span class="line">        &#125;</span><br><span class="line">        Result.Loading -&gt; &#123;</span><br><span class="line">            println(<span class="string">&quot;Loading&quot;</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、实战应用"><a href="#四、实战应用" class="headerlink" title="四、实战应用"></a>四、实战应用</h2><h3 id="1-网络请求状态"><a href="#1-网络请求状态" class="headerlink" title="1. 网络请求状态"></a>1. 网络请求状态</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">sealed</span> <span class="keyword">class</span> <span class="title class_">NetworkState</span>&lt;<span class="type">out T</span>&gt; &#123;</span><br><span class="line">    <span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">Success</span>&lt;<span class="type">T</span>&gt;(<span class="keyword">val</span> <span class="keyword">data</span>: T) : NetworkState&lt;T&gt;()</span><br><span class="line">    <span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">Error</span>(<span class="keyword">val</span> exception: Throwable) : NetworkState&lt;<span class="built_in">Nothing</span>&gt;()</span><br><span class="line">    <span class="keyword">object</span> Loading : NetworkState&lt;<span class="built_in">Nothing</span>&gt;()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Composable</span></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="type">&lt;T&gt;</span> <span class="title">NetworkStateContent</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">    state: <span class="type">NetworkState</span>&lt;<span class="type">T</span>&gt;,</span></span></span><br><span class="line"><span class="params"><span class="function">    onSuccess: @<span class="type">Composable</span> (<span class="type">T</span>) -&gt; <span class="type">Unit</span>,</span></span></span><br><span class="line"><span class="params"><span class="function">    onError: @<span class="type">Composable</span> (<span class="type">Throwable</span>) -&gt; <span class="type">Unit</span>,</span></span></span><br><span class="line"><span class="params"><span class="function">    onLoading: @<span class="type">Composable</span> () -&gt; <span class="type">Unit</span></span></span></span><br><span class="line"><span class="params"><span class="function">)</span></span> &#123;</span><br><span class="line">    <span class="keyword">when</span> (state) &#123;</span><br><span class="line">        <span class="keyword">is</span> NetworkState.Success -&gt; onSuccess(state.<span class="keyword">data</span>)</span><br><span class="line">        <span class="keyword">is</span> NetworkState.Error -&gt; onError(state.exception)</span><br><span class="line">        NetworkState.Loading -&gt; onLoading()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-表单验证"><a href="#2-表单验证" class="headerlink" title="2. 表单验证"></a>2. 表单验证</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">sealed</span> <span class="keyword">class</span> <span class="title class_">FormField</span> &#123;</span><br><span class="line">    <span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">Email</span>(<span class="keyword">val</span> value: String) : FormField()</span><br><span class="line">    <span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">Password</span>(<span class="keyword">val</span> value: String) : FormField()</span><br><span class="line">    <span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">Phone</span>(<span class="keyword">val</span> value: String) : FormField()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">validate</span><span class="params">(field: <span class="type">FormField</span>)</span></span>: ValidationResult = <span class="keyword">when</span> (field) &#123;</span><br><span class="line">    <span class="keyword">is</span> FormField.Email -&gt; &#123;</span><br><span class="line">        <span class="keyword">if</span> (field.value.contains(<span class="string">&quot;@&quot;</span>)) ValidationResult.Valid</span><br><span class="line">        <span class="keyword">else</span> ValidationResult.Invalid(<span class="string">&quot;Invalid email&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">is</span> FormField.Password -&gt; &#123;</span><br><span class="line">        <span class="keyword">if</span> (field.value.length &gt;= <span class="number">8</span>) ValidationResult.Valid</span><br><span class="line">        <span class="keyword">else</span> ValidationResult.Invalid(<span class="string">&quot;Too short&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">is</span> FormField.Phone -&gt; &#123;</span><br><span class="line">        <span class="keyword">if</span> (field.value.matches(Regex(<span class="string">&quot;\\d&#123;10&#125;&quot;</span>))) ValidationResult.Valid</span><br><span class="line">        <span class="keyword">else</span> ValidationResult.Invalid(<span class="string">&quot;Invalid phone&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-订单状态"><a href="#3-订单状态" class="headerlink" title="3. 订单状态"></a>3. 订单状态</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">sealed</span> <span class="keyword">class</span> <span class="title class_">OrderStatus</span> &#123;</span><br><span class="line">    <span class="keyword">object</span> Pending : OrderStatus()</span><br><span class="line">    <span class="keyword">object</span> Processing : OrderStatus()</span><br><span class="line">    <span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">Shipped</span>(<span class="keyword">val</span> trackingNumber: String) : OrderStatus()</span><br><span class="line">    <span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">Delivered</span>(<span class="keyword">val</span> deliveryDate: String) : OrderStatus()</span><br><span class="line">    <span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">Cancelled</span>(<span class="keyword">val</span> reason: String) : OrderStatus()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">getStatusText</span><span class="params">(status: <span class="type">OrderStatus</span>)</span></span>: String = <span class="keyword">when</span> (status) &#123;</span><br><span class="line">    OrderStatus.Pending -&gt; <span class="string">&quot;待处理&quot;</span></span><br><span class="line">    OrderStatus.Processing -&gt; <span class="string">&quot;处理中&quot;</span></span><br><span class="line">    <span class="keyword">is</span> OrderStatus.Shipped -&gt; <span class="string">&quot;已发货: <span class="subst">$&#123;status.trackingNumber&#125;</span>&quot;</span></span><br><span class="line">    <span class="keyword">is</span> OrderStatus.Delivered -&gt; <span class="string">&quot;已送达: <span class="subst">$&#123;status.deliveryDate&#125;</span>&quot;</span></span><br><span class="line">    <span class="keyword">is</span> OrderStatus.Cancelled -&gt; <span class="string">&quot;已取消: <span class="subst">$&#123;status.reason&#125;</span>&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-RecyclerView-多类型"><a href="#4-RecyclerView-多类型" class="headerlink" title="4. RecyclerView 多类型"></a>4. RecyclerView 多类型</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">sealed</span> <span class="keyword">class</span> <span class="title class_">ListItem</span> &#123;</span><br><span class="line">    <span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">Header</span>(<span class="keyword">val</span> title: String) : ListItem()</span><br><span class="line">    <span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">Content</span>(<span class="keyword">val</span> id: String, <span class="keyword">val</span> text: String) : ListItem()</span><br><span class="line">    <span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">Footer</span>(<span class="keyword">val</span> page: <span class="built_in">Int</span>) : ListItem()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MultiTypeAdapter</span> : <span class="type">RecyclerView.Adapter</span>&lt;<span class="type">RecyclerView.ViewHolder</span>&gt;() &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">getItemViewType</span><span class="params">(position: <span class="type">Int</span>)</span></span>: <span class="built_in">Int</span> = <span class="keyword">when</span> (items[position]) &#123;</span><br><span class="line">        <span class="keyword">is</span> ListItem.Header -&gt; TYPE_HEADER</span><br><span class="line">        <span class="keyword">is</span> ListItem.Content -&gt; TYPE_CONTENT</span><br><span class="line">        <span class="keyword">is</span> ListItem.Footer -&gt; TYPE_FOOTER</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onBindViewHolder</span><span class="params">(holder: <span class="type">RecyclerView</span>.<span class="type">ViewHolder</span>, position: <span class="type">Int</span>)</span></span> &#123;</span><br><span class="line">        <span class="keyword">when</span> (<span class="keyword">val</span> item = items[position]) &#123;</span><br><span class="line">            <span class="keyword">is</span> ListItem.Header -&gt; (holder <span class="keyword">as</span> HeaderHolder).bind(item.title)</span><br><span class="line">            <span class="keyword">is</span> ListItem.Content -&gt; (holder <span class="keyword">as</span> ContentHolder).bind(item.text)</span><br><span class="line">            <span class="keyword">is</span> ListItem.Footer -&gt; (holder <span class="keyword">as</span> FooterHolder).bind(item.page)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="五、when-表达式技巧"><a href="#五、when-表达式技巧" class="headerlink" title="五、when 表达式技巧"></a>五、when 表达式技巧</h2><h3 id="1-组合条件"><a href="#1-组合条件" class="headerlink" title="1. 组合条件"></a>1. 组合条件</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">when</span> &#123;</span><br><span class="line">    x &gt; <span class="number">0</span> &amp;&amp; y &gt; <span class="number">0</span> -&gt; <span class="string">&quot;First quadrant&quot;</span></span><br><span class="line">    x &lt; <span class="number">0</span> &amp;&amp; y &gt; <span class="number">0</span> -&gt; <span class="string">&quot;Second quadrant&quot;</span></span><br><span class="line">    x &lt; <span class="number">0</span> &amp;&amp; y &lt; <span class="number">0</span> -&gt; <span class="string">&quot;Third quadrant&quot;</span></span><br><span class="line">    x &gt; <span class="number">0</span> &amp;&amp; y &lt; <span class="number">0</span> -&gt; <span class="string">&quot;Fourth quadrant&quot;</span></span><br><span class="line">    <span class="keyword">else</span> -&gt; <span class="string">&quot;On axis&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-捕获条件"><a href="#2-捕获条件" class="headerlink" title="2. 捕获条件"></a>2. 捕获条件</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">when</span> (<span class="keyword">val</span> result = computeResult()) &#123;</span><br><span class="line">    <span class="keyword">is</span> Result.Success -&gt; println(result.<span class="keyword">data</span>)</span><br><span class="line">    <span class="keyword">is</span> Result.Error -&gt; println(result.message)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-函数返回"><a href="#3-函数返回" class="headerlink" title="3. 函数返回"></a>3. 函数返回</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">describe</span><span class="params">(x: <span class="type">Any</span>)</span></span>: String = <span class="keyword">when</span> (x) &#123;</span><br><span class="line">    <span class="number">0</span> -&gt; <span class="string">&quot;zero&quot;</span></span><br><span class="line">    <span class="number">1</span>, <span class="number">2</span> -&gt; <span class="string">&quot;low&quot;</span></span><br><span class="line">    <span class="keyword">in</span> <span class="number">3.</span><span class="number">.10</span> -&gt; <span class="string">&quot;medium&quot;</span></span><br><span class="line">    <span class="keyword">else</span> -&gt; <span class="string">&quot;unknown&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="六、最佳实践"><a href="#六、最佳实践" class="headerlink" title="六、最佳实践"></a>六、最佳实践</h2><ol>
+<li><strong>编译时安全</strong>：使用密封类 + when 避免遗漏</li>
+<li><strong>智能转换</strong>：利用 when 的类型检查</li>
+<li><strong>避免 else</strong>：让编译器帮助检查完整性</li>
+<li><strong>数据类</strong>：自动生成 equals、hashCode、toString</li>
+</ol>
+<h2 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://kotlinlang.org/docs/sealed-classes.html">Sealed classes and interfaces | Kotlin Documentation</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.runoob.com/kotlin/kotlin-data-sealed-classes.html">Kotlin 数据类与密封类</a></li>
+<li><a target="_blank" rel="noopener" href="https://medium.com/@yilmazgokhan/using-sealed-classes-in-kotlin-compile-time-safety-with-when-a1de2dd32385">Using Sealed Classes in Kotlin: Compile-Time Safety with when</a></li>
+</ul>
+<hr>
+<p><em>持续学习中…</em></p>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/Data-Class/" rel="tag">Data Class</a>, <a class="tag-none-link" href="/blog/tags/Kotlin/" rel="tag">Kotlin</a>, <a class="tag-none-link" href="/blog/tags/Sealed-Class/" rel="tag">Sealed Class</a>, <a class="tag-none-link" href="/blog/tags/when/" rel="tag">when</a>, <a class="tag-none-link" href="/blog/tags/%E6%A8%A1%E5%BC%8F%E5%8C%B9%E9%85%8D/" rel="tag">模式匹配</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-03T15:41:18.944Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Kotlin Multiplatform Ktor网络请求学习" href="/blog/2026/04/03/Kotlin-Multiplatform-Ktor网络请求学习/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" Android热修复Tinker学习" href="/blog/2026/04/03/Android热修复Tinker学习/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>

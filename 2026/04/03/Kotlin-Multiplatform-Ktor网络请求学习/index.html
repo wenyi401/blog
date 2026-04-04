@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>Kotlin Multiplatform Ktor网络请求学习 | Wenyi&#39;s Blog</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/03/Kotlin-Multiplatform-Ktor%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82%E5%AD%A6%E4%B9%A0/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="KMP, Kotlin, Ktor, 网络请求, 跨平台" />
+  
+  <meta name="description" content="前言Ktor HTTP 客户端可以在多平台项目中使用。本文将介绍如何在 Kotlin Multiplatform Mobile 应用中使用 Ktor 进行网络请求。 一、添加依赖版本目录12345678910# gradle&#x2F;libs.versions.toml[versions]ktor &#x3D; &quot;3.4.2&quot;kotlinx-coroutines &#x3D; &quot;1.10.2&amp;q">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kotlin Multiplatform Ktor网络请求学习">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/03/Kotlin-Multiplatform-Ktor%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82%E5%AD%A6%E4%B9%A0/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:description" content="前言Ktor HTTP 客户端可以在多平台项目中使用。本文将介绍如何在 Kotlin Multiplatform Mobile 应用中使用 Ktor 进行网络请求。 一、添加依赖版本目录12345678910# gradle&#x2F;libs.versions.toml[versions]ktor &#x3D; &quot;3.4.2&quot;kotlinx-coroutines &#x3D; &quot;1.10.2&amp;q">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-04-03T23:40:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T15:39:43.500Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="KMP">
+<meta property="article:tag" content="Kotlin">
+<meta property="article:tag" content="Ktor">
+<meta property="article:tag" content="网络请求">
+<meta property="article:tag" content="跨平台">
+<meta name="twitter:card" content="summary">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Kotlin Multiplatform Ktor网络请求学习","description":"前言Ktor HTTP 客户端可以在多平台项目中使用。本文将介绍如何在 Kotlin Multiplatform Mobile 应用中使用 Ktor 进行网络...","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:40:00.000Z","dateModified":"2026-04-03T15:39:43.500Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Kotlin-Multiplatform-Ktor%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82%E5%AD%A6%E4%B9%A0/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/03/Kotlin-Multiplatform-Ktor%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82%E5%AD%A6%E4%B9%A0/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Kotlin Multiplatform Ktor网络请求学习</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-03T23:40:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-03</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~4.86K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Ktor HTTP 客户端可以在多平台项目中使用。本文将介绍如何在 Kotlin Multiplatform Mobile 应用中使用 Ktor 进行网络请求。</p>
+<h2 id="一、添加依赖"><a href="#一、添加依赖" class="headerlink" title="一、添加依赖"></a>一、添加依赖</h2><h3 id="版本目录"><a href="#版本目录" class="headerlink" title="版本目录"></a>版本目录</h3><figure class="highlight toml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># gradle/libs.versions.toml</span></span><br><span class="line"><span class="section">[versions]</span></span><br><span class="line"><span class="attr">ktor</span> = <span class="string">&quot;3.4.2&quot;</span></span><br><span class="line"><span class="attr">kotlinx-coroutines</span> = <span class="string">&quot;1.10.2&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="section">[libraries]</span></span><br><span class="line"><span class="attr">ktor-client-core</span> = &#123; module = <span class="string">&quot;io.ktor:ktor-client-core&quot;</span>, version.ref = <span class="string">&quot;ktor&quot;</span> &#125;</span><br><span class="line"><span class="attr">ktor-client-okhttp</span> = &#123; module = <span class="string">&quot;io.ktor:ktor-client-okhttp&quot;</span>, version.ref = <span class="string">&quot;ktor&quot;</span> &#125;</span><br><span class="line"><span class="attr">ktor-client-darwin</span> = &#123; module = <span class="string">&quot;io.ktor:ktor-client-darwin&quot;</span>, version.ref = <span class="string">&quot;ktor&quot;</span> &#125;</span><br><span class="line"><span class="attr">kotlinx-coroutines-core</span> = &#123; module = <span class="string">&quot;org.jetbrains.kotlinx:kotlinx-coroutines-core&quot;</span>, version.ref = <span class="string">&quot;kotlinx-coroutines&quot;</span> &#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="共享模块"><a href="#共享模块" class="headerlink" title="共享模块"></a>共享模块</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// shared/build.gradle.kts</span></span><br><span class="line">sourceSets &#123;</span><br><span class="line">    commonMain.dependencies &#123;</span><br><span class="line">        implementation(libs.ktor.client.core)</span><br><span class="line">        implementation(libs.kotlinx.coroutines.core)</span><br><span class="line">    &#125;</span><br><span class="line">    androidMain.dependencies &#123;</span><br><span class="line">        implementation(libs.ktor.client.okhttp)</span><br><span class="line">    &#125;</span><br><span class="line">    iosMain.dependencies &#123;</span><br><span class="line">        implementation(libs.ktor.client.darwin)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="二、创建-HttpClient"><a href="#二、创建-HttpClient" class="headerlink" title="二、创建 HttpClient"></a>二、创建 HttpClient</h2><h3 id="基本配置"><a href="#基本配置" class="headerlink" title="基本配置"></a>基本配置</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> io.ktor.client.HttpClient</span><br><span class="line"><span class="keyword">import</span> io.ktor.client.engine.okhttp.OkHttp</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Greeting</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> client = HttpClient()</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">suspend</span> <span class="function"><span class="keyword">fun</span> <span class="title">greet</span><span class="params">()</span></span>: String &#123;</span><br><span class="line">        <span class="keyword">val</span> response = client.<span class="keyword">get</span>(<span class="string">&quot;https://ktor.io/docs/&quot;</span>)</span><br><span class="line">        <span class="keyword">return</span> response.bodyAsText()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="自定义配置"><a href="#自定义配置" class="headerlink" title="自定义配置"></a>自定义配置</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> client = HttpClient &#123;</span><br><span class="line">    install(ContentNegotiation) &#123;</span><br><span class="line">        json(Json &#123;</span><br><span class="line">            ignoreUnknownKeys = <span class="literal">true</span></span><br><span class="line">            prettyPrint = <span class="literal">true</span></span><br><span class="line">        &#125;)</span><br><span class="line">    &#125;</span><br><span class="line">    install(Logging) &#123;</span><br><span class="line">        level = LogLevel.ALL</span><br><span class="line">    &#125;</span><br><span class="line">    install(HttpTimeout) &#123;</span><br><span class="line">        requestTimeoutMillis = <span class="number">30000</span></span><br><span class="line">        connectTimeoutMillis = <span class="number">10000</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="三、发送请求"><a href="#三、发送请求" class="headerlink" title="三、发送请求"></a>三、发送请求</h2><h3 id="GET-请求"><a href="#GET-请求" class="headerlink" title="GET 请求"></a>GET 请求</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">suspend</span> <span class="function"><span class="keyword">fun</span> <span class="title">getUser</span><span class="params">(id: <span class="type">String</span>)</span></span>: User &#123;</span><br><span class="line">    <span class="keyword">return</span> client.<span class="keyword">get</span>(<span class="string">&quot;https://api.example.com/users/<span class="variable">$id</span>&quot;</span>).body()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="POST-请求"><a href="#POST-请求" class="headerlink" title="POST 请求"></a>POST 请求</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">suspend</span> <span class="function"><span class="keyword">fun</span> <span class="title">createUser</span><span class="params">(user: <span class="type">User</span>)</span></span>: User &#123;</span><br><span class="line">    <span class="keyword">return</span> client.post(<span class="string">&quot;https://api.example.com/users&quot;</span>) &#123;</span><br><span class="line">        contentType(ContentType.Application.Json)</span><br><span class="line">        setBody(user)</span><br><span class="line">    &#125;.body()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="带参数请求"><a href="#带参数请求" class="headerlink" title="带参数请求"></a>带参数请求</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">suspend</span> <span class="function"><span class="keyword">fun</span> <span class="title">searchUsers</span><span class="params">(query: <span class="type">String</span>)</span></span>: List&lt;User&gt; &#123;</span><br><span class="line">    <span class="keyword">return</span> client.<span class="keyword">get</span>(<span class="string">&quot;https://api.example.com/users&quot;</span>) &#123;</span><br><span class="line">        parameter(<span class="string">&quot;q&quot;</span>, query)</span><br><span class="line">        parameter(<span class="string">&quot;limit&quot;</span>, <span class="number">10</span>)</span><br><span class="line">    &#125;.body()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、响应处理"><a href="#四、响应处理" class="headerlink" title="四、响应处理"></a>四、响应处理</h2><h3 id="基本响应"><a href="#基本响应" class="headerlink" title="基本响应"></a>基本响应</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> response: HttpResponse = client.<span class="keyword">get</span>(<span class="string">&quot;https://api.example.com/data&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 状态码</span></span><br><span class="line"><span class="keyword">val</span> status = response.status</span><br><span class="line"></span><br><span class="line"><span class="comment">// 响应头</span></span><br><span class="line"><span class="keyword">val</span> headers = response.headers</span><br><span class="line"></span><br><span class="line"><span class="comment">// 响应体</span></span><br><span class="line"><span class="keyword">val</span> text = response.bodyAsText()</span><br></pre></td></tr></table></figure>
+
+<h3 id="JSON-解析"><a href="#JSON-解析" class="headerlink" title="JSON 解析"></a>JSON 解析</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 使用 ContentNegotiation 插件</span></span><br><span class="line"><span class="keyword">val</span> user: User = client.<span class="keyword">get</span>(<span class="string">&quot;https://api.example.com/user/1&quot;</span>).body()</span><br><span class="line"></span><br><span class="line"><span class="comment">// 列表</span></span><br><span class="line"><span class="keyword">val</span> users: List&lt;User&gt; = client.<span class="keyword">get</span>(<span class="string">&quot;https://api.example.com/users&quot;</span>).body()</span><br></pre></td></tr></table></figure>
+
+<h2 id="五、错误处理"><a href="#五、错误处理" class="headerlink" title="五、错误处理"></a>五、错误处理</h2><h3 id="异常捕获"><a href="#异常捕获" class="headerlink" title="异常捕获"></a>异常捕获</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">suspend</span> <span class="function"><span class="keyword">fun</span> <span class="title">safeRequest</span><span class="params">()</span></span>: Result&lt;User&gt; = runCatching &#123;</span><br><span class="line">    client.<span class="keyword">get</span>(<span class="string">&quot;https://api.example.com/user/1&quot;</span>).body()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用</span></span><br><span class="line"><span class="keyword">when</span> (<span class="keyword">val</span> result = safeRequest()) &#123;</span><br><span class="line">    <span class="keyword">is</span> Result.Success -&gt; println(result.<span class="keyword">data</span>)</span><br><span class="line">    <span class="keyword">is</span> Result.Failure -&gt; println(result.exception)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="响应验证"><a href="#响应验证" class="headerlink" title="响应验证"></a>响应验证</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">suspend</span> <span class="function"><span class="keyword">fun</span> <span class="title">fetchUser</span><span class="params">(id: <span class="type">String</span>)</span></span>: User &#123;</span><br><span class="line">    <span class="keyword">val</span> response = client.<span class="keyword">get</span>(<span class="string">&quot;https://api.example.com/users/<span class="variable">$id</span>&quot;</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> (!response.status.isSuccess()) &#123;</span><br><span class="line">        <span class="keyword">throw</span> ApiException(response.status)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> response.body()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="六、拦截器"><a href="#六、拦截器" class="headerlink" title="六、拦截器"></a>六、拦截器</h2><h3 id="请求拦截"><a href="#请求拦截" class="headerlink" title="请求拦截"></a>请求拦截</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> client = HttpClient &#123;</span><br><span class="line">    install(HttpSend) &#123;</span><br><span class="line">        intercept &#123; request -&gt;</span><br><span class="line">            request.headers.append(<span class="string">&quot;Authorization&quot;</span>, <span class="string">&quot;Bearer <span class="variable">$token</span>&quot;</span>)</span><br><span class="line">            execute(request)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="响应拦截"><a href="#响应拦截" class="headerlink" title="响应拦截"></a>响应拦截</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> client = HttpClient &#123;</span><br><span class="line">    responseInterceptor &#123; response -&gt;</span><br><span class="line">        <span class="keyword">if</span> (response.status == HttpStatusCode.Unauthorized) &#123;</span><br><span class="line">            <span class="comment">// 刷新 token</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="七、Android-使用"><a href="#七、Android-使用" class="headerlink" title="七、Android 使用"></a>七、Android 使用</h2><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// App.kt</span></span><br><span class="line"><span class="meta">@Composable</span></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">App</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">var</span> text <span class="keyword">by</span> remember &#123; mutableStateOf(<span class="string">&quot;Loading...&quot;</span>) &#125;</span><br><span class="line">    </span><br><span class="line">    LaunchedEffect(<span class="built_in">Unit</span>) &#123;</span><br><span class="line">        text = Greeting().greet()</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    Text(text = text)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="八、iOS-使用"><a href="#八、iOS-使用" class="headerlink" title="八、iOS 使用"></a>八、iOS 使用</h2><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ContentView.swift</span></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">ContentView</span>: <span class="title class_ inherited__">View</span> &#123;</span><br><span class="line">    <span class="meta">@State</span> <span class="keyword">private</span> <span class="keyword">var</span> text <span class="operator">=</span> <span class="string">&quot;Loading...&quot;</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">var</span> body: <span class="keyword">some</span> <span class="type">View</span> &#123;</span><br><span class="line">        <span class="type">Text</span>(text)</span><br><span class="line">            .onAppear &#123;</span><br><span class="line">                <span class="type">Greeting</span>().greet &#123; result <span class="keyword">in</span></span><br><span class="line">                    <span class="type">DispatchQueue</span>.main.async &#123;</span><br><span class="line">                        <span class="keyword">self</span>.text <span class="operator">=</span> result</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="九、最佳实践"><a href="#九、最佳实践" class="headerlink" title="九、最佳实践"></a>九、最佳实践</h2><ol>
+<li><strong>单例 HttpClient</strong>：重用客户端实例</li>
+<li><strong>依赖注入</strong>：使用 Koin 或 Dagger 注入</li>
+<li><strong>错误处理</strong>：统一处理网络错误</li>
+<li><strong>缓存策略</strong>：合理使用缓存</li>
+<li><strong>取消请求</strong>：正确处理协程取消</li>
+</ol>
+<h2 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://ktor.io/docs/client-create-multiplatform-application.html">Creating a cross-platform mobile application | Ktor</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/gitblog_00184/article/details/154811908">Kotlin Multiplatform网络请求：Ktor集成与最佳实践</a></li>
+<li><a target="_blank" rel="noopener" href="https://medium.com/@shivathapaa/kmp-networking-in-production-part-1-setting-up-ktor-the-right-way-91e7fdfd3c5b">Building a Production-Ready Networking Layer in KMP</a></li>
+</ul>
+<hr>
+<p><em>持续学习中…</em></p>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/KMP/" rel="tag">KMP</a>, <a class="tag-none-link" href="/blog/tags/Kotlin/" rel="tag">Kotlin</a>, <a class="tag-none-link" href="/blog/tags/Ktor/" rel="tag">Ktor</a>, <a class="tag-none-link" href="/blog/tags/%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82/" rel="tag">网络请求</a>, <a class="tag-none-link" href="/blog/tags/%E8%B7%A8%E5%B9%B3%E5%8F%B0/" rel="tag">跨平台</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-03T15:39:43.500Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Android组件化架构学习-ARouter路由框架" href="/blog/2026/04/03/Android组件化架构学习-ARouter路由框架/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" Kotlin数据类与when表达式实战" href="/blog/2026/04/03/Kotlin数据类与when表达式实战/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>

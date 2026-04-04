@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>Android插件化Hook技术学习 | Wenyi&#39;s Blog</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/03/Android%E6%8F%92%E4%BB%B6%E5%8C%96Hook%E6%8A%80%E6%9C%AF%E5%AD%A6%E4%B9%A0/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="Android, ClassLoader, Hook, 插件化, 热更新" />
+  
+  <meta name="description" content="前言Android 插件化是一种开发模式，允许动态加载和卸载 APK，实现模块化开发和热更新功能。Hook 技术是插件化的核心技术之一。 一、插件化原理类加载机制Android 插件化的核心原理基于 Java 的类加载机制： 1234567BootClassLoader (启动类加载器)    │    ▼PathClassLoader (应用类加载器)    │    ▼DexClassLoad">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android插件化Hook技术学习">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/03/Android%E6%8F%92%E4%BB%B6%E5%8C%96Hook%E6%8A%80%E6%9C%AF%E5%AD%A6%E4%B9%A0/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:description" content="前言Android 插件化是一种开发模式，允许动态加载和卸载 APK，实现模块化开发和热更新功能。Hook 技术是插件化的核心技术之一。 一、插件化原理类加载机制Android 插件化的核心原理基于 Java 的类加载机制： 1234567BootClassLoader (启动类加载器)    │    ▼PathClassLoader (应用类加载器)    │    ▼DexClassLoad">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-04-03T23:37:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T15:37:44.248Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="ClassLoader">
+<meta property="article:tag" content="Hook">
+<meta property="article:tag" content="插件化">
+<meta property="article:tag" content="热更新">
+<meta name="twitter:card" content="summary">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Android插件化Hook技术学习","description":"前言Android 插件化是一种开发模式，允许动态加载和卸载 APK，实现模块化开发和热更新功能。Hook 技术是插件化的核心技术之一。\n","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:37:00.000Z","dateModified":"2026-04-03T15:37:44.248Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Android%E6%8F%92%E4%BB%B6%E5%8C%96Hook%E6%8A%80%E6%9C%AF%E5%AD%A6%E4%B9%A0/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/03/Android%E6%8F%92%E4%BB%B6%E5%8C%96Hook%E6%8A%80%E6%9C%AF%E5%AD%A6%E4%B9%A0/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Android插件化Hook技术学习</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-03T23:37:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-03</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~5.16K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Android 插件化是一种开发模式，允许动态加载和卸载 APK，实现模块化开发和热更新功能。Hook 技术是插件化的核心技术之一。</p>
+<h2 id="一、插件化原理"><a href="#一、插件化原理" class="headerlink" title="一、插件化原理"></a>一、插件化原理</h2><h3 id="类加载机制"><a href="#类加载机制" class="headerlink" title="类加载机制"></a>类加载机制</h3><p>Android 插件化的核心原理基于 Java 的类加载机制：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">BootClassLoader (启动类加载器)</span><br><span class="line">    │</span><br><span class="line">    ▼</span><br><span class="line">PathClassLoader (应用类加载器)</span><br><span class="line">    │</span><br><span class="line">    ▼</span><br><span class="line">DexClassLoader (动态类加载器)</span><br></pre></td></tr></table></figure>
+
+<h3 id="双亲委托机制"><a href="#双亲委托机制" class="headerlink" title="双亲委托机制"></a>双亲委托机制</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">加载类请求</span><br><span class="line">    │</span><br><span class="line">    ▼</span><br><span class="line">检查是否已加载</span><br><span class="line">    │</span><br><span class="line">    ├── 已加载 → 返回</span><br><span class="line">    │</span><br><span class="line">    └── 未加载 → 委托父加载器</span><br><span class="line">          │</span><br><span class="line">          ▼</span><br><span class="line">        父加载器无法加载</span><br><span class="line">          │</span><br><span class="line">          ▼</span><br><span class="line">        自己加载</span><br></pre></td></tr></table></figure>
+
+<h2 id="二、ClassLoader-详解"><a href="#二、ClassLoader-详解" class="headerlink" title="二、ClassLoader 详解"></a>二、ClassLoader 详解</h2><h3 id="PathClassLoader"><a href="#PathClassLoader" class="headerlink" title="PathClassLoader"></a>PathClassLoader</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 用于加载已安装 APK 的类</span></span><br><span class="line"><span class="type">PathClassLoader</span> <span class="variable">pathClassLoader</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">PathClassLoader</span>(</span><br><span class="line">    dexPath,    <span class="comment">// dex 文件路径</span></span><br><span class="line">    librarySearchPath,  <span class="comment">// native 库路径</span></span><br><span class="line">    parent      <span class="comment">// 父加载器</span></span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<h3 id="DexClassLoader"><a href="#DexClassLoader" class="headerlink" title="DexClassLoader"></a>DexClassLoader</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 用于加载未安装 APK 的类</span></span><br><span class="line"><span class="type">DexClassLoader</span> <span class="variable">dexClassLoader</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">DexClassLoader</span>(</span><br><span class="line">    dexPath,        <span class="comment">// dex 文件路径</span></span><br><span class="line">    optimizedDirectory,  <span class="comment">// 优化后的 dex 存放目录</span></span><br><span class="line">    librarySearchPath,   <span class="comment">// native 库路径</span></span><br><span class="line">    parent          <span class="comment">// 父加载器</span></span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<h2 id="三、Hook-技术"><a href="#三、Hook-技术" class="headerlink" title="三、Hook 技术"></a>三、Hook 技术</h2><h3 id="Hook-定义"><a href="#Hook-定义" class="headerlink" title="Hook 定义"></a>Hook 定义</h3><p>Hook（钩子）是一种拦截和修改程序执行流程的技术，在插件化中用于：</p>
+<ul>
+<li>替换系统对象</li>
+<li>拦截方法调用</li>
+<li>修改方法行为</li>
+</ul>
+<h3 id="Hook-方式"><a href="#Hook-方式" class="headerlink" title="Hook 方式"></a>Hook 方式</h3><table>
+<thead>
+<tr>
+<th>方式</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>反射</strong></td>
+<td>修改私有字段</td>
+</tr>
+<tr>
+<td><strong>动态代理</strong></td>
+<td>代理接口调用</td>
+</tr>
+<tr>
+<td><strong>Xposed</strong></td>
+<td>全局 Hook 框架</td>
+</tr>
+<tr>
+<td><strong>ASM</strong></td>
+<td>字节码修改</td>
+</tr>
+</tbody></table>
+<h2 id="四、Hook-ClassLoader"><a href="#四、Hook-ClassLoader" class="headerlink" title="四、Hook ClassLoader"></a>四、Hook ClassLoader</h2><h3 id="加载插件类"><a href="#加载插件类" class="headerlink" title="加载插件类"></a>加载插件类</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">PluginClassLoader</span> <span class="keyword">extends</span> <span class="title class_">PathClassLoader</span> &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> Class&lt;?&gt; loadPluginClass(String className) &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">// 先检查是否已加载</span></span><br><span class="line">            Class&lt;?&gt; clazz = findLoadedClass(className);</span><br><span class="line">            <span class="keyword">if</span> (clazz != <span class="literal">null</span>) &#123;</span><br><span class="line">                <span class="keyword">return</span> clazz;</span><br><span class="line">            &#125;</span><br><span class="line">            </span><br><span class="line">            <span class="comment">// 从插件 dex 中加载</span></span><br><span class="line">            <span class="keyword">return</span> findClass(className);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (ClassNotFoundException e) &#123;</span><br><span class="line">            <span class="comment">// 委托给父加载器</span></span><br><span class="line">            <span class="keyword">return</span> <span class="built_in">super</span>.loadClass(className, <span class="literal">false</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="合并-Dex"><a href="#合并-Dex" class="headerlink" title="合并 Dex"></a>合并 Dex</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 将插件 dex 合并到宿主</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">combineDex</span><span class="params">(ClassLoader hostClassLoader, String pluginDexPath)</span> &#123;</span><br><span class="line">    <span class="type">Object</span> <span class="variable">pathList</span> <span class="operator">=</span> getField(hostClassLoader, <span class="string">&quot;pathList&quot;</span>);</span><br><span class="line">    Object[] pluginDexElements = makeDexElements(pluginDexPath);</span><br><span class="line">    Object[] hostDexElements = (Object[]) getField(pathList, <span class="string">&quot;dexElements&quot;</span>);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 合并数组</span></span><br><span class="line">    Object[] combined = combineArrays(hostDexElements, pluginDexElements);</span><br><span class="line">    setField(pathList, <span class="string">&quot;dexElements&quot;</span>, combined);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="五、Hook-Activity-启动"><a href="#五、Hook-Activity-启动" class="headerlink" title="五、Hook Activity 启动"></a>五、Hook Activity 启动</h2><h3 id="AMS-Hook"><a href="#AMS-Hook" class="headerlink" title="AMS Hook"></a>AMS Hook</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Hook IActivityManager</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">hookAMS</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">Object</span> <span class="variable">gDefault</span> <span class="operator">=</span> getField(<span class="literal">null</span>, <span class="string">&quot;android.app.ActivityManager&quot;</span>, <span class="string">&quot;IActivityManagerSingleton&quot;</span>);</span><br><span class="line">    <span class="type">Object</span> <span class="variable">rawIActivityManager</span> <span class="operator">=</span> getField(gDefault, <span class="string">&quot;mInstance&quot;</span>);</span><br><span class="line">    </span><br><span class="line">    <span class="type">Object</span> <span class="variable">proxy</span> <span class="operator">=</span> Proxy.newProxyInstance(</span><br><span class="line">        rawIActivityManager.getClass().getClassLoader(),</span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">Class</span>&lt;?&gt;[] &#123; Class.forName(<span class="string">&quot;android.app.IActivityManager&quot;</span>) &#125;,</span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">IActivityManagerProxy</span>(rawIActivityManager)</span><br><span class="line">    );</span><br><span class="line">    </span><br><span class="line">    setField(gDefault, <span class="string">&quot;mInstance&quot;</span>, proxy);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="代理类"><a href="#代理类" class="headerlink" title="代理类"></a>代理类</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">IActivityManagerProxy</span> <span class="keyword">implements</span> <span class="title class_">InvocationHandler</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> Object mOrigin;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">IActivityManagerProxy</span><span class="params">(Object origin)</span> &#123;</span><br><span class="line">        mOrigin = origin;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> Object <span class="title function_">invoke</span><span class="params">(Object proxy, Method method, Object[] args)</span> <span class="keyword">throws</span> Throwable &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="string">&quot;startActivity&quot;</span>.equals(method.getName())) &#123;</span><br><span class="line">            <span class="comment">// 替换为占位 Activity</span></span><br><span class="line">            replaceActivity(args);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> method.invoke(mOrigin, args);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="六、插件化框架对比"><a href="#六、插件化框架对比" class="headerlink" title="六、插件化框架对比"></a>六、插件化框架对比</h2><table>
+<thead>
+<tr>
+<th>框架</th>
+<th>特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>DroidPlugin</strong></td>
+<td>完全 Hook，支持四大组件</td>
+</tr>
+<tr>
+<td><strong>RePlugin</strong></td>
+<td>百度出品，性能优秀</td>
+</tr>
+<tr>
+<td><strong>VirtualAPK</strong></td>
+<td>滴滴出品，功能完整</td>
+</tr>
+<tr>
+<td><strong>Shadow</strong></td>
+<td>腾讯出品，零反射实现</td>
+</tr>
+</tbody></table>
+<h2 id="七、资源加载"><a href="#七、资源加载" class="headerlink" title="七、资源加载"></a>七、资源加载</h2><h3 id="AssetManager-Hook"><a href="#AssetManager-Hook" class="headerlink" title="AssetManager Hook"></a>AssetManager Hook</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">addAssetPath</span><span class="params">(String pluginPath)</span> &#123;</span><br><span class="line">    <span class="type">AssetManager</span> <span class="variable">assetManager</span> <span class="operator">=</span> AssetManager.class.newInstance();</span><br><span class="line">    <span class="type">Method</span> <span class="variable">addAssetPath</span> <span class="operator">=</span> AssetManager.class.getMethod(<span class="string">&quot;addAssetPath&quot;</span>, String.class);</span><br><span class="line">    addAssetPath.invoke(assetManager, pluginPath);</span><br><span class="line">    </span><br><span class="line">    <span class="type">Resources</span> <span class="variable">resources</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Resources</span>(</span><br><span class="line">        assetManager,</span><br><span class="line">        context.getResources().getDisplayMetrics(),</span><br><span class="line">        context.getResources().getConfiguration()</span><br><span class="line">    );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="八、生命周期管理"><a href="#八、生命周期管理" class="headerlink" title="八、生命周期管理"></a>八、生命周期管理</h2><h3 id="代理-Activity"><a href="#代理-Activity" class="headerlink" title="代理 Activity"></a>代理 Activity</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ProxyActivity</span> <span class="keyword">extends</span> <span class="title class_">Activity</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> PluginActivity mPluginActivity;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">onCreate</span><span class="params">(Bundle savedInstanceState)</span> &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">className</span> <span class="operator">=</span> getIntent().getStringExtra(<span class="string">&quot;className&quot;</span>);</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            Class&lt;?&gt; clazz = mPluginClassLoader.loadClass(className);</span><br><span class="line">            mPluginActivity = (PluginActivity) clazz.newInstance();</span><br><span class="line">            mPluginActivity.attach(<span class="built_in">this</span>);</span><br><span class="line">            mPluginActivity.onCreate(savedInstanceState);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="九、签名问题"><a href="#九、签名问题" class="headerlink" title="九、签名问题"></a>九、签名问题</h2><h3 id="PMS-Hook"><a href="#PMS-Hook" class="headerlink" title="PMS Hook"></a>PMS Hook</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Hook PackageManagerService</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">hookPMS</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">Object</span> <span class="variable">gDefault</span> <span class="operator">=</span> getField(<span class="literal">null</span>, <span class="string">&quot;android.app.ActivityThread&quot;</span>, <span class="string">&quot;sPackageManager&quot;</span>);</span><br><span class="line">    </span><br><span class="line">    <span class="type">Object</span> <span class="variable">proxy</span> <span class="operator">=</span> Proxy.newProxyInstance(</span><br><span class="line">        gDefault.getClass().getClassLoader(),</span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">Class</span>&lt;?&gt;[] &#123; Class.forName(<span class="string">&quot;android.content.pm.IPackageManager&quot;</span>) &#125;,</span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">IPackageManagerProxy</span>(gDefault)</span><br><span class="line">    );</span><br><span class="line">    </span><br><span class="line">    setField(<span class="literal">null</span>, <span class="string">&quot;android.app.ActivityThread&quot;</span>, <span class="string">&quot;sPackageManager&quot;</span>, proxy);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="十、最佳实践"><a href="#十、最佳实践" class="headerlink" title="十、最佳实践"></a>十、最佳实践</h2><ol>
+<li><strong>选择合适框架</strong>：根据需求选择插件化框架</li>
+<li><strong>理解 Hook 原理</strong>：深入理解类加载和 Hook 机制</li>
+<li><strong>处理兼容性</strong>：Android 版本差异处理</li>
+<li><strong>资源管理</strong>：正确加载和管理插件资源</li>
+<li><strong>生命周期</strong>：正确处理插件组件生命周期</li>
+</ol>
+<h2 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://cloud.tencent.com/developer/article/2250321">Android插件化技术详解</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/xwdrhgr/article/details/158538042">插件化框架原理与实现</a></li>
+<li><a target="_blank" rel="noopener" href="https://jishuzhan.net/article/2000133376926351361">Android插件化原理与方案详解</a></li>
+</ul>
+<hr>
+<p><em>持续学习中…</em></p>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/Android/" rel="tag">Android</a>, <a class="tag-none-link" href="/blog/tags/ClassLoader/" rel="tag">ClassLoader</a>, <a class="tag-none-link" href="/blog/tags/Hook/" rel="tag">Hook</a>, <a class="tag-none-link" href="/blog/tags/%E6%8F%92%E4%BB%B6%E5%8C%96/" rel="tag">插件化</a>, <a class="tag-none-link" href="/blog/tags/%E7%83%AD%E6%9B%B4%E6%96%B0/" rel="tag">热更新</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-03T15:37:44.248Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Kotlin Coroutines Select表达式学习" href="/blog/2026/04/03/Kotlin-Coroutines-Select表达式学习/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" Android组件化架构学习-ARouter路由框架" href="/blog/2026/04/03/Android组件化架构学习-ARouter路由框架/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>

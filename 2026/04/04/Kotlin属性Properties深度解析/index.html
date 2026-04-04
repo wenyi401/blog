@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>Kotlin属性Properties深度解析 | Wenyi&#39;s Blog</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/04/Kotlin%E5%B1%9E%E6%80%A7Properties%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="Kotlin, Properties, getter, setter, 属性" />
+  
+  <meta name="description" content="前言Kotlin 属性允许存储和管理数据，无需编写访问函数。每个属性都有名称、类型和自动生成的 getter，可变属性还有 setter。 一、声明属性只读属性（val）1val pi &#x3D; 3.14159  可变属性（var）1var counter &#x3D; 0  类中声明12345class Address &#123;    var name: String &#x3D; &quot;Holmes, She">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kotlin属性Properties深度解析">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/04/Kotlin%E5%B1%9E%E6%80%A7Properties%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:description" content="前言Kotlin 属性允许存储和管理数据，无需编写访问函数。每个属性都有名称、类型和自动生成的 getter，可变属性还有 setter。 一、声明属性只读属性（val）1val pi &#x3D; 3.14159  可变属性（var）1var counter &#x3D; 0  类中声明12345class Address &#123;    var name: String &#x3D; &quot;Holmes, She">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-04-04T06:20:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T22:18:10.476Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="Kotlin">
+<meta property="article:tag" content="Properties">
+<meta property="article:tag" content="getter">
+<meta property="article:tag" content="setter">
+<meta property="article:tag" content="属性">
+<meta name="twitter:card" content="summary">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Kotlin属性Properties深度解析","description":"前言Kotlin 属性允许存储和管理数据，无需编写访问函数。每个属性都有名称、类型和自动生成的 getter，可变属性还有 setter。\n","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-04T06:20:00.000Z","dateModified":"2026-04-03T22:18:10.476Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/04/Kotlin%E5%B1%9E%E6%80%A7Properties%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/04/Kotlin%E5%B1%9E%E6%80%A7Properties%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Kotlin属性Properties深度解析</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-04T06:20:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-04</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~2.06K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Kotlin 属性允许存储和管理数据，无需编写访问函数。每个属性都有名称、类型和自动生成的 getter，可变属性还有 setter。</p>
+<h2 id="一、声明属性"><a href="#一、声明属性" class="headerlink" title="一、声明属性"></a>一、声明属性</h2><h3 id="只读属性（val）"><a href="#只读属性（val）" class="headerlink" title="只读属性（val）"></a>只读属性（val）</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> pi = <span class="number">3.14159</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="可变属性（var）"><a href="#可变属性（var）" class="headerlink" title="可变属性（var）"></a>可变属性（var）</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> counter = <span class="number">0</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="类中声明"><a href="#类中声明" class="headerlink" title="类中声明"></a>类中声明</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Address</span> &#123;</span><br><span class="line">    <span class="keyword">var</span> name: String = <span class="string">&quot;Holmes, Sherlock&quot;</span></span><br><span class="line">    <span class="keyword">var</span> street: String = <span class="string">&quot;Baker&quot;</span></span><br><span class="line">    <span class="keyword">var</span> city: String = <span class="string">&quot;London&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="二、自定义-Getter-和-Setter"><a href="#二、自定义-Getter-和-Setter" class="headerlink" title="二、自定义 Getter 和 Setter"></a>二、自定义 Getter 和 Setter</h2><h3 id="自定义-Getter"><a href="#自定义-Getter" class="headerlink" title="自定义 Getter"></a>自定义 Getter</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Rectangle</span>(<span class="keyword">val</span> width: <span class="built_in">Int</span>, <span class="keyword">val</span> height: <span class="built_in">Int</span>) &#123;</span><br><span class="line">    <span class="keyword">val</span> area: <span class="built_in">Int</span></span><br><span class="line">        <span class="keyword">get</span>() = <span class="keyword">this</span>.width * <span class="keyword">this</span>.height</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="自定义-Setter"><a href="#自定义-Setter" class="headerlink" title="自定义 Setter"></a>自定义 Setter</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Point</span>(<span class="keyword">var</span> x: <span class="built_in">Int</span>, <span class="keyword">var</span> y: <span class="built_in">Int</span>) &#123;</span><br><span class="line">    <span class="keyword">var</span> coordinates: String</span><br><span class="line">        <span class="keyword">get</span>() = <span class="string">&quot;<span class="variable">$x</span>,<span class="variable">$y</span>&quot;</span></span><br><span class="line">        <span class="keyword">set</span>(value) &#123;</span><br><span class="line">            <span class="keyword">val</span> parts = value.split(<span class="string">&quot;,&quot;</span>)</span><br><span class="line">            x = parts[<span class="number">0</span>].toInt()</span><br><span class="line">            y = parts[<span class="number">1</span>].toInt()</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="修改可见性"><a href="#修改可见性" class="headerlink" title="修改可见性"></a>修改可见性</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">BankAccount</span>(initialBalance: <span class="built_in">Int</span>) &#123;</span><br><span class="line">    <span class="keyword">var</span> balance: <span class="built_in">Int</span> = initialBalance</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">set</span>  <span class="comment">// 只能在类内部修改</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="三、Backing-Fields"><a href="#三、Backing-Fields" class="headerlink" title="三、Backing Fields"></a>三、Backing Fields</h2><p>使用 <code>field</code> 关键字引用幕后字段：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Scoreboard</span> &#123;</span><br><span class="line">    <span class="keyword">var</span> score: <span class="built_in">Int</span> = <span class="number">0</span></span><br><span class="line">        <span class="keyword">set</span>(value) &#123;</span><br><span class="line">            field = value</span><br><span class="line">            println(<span class="string">&quot;Score updated to <span class="variable">$field</span>&quot;</span>)</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、Backing-Properties"><a href="#四、Backing-Properties" class="headerlink" title="四、Backing Properties"></a>四、Backing Properties</h2><p>使用私有属性作为幕后属性：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">ShoppingCart</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> _items = mutableListOf&lt;String&gt;()</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">val</span> items: List&lt;String&gt;</span><br><span class="line">        <span class="keyword">get</span>() = _items</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">addItem</span><span class="params">(item: <span class="type">String</span>)</span></span> &#123;</span><br><span class="line">        _items.add(item)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="五、编译期常量"><a href="#五、编译期常量" class="headerlink" title="五、编译期常量"></a>五、编译期常量</h2><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">val</span> MAX_LOGIN_ATTEMPTS = <span class="number">3</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>要求</strong>：</p>
+<ul>
+<li>顶层或对象声明中</li>
+<li>String 或基本类型</li>
+<li>无自定义 getter</li>
+</ul>
+<h2 id="六、延迟初始化"><a href="#六、延迟初始化" class="headerlink" title="六、延迟初始化"></a>六、延迟初始化</h2><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">OrderServiceTest</span> &#123;</span><br><span class="line">    <span class="keyword">lateinit</span> <span class="keyword">var</span> orderService: OrderService</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@SetUp</span></span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">setup</span><span class="params">()</span></span> &#123;</span><br><span class="line">        orderService = OrderService()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="检查是否初始化"><a href="#检查是否初始化" class="headerlink" title="检查是否初始化"></a>检查是否初始化</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (<span class="keyword">this</span>::latestReading.isInitialized) &#123;</span><br><span class="line">    println(latestReading)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="七、委托属性"><a href="#七、委托属性" class="headerlink" title="七、委托属性"></a>七、委托属性</h2><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">User</span> &#123;</span><br><span class="line">    <span class="keyword">var</span> name: String <span class="keyword">by</span> Delegates.observable(<span class="string">&quot;&quot;</span>) &#123; _, old, new -&gt;</span><br><span class="line">        println(<span class="string">&quot;Name changed from <span class="variable">$old</span> to <span class="variable">$new</span>&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="八、最佳实践"><a href="#八、最佳实践" class="headerlink" title="八、最佳实践"></a>八、最佳实践</h2><h3 id="1-初始化属性"><a href="#1-初始化属性" class="headerlink" title="1. 初始化属性"></a>1. 初始化属性</h3><p>推荐在声明时初始化。</p>
+<h3 id="2-使用-val-而非-var"><a href="#2-使用-val-而非-var" class="headerlink" title="2. 使用 val 而非 var"></a>2. 使用 val 而非 var</h3><p>优先使用不可变属性。</p>
+<h3 id="3-合理使用-lateinit"><a href="#3-合理使用-lateinit" class="headerlink" title="3. 合理使用 lateinit"></a>3. 合理使用 lateinit</h3><p>仅在必要时使用延迟初始化。</p>
+<h2 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://kotlinlang.org/docs/properties.html">Properties | Kotlin Documentation</a></li>
+<li><a target="_blank" rel="noopener" href="https://kotlinlang.org/docs/delegated-properties.html">Delegated Properties | Kotlin Documentation</a></li>
+</ul>
+<hr>
+<p><em>深入学习中…</em></p>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/Kotlin/" rel="tag">Kotlin</a>, <a class="tag-none-link" href="/blog/tags/Properties/" rel="tag">Properties</a>, <a class="tag-none-link" href="/blog/tags/getter/" rel="tag">getter</a>, <a class="tag-none-link" href="/blog/tags/setter/" rel="tag">setter</a>, <a class="tag-none-link" href="/blog/tags/%E5%B1%9E%E6%80%A7/" rel="tag">属性</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-03T22:18:10.476Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Android Content Provider深度解析" href="/blog/2026/04/04/Android-Content-Provider深度解析/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" Android布局Layout深度解析" href="/blog/2026/04/04/Android布局Layout深度解析/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>

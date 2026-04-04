@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>Java Android性能优化学习笔记 | Wenyi&#39;s Blog</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/03/Java-Android%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="Android, Java, 内存管理, 性能优化" />
+  
+  <meta name="description" content="前言Android 性能优化是高级开发者必须掌握的技能。本文将从内存管理、UI 渲染、启动速度、网络请求、电池消耗、包体积等核心领域全面介绍 Android 性能优化。 性能优化维度   维度 描述    内存优化 防止内存泄漏，优化内存使用   UI 渲染 提高界面流畅度，减少卡顿   启动速度 优化冷启动和热启动时间   网络请求 减少请求次数，优化数据传输   电池消耗 降低耗电量，延长续航">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java Android性能优化学习笔记">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/03/Java-Android%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:description" content="前言Android 性能优化是高级开发者必须掌握的技能。本文将从内存管理、UI 渲染、启动速度、网络请求、电池消耗、包体积等核心领域全面介绍 Android 性能优化。 性能优化维度   维度 描述    内存优化 防止内存泄漏，优化内存使用   UI 渲染 提高界面流畅度，减少卡顿   启动速度 优化冷启动和热启动时间   网络请求 减少请求次数，优化数据传输   电池消耗 降低耗电量，延长续航">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-04-03T22:48:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T14:48:13.472Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="内存管理">
+<meta property="article:tag" content="性能优化">
+<meta name="twitter:card" content="summary">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Java Android性能优化学习笔记","description":"前言Android 性能优化是高级开发者必须掌握的技能。本文将从内存管理、UI 渲染、启动速度、网络请求、电池消耗、包体积等核心领域全面介绍 Android ...","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T22:48:00.000Z","dateModified":"2026-04-03T14:48:13.472Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Java-Android%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/03/Java-Android%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Java Android性能优化学习笔记</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-03T22:48:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-03</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~5.31K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Android 性能优化是高级开发者必须掌握的技能。本文将从内存管理、UI 渲染、启动速度、网络请求、电池消耗、包体积等核心领域全面介绍 Android 性能优化。</p>
+<h2 id="性能优化维度"><a href="#性能优化维度" class="headerlink" title="性能优化维度"></a>性能优化维度</h2><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>内存优化</strong></td>
+<td>防止内存泄漏，优化内存使用</td>
+</tr>
+<tr>
+<td><strong>UI 渲染</strong></td>
+<td>提高界面流畅度，减少卡顿</td>
+</tr>
+<tr>
+<td><strong>启动速度</strong></td>
+<td>优化冷启动和热启动时间</td>
+</tr>
+<tr>
+<td><strong>网络请求</strong></td>
+<td>减少请求次数，优化数据传输</td>
+</tr>
+<tr>
+<td><strong>电池消耗</strong></td>
+<td>降低耗电量，延长续航</td>
+</tr>
+<tr>
+<td><strong>包体积</strong></td>
+<td>减小 APK 大小</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="一、内存优化"><a href="#一、内存优化" class="headerlink" title="一、内存优化"></a>一、内存优化</h2><h3 id="1-内存泄漏常见场景"><a href="#1-内存泄漏常见场景" class="headerlink" title="1. 内存泄漏常见场景"></a>1. 内存泄漏常见场景</h3><h4 id="静态变量持有-Context"><a href="#静态变量持有-Context" class="headerlink" title="静态变量持有 Context"></a>静态变量持有 Context</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ❌ 错误：静态变量持有 Activity 引用</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Utils</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Context context;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">init</span><span class="params">(Context ctx)</span> &#123;</span><br><span class="line">        context = ctx; <span class="comment">// 内存泄漏！</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// ✅ 正确：使用 Application Context</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Utils</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Context context;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">init</span><span class="params">(Context ctx)</span> &#123;</span><br><span class="line">        context = ctx.getApplicationContext();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="匿名内部类持有外部类引用"><a href="#匿名内部类持有外部类引用" class="headerlink" title="匿名内部类持有外部类引用"></a>匿名内部类持有外部类引用</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ❌ 错误：Handler 导致内存泄漏</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MainActivity</span> <span class="keyword">extends</span> <span class="title class_">Activity</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">Handler</span> <span class="variable">handler</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Handler</span>() &#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">handleMessage</span><span class="params">(Message msg)</span> &#123;</span><br><span class="line">            <span class="comment">// 持有 Activity 引用</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// ✅ 正确：使用静态内部类 + 弱引用</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MainActivity</span> <span class="keyword">extends</span> <span class="title class_">Activity</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">class</span> <span class="title class_">SafeHandler</span> <span class="keyword">extends</span> <span class="title class_">Handler</span> &#123;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">final</span> WeakReference&lt;MainActivity&gt; activityRef;</span><br><span class="line">        </span><br><span class="line">        SafeHandler(MainActivity activity) &#123;</span><br><span class="line">            activityRef = <span class="keyword">new</span> <span class="title class_">WeakReference</span>&lt;&gt;(activity);</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">handleMessage</span><span class="params">(Message msg)</span> &#123;</span><br><span class="line">            <span class="type">MainActivity</span> <span class="variable">activity</span> <span class="operator">=</span> activityRef.get();</span><br><span class="line">            <span class="keyword">if</span> (activity != <span class="literal">null</span>) &#123;</span><br><span class="line">                <span class="comment">// 处理消息</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-内存分析工具"><a href="#2-内存分析工具" class="headerlink" title="2. 内存分析工具"></a>2. 内存分析工具</h3><table>
+<thead>
+<tr>
+<th>工具</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Android Profiler</strong></td>
+<td>实时内存监控</td>
+</tr>
+<tr>
+<td><strong>LeakCanary</strong></td>
+<td>自动检测内存泄漏</td>
+</tr>
+<tr>
+<td><strong>MAT</strong></td>
+<td>内存快照分析</td>
+</tr>
+</tbody></table>
+<h3 id="3-内存优化技巧"><a href="#3-内存优化技巧" class="headerlink" title="3. 内存优化技巧"></a>3. 内存优化技巧</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 使用 SparseArray 替代 HashMap&lt;Integer, Object&gt;</span></span><br><span class="line">SparseArray&lt;String&gt; array = <span class="keyword">new</span> <span class="title class_">SparseArray</span>&lt;&gt;();</span><br><span class="line">array.put(<span class="number">1</span>, <span class="string">&quot;Hello&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用 ArrayMap 替代 HashMap（少量数据时）</span></span><br><span class="line">ArrayMap&lt;String, String&gt; map = <span class="keyword">new</span> <span class="title class_">ArrayMap</span>&lt;&gt;();</span><br><span class="line"></span><br><span class="line"><span class="comment">// 及时回收 Bitmap</span></span><br><span class="line"><span class="keyword">if</span> (bitmap != <span class="literal">null</span> &amp;&amp; !bitmap.isRecycled()) &#123;</span><br><span class="line">    bitmap.recycle();</span><br><span class="line">    bitmap = <span class="literal">null</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="二、UI-渲染优化"><a href="#二、UI-渲染优化" class="headerlink" title="二、UI 渲染优化"></a>二、UI 渲染优化</h2><h3 id="1-布局优化"><a href="#1-布局优化" class="headerlink" title="1. 布局优化"></a>1. 布局优化</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 使用 ConstraintLayout 减少布局层级 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">androidx.constraintlayout.widget.ConstraintLayout</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:layout_width</span>=<span class="string">&quot;match_parent&quot;</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:layout_height</span>=<span class="string">&quot;match_parent&quot;</span>&gt;</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">&lt;!-- 避免过度嵌套 --&gt;</span></span><br><span class="line">    </span><br><span class="line"><span class="tag">&lt;/<span class="name">androidx.constraintlayout.widget.ConstraintLayout</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- 使用 ViewStub 延迟加载 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">ViewStub</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:id</span>=<span class="string">&quot;@+id/stub&quot;</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:layout</span>=<span class="string">&quot;@layout/extra_layout&quot;</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:layout_width</span>=<span class="string">&quot;wrap_content&quot;</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:layout_height</span>=<span class="string">&quot;wrap_content&quot;</span> /&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="2-RecyclerView-优化"><a href="#2-RecyclerView-优化" class="headerlink" title="2. RecyclerView 优化"></a>2. RecyclerView 优化</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 使用 ViewHolder 模式</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MyAdapter</span> <span class="keyword">extends</span> <span class="title class_">RecyclerView</span>.Adapter&lt;MyViewHolder&gt; &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">onBindViewHolder</span><span class="params">(<span class="meta">@NonNull</span> MyViewHolder holder, <span class="type">int</span> position)</span> &#123;</span><br><span class="line">        <span class="comment">// 避免在 onBindViewHolder 中创建对象</span></span><br><span class="line">        <span class="comment">// 使用 DiffUtil 优化刷新</span></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 设置缓存大小</span></span><br><span class="line">    <span class="comment">// recyclerView.setItemViewCacheSize(20);</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用 DiffUtil</span></span><br><span class="line">DiffUtil.<span class="type">DiffResult</span> <span class="variable">diffResult</span> <span class="operator">=</span> DiffUtil.calculateDiff(<span class="keyword">new</span> <span class="title class_">MyDiffCallback</span>(oldList, newList));</span><br><span class="line">diffResult.dispatchUpdatesTo(adapter);</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-避免过度绘制"><a href="#3-避免过度绘制" class="headerlink" title="3. 避免过度绘制"></a>3. 避免过度绘制</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 在开发者选项中开启&quot;调试 GPU 过度绘制&quot;</span></span><br><span class="line"><span class="comment">// 优化：移除不必要的背景</span></span><br><span class="line">view.setBackground(<span class="literal">null</span>);</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="三、启动速度优化"><a href="#三、启动速度优化" class="headerlink" title="三、启动速度优化"></a>三、启动速度优化</h2><h3 id="1-冷启动优化"><a href="#1-冷启动优化" class="headerlink" title="1. 冷启动优化"></a>1. 冷启动优化</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 在 Application 中延迟初始化</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MyApp</span> <span class="keyword">extends</span> <span class="title class_">Application</span> &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">onCreate</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="built_in">super</span>.onCreate();</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 延迟初始化非必要组件</span></span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">Thread</span>(() -&gt; &#123;</span><br><span class="line">            <span class="comment">// 初始化第三方 SDK</span></span><br><span class="line">        &#125;).start();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用 App Startup 库</span></span><br><span class="line">dependencies &#123;</span><br><span class="line">    implementation <span class="string">&quot;androidx.startup:startup-runtime:1.1.1&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-Activity-启动优化"><a href="#2-Activity-启动优化" class="headerlink" title="2. Activity 启动优化"></a>2. Activity 启动优化</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 避免在 onCreate 中执行耗时操作</span></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">onCreate</span><span class="params">(Bundle savedInstanceState)</span> &#123;</span><br><span class="line">    <span class="built_in">super</span>.onCreate(savedInstanceState);</span><br><span class="line">    setContentView(R.layout.activity_main);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 使用异步加载</span></span><br><span class="line">    <span class="keyword">new</span> <span class="title class_">LoadDataTask</span>().execute();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="四、网络请求优化"><a href="#四、网络请求优化" class="headerlink" title="四、网络请求优化"></a>四、网络请求优化</h2><h3 id="1-图片加载优化"><a href="#1-图片加载优化" class="headerlink" title="1. 图片加载优化"></a>1. 图片加载优化</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 使用 Glide 加载图片</span></span><br><span class="line">Glide.with(context)</span><br><span class="line">    .load(url)</span><br><span class="line">    .placeholder(R.drawable.placeholder)</span><br><span class="line">    .error(R.drawable.error)</span><br><span class="line">    .override(<span class="number">800</span>, <span class="number">600</span>) <span class="comment">// 指定大小</span></span><br><span class="line">    .into(imageView);</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-网络缓存"><a href="#2-网络缓存" class="headerlink" title="2. 网络缓存"></a>2. 网络缓存</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// OkHttp 缓存</span></span><br><span class="line"><span class="type">int</span> <span class="variable">cacheSize</span> <span class="operator">=</span> <span class="number">10</span> * <span class="number">1024</span> * <span class="number">1024</span>; <span class="comment">// 10 MB</span></span><br><span class="line"><span class="type">Cache</span> <span class="variable">cache</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Cache</span>(cacheDir, cacheSize);</span><br><span class="line"></span><br><span class="line"><span class="type">OkHttpClient</span> <span class="variable">client</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">OkHttpClient</span>.Builder()</span><br><span class="line">    .cache(cache)</span><br><span class="line">    .build();</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="五、电池消耗优化"><a href="#五、电池消耗优化" class="headerlink" title="五、电池消耗优化"></a>五、电池消耗优化</h2><h3 id="1-减少后台操作"><a href="#1-减少后台操作" class="headerlink" title="1. 减少后台操作"></a>1. 减少后台操作</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 使用 WorkManager 调度后台任务</span></span><br><span class="line">WorkManager.getInstance(context)</span><br><span class="line">    .enqueue(<span class="keyword">new</span> <span class="title class_">OneTimeWorkRequest</span>.Builder(MyWorker.class)</span><br><span class="line">        .setConstraints(<span class="keyword">new</span> <span class="title class_">Constraints</span>.Builder()</span><br><span class="line">            .setRequiresBatteryNotLow(<span class="literal">true</span>)</span><br><span class="line">            .build())</span><br><span class="line">        .build());</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-优化定位请求"><a href="#2-优化定位请求" class="headerlink" title="2. 优化定位请求"></a>2. 优化定位请求</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 使用合适的定位精度</span></span><br><span class="line"><span class="type">LocationRequest</span> <span class="variable">request</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">LocationRequest</span>();</span><br><span class="line">request.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);</span><br><span class="line">request.setInterval(<span class="number">60000</span>); <span class="comment">// 1 分钟更新一次</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="六、包体积优化"><a href="#六、包体积优化" class="headerlink" title="六、包体积优化"></a>六、包体积优化</h2><h3 id="1-资源优化"><a href="#1-资源优化" class="headerlink" title="1. 资源优化"></a>1. 资源优化</h3><figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">android &#123;</span><br><span class="line">    buildTypes &#123;</span><br><span class="line">        release &#123;</span><br><span class="line">            minifyEnabled <span class="keyword">true</span></span><br><span class="line">            shrinkResources <span class="keyword">true</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-So-文件优化"><a href="#2-So-文件优化" class="headerlink" title="2. So 文件优化"></a>2. So 文件优化</h3><figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">android &#123;</span><br><span class="line">    defaultConfig &#123;</span><br><span class="line">        ndk &#123;</span><br><span class="line">            abiFilters <span class="string">&#x27;armeabi-v7a&#x27;</span>, <span class="string">&#x27;arm64-v8a&#x27;</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="性能分析工具"><a href="#性能分析工具" class="headerlink" title="性能分析工具"></a>性能分析工具</h2><table>
+<thead>
+<tr>
+<th>工具</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Android Profiler</strong></td>
+<td>CPU、内存、网络分析</td>
+</tr>
+<tr>
+<td><strong>Systrace</strong></td>
+<td>系统级性能分析</td>
+</tr>
+<tr>
+<td><strong>Layout Inspector</strong></td>
+<td>布局层级分析</td>
+</tr>
+<tr>
+<td><strong>APK Analyzer</strong></td>
+<td>APK 体积分析</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://juejin.cn/post/7483127098352254987">Android 性能优化全面指南</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/JsonChao/Awesome-Android-Performance">Awesome-Android-Performance</a></li>
+<li><a target="_blank" rel="noopener" href="https://developer.android.google.cn/topic/performance?hl=zh-cn">Android 性能优化官方指南</a></li>
+</ul>
+<h2 id="下一步"><a href="#下一步" class="headerlink" title="下一步"></a>下一步</h2><ul>
+<li>深入学习内存泄漏检测工具</li>
+<li>实践 UI 渲染优化</li>
+<li>研究 Jetpack Compose 性能优化</li>
+</ul>
+<hr>
+<p><em>持续学习中…</em></p>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/Android/" rel="tag">Android</a>, <a class="tag-none-link" href="/blog/tags/Java/" rel="tag">Java</a>, <a class="tag-none-link" href="/blog/tags/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/" rel="tag">内存管理</a>, <a class="tag-none-link" href="/blog/tags/%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/" rel="tag">性能优化</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-03T14:48:13.472Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Android Jetpack组件学习-Paging3分页加载" href="/blog/2026/04/03/Android-Jetpack组件学习-Paging3分页加载/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" Kotlin Multiplatform跨平台开发学习" href="/blog/2026/04/03/Kotlin-Multiplatform跨平台开发学习/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>

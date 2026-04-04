@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>Android IPC Binder进程间通信学习 | Wenyi&#39;s Blog</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/03/Android-IPC-Binder%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1%E5%AD%A6%E4%B9%A0/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="AIDL, Android, Binder, IPC, 进程通信" />
+  
+  <meta name="description" content="前言Binder 是 Android 系统中高效的跨进程通信（IPC）机制，它将运行在不同进程中的组件进行绑定，实现彼此通信。Binder 支撑着 Android 四大组件的调度与系统服务调用。 一、IPC 基本概念为什么需要 IPC？ 进程隔离：Android 每个应用运行在独立进程中 安全考虑：进程间内存不共享 资源共享：需要跨进程传递数据和调用方法  IPC 方式对比   方式 描述 适用场">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android IPC Binder进程间通信学习">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/03/Android-IPC-Binder%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1%E5%AD%A6%E4%B9%A0/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:description" content="前言Binder 是 Android 系统中高效的跨进程通信（IPC）机制，它将运行在不同进程中的组件进行绑定，实现彼此通信。Binder 支撑着 Android 四大组件的调度与系统服务调用。 一、IPC 基本概念为什么需要 IPC？ 进程隔离：Android 每个应用运行在独立进程中 安全考虑：进程间内存不共享 资源共享：需要跨进程传递数据和调用方法  IPC 方式对比   方式 描述 适用场">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-04-03T23:20:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T15:21:29.200Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="AIDL">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="Binder">
+<meta property="article:tag" content="IPC">
+<meta property="article:tag" content="进程通信">
+<meta name="twitter:card" content="summary">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Android IPC Binder进程间通信学习","description":"前言Binder 是 Android 系统中高效的跨进程通信（IPC）机制，它将运行在不同进程中的组件进行绑定，实现彼此通信。Binder 支撑着 Andro...","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:20:00.000Z","dateModified":"2026-04-03T15:21:29.200Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Android-IPC-Binder%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1%E5%AD%A6%E4%B9%A0/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/03/Android-IPC-Binder%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1%E5%AD%A6%E4%B9%A0/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Android IPC Binder进程间通信学习</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-03T23:20:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-03</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~4.78K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Binder 是 Android 系统中高效的跨进程通信（IPC）机制，它将运行在不同进程中的组件进行绑定，实现彼此通信。Binder 支撑着 Android 四大组件的调度与系统服务调用。</p>
+<h2 id="一、IPC-基本概念"><a href="#一、IPC-基本概念" class="headerlink" title="一、IPC 基本概念"></a>一、IPC 基本概念</h2><h3 id="为什么需要-IPC？"><a href="#为什么需要-IPC？" class="headerlink" title="为什么需要 IPC？"></a>为什么需要 IPC？</h3><ul>
+<li><strong>进程隔离</strong>：Android 每个应用运行在独立进程中</li>
+<li><strong>安全考虑</strong>：进程间内存不共享</li>
+<li><strong>资源共享</strong>：需要跨进程传递数据和调用方法</li>
+</ul>
+<h3 id="IPC-方式对比"><a href="#IPC-方式对比" class="headerlink" title="IPC 方式对比"></a>IPC 方式对比</h3><table>
+<thead>
+<tr>
+<th>方式</th>
+<th>描述</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Intent</strong></td>
+<td>简单数据传递</td>
+<td>四大组件通信</td>
+</tr>
+<tr>
+<td><strong>Binder</strong></td>
+<td>高效进程间通信</td>
+<td>复杂数据交互</td>
+</tr>
+<tr>
+<td><strong>AIDL</strong></td>
+<td>Binder 的简化封装</td>
+<td>定义跨进程接口</td>
+</tr>
+<tr>
+<td><strong>Messenger</strong></td>
+<td>基于消息队列</td>
+<td>低并发场景</td>
+</tr>
+<tr>
+<td><strong>ContentProvider</strong></td>
+<td>数据共享</td>
+<td>跨进程数据访问</td>
+</tr>
+<tr>
+<td><strong>Socket</strong></td>
+<td>网络通信</td>
+<td>跨设备通信</td>
+</tr>
+</tbody></table>
+<h2 id="二、Binder-概述"><a href="#二、Binder-概述" class="headerlink" title="二、Binder 概述"></a>二、Binder 概述</h2><h3 id="什么是-Binder？"><a href="#什么是-Binder？" class="headerlink" title="什么是 Binder？"></a>什么是 Binder？</h3><p>Binder 是一种进程间通信系统，让两个进程在 Android 设备上通信。Binder 提供了一种完全透明的方式在另一个进程中执行函数调用。</p>
+<h3 id="Binder-角色"><a href="#Binder-角色" class="headerlink" title="Binder 角色"></a>Binder 角色</h3><table>
+<thead>
+<tr>
+<th>角色</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Client</strong></td>
+<td>调用进程</td>
+</tr>
+<tr>
+<td><strong>Server</strong></td>
+<td>被调用进程</td>
+</tr>
+<tr>
+<td><strong>Binder Proxy</strong></td>
+<td>客户端端点</td>
+</tr>
+<tr>
+<td><strong>Binder Stub</strong></td>
+<td>服务端端点</td>
+</tr>
+<tr>
+<td><strong>Binder Driver</strong></td>
+<td>内核驱动</td>
+</tr>
+</tbody></table>
+<h3 id="Binder-优势"><a href="#Binder-优势" class="headerlink" title="Binder 优势"></a>Binder 优势</h3><ul>
+<li><strong>一次拷贝</strong>：数据只需拷贝一次，高效</li>
+<li><strong>安全权限</strong>：支持 UID&#x2F;PID 验证</li>
+<li><strong>面向对象</strong>：透明的远程调用</li>
+</ul>
+<h2 id="三、AIDL-使用"><a href="#三、AIDL-使用" class="headerlink" title="三、AIDL 使用"></a>三、AIDL 使用</h2><h3 id="定义-AIDL-接口"><a href="#定义-AIDL-接口" class="headerlink" title="定义 AIDL 接口"></a>定义 AIDL 接口</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">// IRemoteService.aidl</span><br><span class="line">package com.example;</span><br><span class="line"></span><br><span class="line">interface IRemoteService &#123;</span><br><span class="line">    int getPid();</span><br><span class="line">    void basicTypes(int anInt, long aLong, boolean aBoolean, </span><br><span class="line">                    float aFloat, double aDouble, String aString);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="实现服务端"><a href="#实现服务端" class="headerlink" title="实现服务端"></a>实现服务端</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">RemoteService</span> : <span class="type">Service</span>() &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> binder = <span class="keyword">object</span> : IRemoteService.Stub() &#123;</span><br><span class="line">        <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">getPid</span><span class="params">()</span></span>: <span class="built_in">Int</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> Process.myPid()</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">basicTypes</span><span class="params">(anInt: <span class="type">Int</span>, aLong: <span class="type">Long</span>, aBoolean: <span class="type">Boolean</span>,</span></span></span><br><span class="line"><span class="params"><span class="function">                               aFloat: <span class="type">Float</span>, aDouble: <span class="type">Double</span>, aString: <span class="type">String</span>)</span></span> &#123;</span><br><span class="line">            <span class="comment">// 处理基本类型</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onBind</span><span class="params">(intent: <span class="type">Intent</span>)</span></span>: IBinder &#123;</span><br><span class="line">        <span class="keyword">return</span> binder</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="客户端绑定"><a href="#客户端绑定" class="headerlink" title="客户端绑定"></a>客户端绑定</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MainActivity</span> : <span class="type">AppCompatActivity</span>() &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">var</span> remoteService: IRemoteService? = <span class="literal">null</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> connection = <span class="keyword">object</span> : ServiceConnection &#123;</span><br><span class="line">        <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onServiceConnected</span><span class="params">(name: <span class="type">ComponentName</span>, service: <span class="type">IBinder</span>)</span></span> &#123;</span><br><span class="line">            remoteService = IRemoteService.Stub.asInterface(service)</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="keyword">val</span> pid = remoteService?.pid</span><br><span class="line">                Log.d(<span class="string">&quot;IPC&quot;</span>, <span class="string">&quot;Remote PID: <span class="variable">$pid</span>&quot;</span>)</span><br><span class="line">            &#125; <span class="keyword">catch</span> (e: RemoteException) &#123;</span><br><span class="line">                e.printStackTrace()</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onServiceDisconnected</span><span class="params">(name: <span class="type">ComponentName</span>)</span></span> &#123;</span><br><span class="line">            remoteService = <span class="literal">null</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onStart</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="keyword">super</span>.onStart()</span><br><span class="line">        <span class="keyword">val</span> intent = Intent(<span class="keyword">this</span>, RemoteService::<span class="keyword">class</span>.java)</span><br><span class="line">        bindService(intent, connection, Context.BIND_AUTO_CREATE)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onStop</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="keyword">super</span>.onStop()</span><br><span class="line">        unbindService(connection)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、AIDL-数据类型"><a href="#四、AIDL-数据类型" class="headerlink" title="四、AIDL 数据类型"></a>四、AIDL 数据类型</h2><h3 id="支持的类型"><a href="#支持的类型" class="headerlink" title="支持的类型"></a>支持的类型</h3><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>基本类型</strong></td>
+<td>int, long, boolean, float, double, String</td>
+</tr>
+<tr>
+<td><strong>List</strong></td>
+<td>泛型参数必须是支持的类型</td>
+</tr>
+<tr>
+<td><strong>Map</strong></td>
+<td>泛型参数必须是支持的类型</td>
+</tr>
+<tr>
+<td><strong>Parcelable</strong></td>
+<td>实现了 Parcelable 的自定义类</td>
+</tr>
+<tr>
+<td><strong>AIDL 接口</strong></td>
+<td>其他 AIDL 定义</td>
+</tr>
+</tbody></table>
+<h3 id="Parcelable-实现"><a href="#Parcelable-实现" class="headerlink" title="Parcelable 实现"></a>Parcelable 实现</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Parcelize</span></span><br><span class="line"><span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">User</span>(</span><br><span class="line">    <span class="keyword">val</span> id: <span class="built_in">Int</span>,</span><br><span class="line">    <span class="keyword">val</span> name: String,</span><br><span class="line">    <span class="keyword">val</span> email: String</span><br><span class="line">) : Parcelable</span><br></pre></td></tr></table></figure>
+
+<h3 id="AIDL-中使用-Parcelable"><a href="#AIDL-中使用-Parcelable" class="headerlink" title="AIDL 中使用 Parcelable"></a>AIDL 中使用 Parcelable</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">// User.aidl</span><br><span class="line">package com.example;</span><br><span class="line">parcelable User;</span><br><span class="line"></span><br><span class="line">// IRemoteService.aidl</span><br><span class="line">package com.example;</span><br><span class="line">import com.example.User;</span><br><span class="line"></span><br><span class="line">interface IRemoteService &#123;</span><br><span class="line">    User getUser(int id);</span><br><span class="line">    void setUser(User user);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="五、Binder-原理"><a href="#五、Binder-原理" class="headerlink" title="五、Binder 原理"></a>五、Binder 原理</h2><h3 id="通信流程"><a href="#通信流程" class="headerlink" title="通信流程"></a>通信流程</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Client                        Binder Driver                      Server</span><br><span class="line">   │                               │                                │</span><br><span class="line">   │ ── transact() ────────────────&gt;│                                │</span><br><span class="line">   │                               │ ── onTransact() ───────────────&gt;│</span><br><span class="line">   │                               │                                │</span><br><span class="line">   │                               │ &lt;── return result ─────────────│</span><br><span class="line">   │ &lt;── return result ────────────│                                │</span><br></pre></td></tr></table></figure>
+
+<h3 id="一次拷贝原理"><a href="#一次拷贝原理" class="headerlink" title="一次拷贝原理"></a>一次拷贝原理</h3><p>传统 IPC 需要两次拷贝：</p>
+<ol>
+<li>用户空间 → 内核空间</li>
+<li>内核空间 → 目标进程用户空间</li>
+</ol>
+<p>Binder 只需一次拷贝：</p>
+<ol>
+<li>通过 mmap 共享内存，直接写入目标进程空间</li>
+</ol>
+<h2 id="六、多进程注意事项"><a href="#六、多进程注意事项" class="headerlink" title="六、多进程注意事项"></a>六、多进程注意事项</h2><h3 id="Application-多次创建"><a href="#Application-多次创建" class="headerlink" title="Application 多次创建"></a>Application 多次创建</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MyApplication</span> : <span class="type">Application</span>() &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onCreate</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate()</span><br><span class="line">        <span class="comment">// 每个进程都会调用</span></span><br><span class="line">        Log.d(<span class="string">&quot;MyApp&quot;</span>, <span class="string">&quot;Process: <span class="subst">$&#123;Process.myPid()&#125;</span>&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="SharedPreferences-跨进程"><a href="#SharedPreferences-跨进程" class="headerlink" title="SharedPreferences 跨进程"></a>SharedPreferences 跨进程</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 不推荐：跨进程不安全</span></span><br><span class="line"><span class="keyword">val</span> prefs = getSharedPreferences(<span class="string">&quot;data&quot;</span>, MODE_PRIVATE)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 推荐：使用 ContentProvider 或 MODE_MULTI_PROCESS</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="单例模式"><a href="#单例模式" class="headerlink" title="单例模式"></a>单例模式</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 每个进程都有独立的单例实例</span></span><br><span class="line"><span class="keyword">object</span> Singleton &#123;</span><br><span class="line">    <span class="keyword">var</span> <span class="keyword">data</span>: String = <span class="string">&quot;&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="七、调试技巧"><a href="#七、调试技巧" class="headerlink" title="七、调试技巧"></a>七、调试技巧</h2><h3 id="查看-Binder-状态"><a href="#查看-Binder-状态" class="headerlink" title="查看 Binder 状态"></a>查看 Binder 状态</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查看 Binder 线程池</span></span><br><span class="line">adb shell <span class="built_in">cat</span> /proc/&lt;pid&gt;/status</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看 Binder 调用</span></span><br><span class="line">adb shell dumpsys activity services &lt;package_name&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="监控-Binder-调用"><a href="#监控-Binder-调用" class="headerlink" title="监控 Binder 调用"></a>监控 Binder 调用</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">LoggingBinder</span> : <span class="type">Binder</span>() &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onTransact</span><span class="params">(code: <span class="type">Int</span>, <span class="keyword">data</span>: <span class="type">Parcel</span>, reply: <span class="type">Parcel</span>?, flags: <span class="type">Int</span>)</span></span>: <span class="built_in">Boolean</span> &#123;</span><br><span class="line">        Log.d(<span class="string">&quot;Binder&quot;</span>, <span class="string">&quot;onTransact: code=<span class="variable">$code</span>&quot;</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">super</span>.onTransact(code, <span class="keyword">data</span>, reply, flags)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="八、最佳实践"><a href="#八、最佳实践" class="headerlink" title="八、最佳实践"></a>八、最佳实践</h2><ol>
+<li><strong>异步调用</strong>：避免阻塞 UI 线程</li>
+<li><strong>异常处理</strong>：捕获 RemoteException</li>
+<li><strong>连接管理</strong>：及时绑定和解绑</li>
+<li><strong>权限控制</strong>：使用 permission 保护服务</li>
+<li><strong>数据限制</strong>：避免传输大数据</li>
+</ol>
+<h2 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://source.android.com/docs/core/architecture/ipc/binder-overview">Binder overview - Android Open Source Project</a></li>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/1913005193198543940">循序渐进 Android Binder（一）</a></li>
+<li><a target="_blank" rel="noopener" href="https://developer.cloud.tencent.com/article/2595944">Android跨进程通信：Binder 进程间通信机制解析</a></li>
+</ul>
+<hr>
+<p><em>持续学习中…</em></p>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/AIDL/" rel="tag">AIDL</a>, <a class="tag-none-link" href="/blog/tags/Android/" rel="tag">Android</a>, <a class="tag-none-link" href="/blog/tags/Binder/" rel="tag">Binder</a>, <a class="tag-none-link" href="/blog/tags/IPC/" rel="tag">IPC</a>, <a class="tag-none-link" href="/blog/tags/%E8%BF%9B%E7%A8%8B%E9%80%9A%E4%BF%A1/" rel="tag">进程通信</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-03T15:21:29.200Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Kotlin委托模式学习-类委托与属性委托" href="/blog/2026/04/03/Kotlin委托模式学习-类委托与属性委托/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" Kotlin Value Class内联类学习" href="/blog/2026/04/03/Kotlin-Value-Class内联类学习/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>

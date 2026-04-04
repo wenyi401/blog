@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>Kotlin泛型进阶-协变与逆变 | Wenyi&#39;s Blog</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/03/Kotlin%E6%B3%9B%E5%9E%8B%E8%BF%9B%E9%98%B6-%E5%8D%8F%E5%8F%98%E4%B8%8E%E9%80%86%E5%8F%98/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="Generic, Kotlin, 协变, 泛型, 逆变" />
+  
+  <meta name="description" content="前言Kotlin 泛型中的协变（Covariance）和逆变（Contravariance）是类型系统的高级特性，用于解决泛型的类型安全问题。 一、泛型基础泛型类1234class Box&lt;T&gt;(val value: T)val stringBox &#x3D; Box(&quot;Hello&quot;)val intBox &#x3D; Box(42)  泛型函数123fun &lt;T&gt; Li">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kotlin泛型进阶-协变与逆变">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/03/Kotlin%E6%B3%9B%E5%9E%8B%E8%BF%9B%E9%98%B6-%E5%8D%8F%E5%8F%98%E4%B8%8E%E9%80%86%E5%8F%98/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:description" content="前言Kotlin 泛型中的协变（Covariance）和逆变（Contravariance）是类型系统的高级特性，用于解决泛型的类型安全问题。 一、泛型基础泛型类1234class Box&lt;T&gt;(val value: T)val stringBox &#x3D; Box(&quot;Hello&quot;)val intBox &#x3D; Box(42)  泛型函数123fun &lt;T&gt; Li">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-04-03T23:28:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T15:28:50.028Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="Generic">
+<meta property="article:tag" content="Kotlin">
+<meta property="article:tag" content="协变">
+<meta property="article:tag" content="泛型">
+<meta property="article:tag" content="逆变">
+<meta name="twitter:card" content="summary">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Kotlin泛型进阶-协变与逆变","description":"前言Kotlin 泛型中的协变（Covariance）和逆变（Contravariance）是类型系统的高级特性，用于解决泛型的类型安全问题。\n","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:28:00.000Z","dateModified":"2026-04-03T15:28:50.028Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Kotlin%E6%B3%9B%E5%9E%8B%E8%BF%9B%E9%98%B6-%E5%8D%8F%E5%8F%98%E4%B8%8E%E9%80%86%E5%8F%98/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/03/Kotlin%E6%B3%9B%E5%9E%8B%E8%BF%9B%E9%98%B6-%E5%8D%8F%E5%8F%98%E4%B8%8E%E9%80%86%E5%8F%98/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Kotlin泛型进阶-协变与逆变</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-03T23:28:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-03</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~3.60K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Kotlin 泛型中的协变（Covariance）和逆变（Contravariance）是类型系统的高级特性，用于解决泛型的类型安全问题。</p>
+<h2 id="一、泛型基础"><a href="#一、泛型基础" class="headerlink" title="一、泛型基础"></a>一、泛型基础</h2><h3 id="泛型类"><a href="#泛型类" class="headerlink" title="泛型类"></a>泛型类</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Box</span>&lt;<span class="type">T</span>&gt;(<span class="keyword">val</span> value: T)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> stringBox = Box(<span class="string">&quot;Hello&quot;</span>)</span><br><span class="line"><span class="keyword">val</span> intBox = Box(<span class="number">42</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="泛型函数"><a href="#泛型函数" class="headerlink" title="泛型函数"></a>泛型函数</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="type">&lt;T&gt;</span> List<span class="type">&lt;T&gt;</span>.<span class="title">firstOrNull</span><span class="params">()</span></span>: T? &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">if</span> (isEmpty()) <span class="literal">null</span> <span class="keyword">else</span> <span class="keyword">this</span>[<span class="number">0</span>]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="泛型约束"><a href="#泛型约束" class="headerlink" title="泛型约束"></a>泛型约束</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="type">&lt;T : Comparable&lt;T&gt;</span>&gt; <span class="title">max</span><span class="params">(a: <span class="type">T</span>, b: <span class="type">T</span>)</span></span>: T &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">if</span> (a &gt; b) a <span class="keyword">else</span> b</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="二、型变问题"><a href="#二、型变问题" class="headerlink" title="二、型变问题"></a>二、型变问题</h2><h3 id="为什么需要型变？"><a href="#为什么需要型变？" class="headerlink" title="为什么需要型变？"></a>为什么需要型变？</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">open</span> <span class="keyword">class</span> <span class="title class_">Animal</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Dog</span> : <span class="type">Animal</span>()</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Cat</span> : <span class="type">Animal</span>()</span><br><span class="line"></span><br><span class="line"><span class="comment">// ❌ 编译错误：List&lt;Dog&gt; 不是 List&lt;Animal&gt; 的子类型</span></span><br><span class="line"><span class="keyword">val</span> animals: List&lt;Animal&gt; = listOf(Dog())</span><br></pre></td></tr></table></figure>
+
+<h3 id="不变性（Invariant）"><a href="#不变性（Invariant）" class="headerlink" title="不变性（Invariant）"></a>不变性（Invariant）</h3><p>默认情况下，泛型是不变的：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Box</span>&lt;<span class="type">T</span>&gt;(<span class="keyword">val</span> value: T)</span><br><span class="line"></span><br><span class="line"><span class="comment">// ❌ 编译错误</span></span><br><span class="line"><span class="keyword">val</span> box: Box&lt;Animal&gt; = Box(Dog())</span><br></pre></td></tr></table></figure>
+
+<h2 id="三、协变（Covariance）"><a href="#三、协变（Covariance）" class="headerlink" title="三、协变（Covariance）"></a>三、协变（Covariance）</h2><h3 id="out-关键字"><a href="#out-关键字" class="headerlink" title="out 关键字"></a>out 关键字</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 协变：只能读取，不能写入</span></span><br><span class="line"><span class="keyword">interface</span> <span class="title class_">Producer</span>&lt;<span class="type">out T</span>&gt; &#123;</span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">produce</span><span class="params">()</span></span>: T</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">DogProducer</span> : <span class="type">Producer</span>&lt;<span class="type">Dog</span>&gt; &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">produce</span><span class="params">()</span></span>: Dog = Dog()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// ✅ 编译通过：Producer&lt;Dog&gt; 是 Producer&lt;Animal&gt; 的子类型</span></span><br><span class="line"><span class="keyword">val</span> producer: Producer&lt;Animal&gt; = DogProducer()</span><br></pre></td></tr></table></figure>
+
+<h3 id="协变规则"><a href="#协变规则" class="headerlink" title="协变规则"></a>协变规则</h3><ul>
+<li>使用 <code>out</code> 修饰符</li>
+<li>只能在返回值位置使用 T</li>
+<li>不能在参数位置使用 T</li>
+</ul>
+<h3 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Kotlin 标准库的 List 是协变的</span></span><br><span class="line"><span class="keyword">interface</span> <span class="title class_">List</span>&lt;<span class="type">out E</span>&gt; &#123;</span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">get</span><span class="params">(index: <span class="type">Int</span>)</span></span>: E</span><br><span class="line">    <span class="comment">// 不能有 fun add(element: E)</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> dogs: List&lt;Dog&gt; = listOf(Dog())</span><br><span class="line"><span class="keyword">val</span> animals: List&lt;Animal&gt; = dogs <span class="comment">// ✅</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="四、逆变（Contravariance）"><a href="#四、逆变（Contravariance）" class="headerlink" title="四、逆变（Contravariance）"></a>四、逆变（Contravariance）</h2><h3 id="in-关键字"><a href="#in-关键字" class="headerlink" title="in 关键字"></a>in 关键字</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 逆变：只能写入，不能读取</span></span><br><span class="line"><span class="keyword">interface</span> <span class="title class_">Consumer</span>&lt;<span class="type">in T</span>&gt; &#123;</span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">consume</span><span class="params">(item: <span class="type">T</span>)</span></span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">AnimalConsumer</span> : <span class="type">Consumer</span>&lt;<span class="type">Animal</span>&gt; &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">consume</span><span class="params">(item: <span class="type">Animal</span>)</span></span> &#123;</span><br><span class="line">        println(<span class="string">&quot;Consuming animal&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// ✅ 编译通过：Consumer&lt;Animal&gt; 是 Consumer&lt;Dog&gt; 的子类型</span></span><br><span class="line"><span class="keyword">val</span> consumer: Consumer&lt;Dog&gt; = AnimalConsumer()</span><br></pre></td></tr></table></figure>
+
+<h3 id="逆变规则"><a href="#逆变规则" class="headerlink" title="逆变规则"></a>逆变规则</h3><ul>
+<li>使用 <code>in</code> 修饰符</li>
+<li>只能在参数位置使用 T</li>
+<li>不能在返回值位置使用 T</li>
+</ul>
+<h3 id="示例-1"><a href="#示例-1" class="headerlink" title="示例"></a>示例</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Comparable 是逆变的</span></span><br><span class="line"><span class="keyword">interface</span> <span class="title class_">Comparable</span>&lt;<span class="type">in T</span>&gt; &#123;</span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">compareTo</span><span class="params">(other: <span class="type">T</span>)</span></span>: <span class="built_in">Int</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Dog</span> : <span class="type">Comparable</span>&lt;<span class="type">Dog</span>&gt; &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">compareTo</span><span class="params">(other: <span class="type">Dog</span>)</span></span>: <span class="built_in">Int</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="五、型变对比"><a href="#五、型变对比" class="headerlink" title="五、型变对比"></a>五、型变对比</h2><table>
+<thead>
+<tr>
+<th>特性</th>
+<th>协变（out）</th>
+<th>逆变（in）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>子类型关系</strong></td>
+<td>Producer<Dog> → Producer<Animal></td>
+<td>Consumer<Animal> → Consumer<Dog></td>
+</tr>
+<tr>
+<td><strong>操作</strong></td>
+<td>只读（生产）</td>
+<td>只写（消费）</td>
+</tr>
+<tr>
+<td><strong>使用位置</strong></td>
+<td>返回值</td>
+<td>参数</td>
+</tr>
+<tr>
+<td><strong>记忆口诀</strong></td>
+<td>out &#x3D; 输出</td>
+<td>in &#x3D; 输入</td>
+</tr>
+</tbody></table>
+<h2 id="六、使用处型变"><a href="#六、使用处型变" class="headerlink" title="六、使用处型变"></a>六、使用处型变</h2><h3 id="类型投影"><a href="#类型投影" class="headerlink" title="类型投影"></a>类型投影</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 使用处协变</span></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">copy</span><span class="params">(from: <span class="type">Array</span>&lt;<span class="type">out</span> <span class="type">Any</span>&gt;, to: <span class="type">Array</span>&lt;<span class="type">Any</span>&gt;)</span></span> &#123;</span><br><span class="line">    <span class="keyword">for</span> (i <span class="keyword">in</span> from.indices) &#123;</span><br><span class="line">        to[i] = from[i]</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用处逆变</span></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">fill</span><span class="params">(array: <span class="type">Array</span>&lt;<span class="type">in</span> <span class="type">Any</span>&gt;, value: <span class="type">Any</span>)</span></span> &#123;</span><br><span class="line">    <span class="keyword">for</span> (i <span class="keyword">in</span> array.indices) &#123;</span><br><span class="line">        array[i] = value</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="星投影"><a href="#星投影" class="headerlink" title="星投影"></a>星投影</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 等价于 Array&lt;out Any?&gt;</span></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">printArray</span><span class="params">(array: <span class="type">Array</span>&lt;*&gt;)</span></span> &#123;</span><br><span class="line">    <span class="keyword">for</span> (item <span class="keyword">in</span> array) &#123;</span><br><span class="line">        println(item)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="七、实化（Reified）"><a href="#七、实化（Reified）" class="headerlink" title="七、实化（Reified）"></a>七、实化（Reified）</h2><h3 id="内联函数-reified"><a href="#内联函数-reified" class="headerlink" title="内联函数 + reified"></a>内联函数 + reified</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 普通泛型无法在运行时获取类型</span></span><br><span class="line"><span class="keyword">inline</span> <span class="function"><span class="keyword">fun</span> <span class="type">&lt;<span class="keyword">reified</span> T&gt;</span> <span class="title">isType</span><span class="params">(value: <span class="type">Any</span>)</span></span>: <span class="built_in">Boolean</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> value <span class="keyword">is</span> T</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用</span></span><br><span class="line">println(isType&lt;String&gt;(<span class="string">&quot;Hello&quot;</span>)) <span class="comment">// true</span></span><br><span class="line">println(isType&lt;<span class="built_in">Int</span>&gt;(<span class="string">&quot;Hello&quot;</span>)) <span class="comment">// false</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="获取泛型类型"><a href="#获取泛型类型" class="headerlink" title="获取泛型类型"></a>获取泛型类型</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">inline</span> <span class="function"><span class="keyword">fun</span> <span class="type">&lt;<span class="keyword">reified</span> T&gt;</span> <span class="title">create</span><span class="params">()</span></span>: T &#123;</span><br><span class="line">    <span class="keyword">return</span> T::<span class="keyword">class</span>.java.getDeclaredConstructor().newInstance()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> user = create&lt;User&gt;()</span><br></pre></td></tr></table></figure>
+
+<h2 id="八、实际应用"><a href="#八、实际应用" class="headerlink" title="八、实际应用"></a>八、实际应用</h2><h3 id="协变示例"><a href="#协变示例" class="headerlink" title="协变示例"></a>协变示例</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">interface</span> <span class="title class_">Source</span>&lt;<span class="type">out T</span>&gt; &#123;</span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">next</span><span class="params">()</span></span>: T</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">demo</span><span class="params">(strs: <span class="type">Source</span>&lt;<span class="type">String</span>&gt;)</span></span> &#123;</span><br><span class="line">    <span class="keyword">val</span> objects: Source&lt;Any&gt; = strs <span class="comment">// ✅ 协变</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="逆变示例"><a href="#逆变示例" class="headerlink" title="逆变示例"></a>逆变示例</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">interface</span> <span class="title class_">Comparable</span>&lt;<span class="type">in T</span>&gt; &#123;</span><br><span class="line">    <span class="keyword">operator</span> <span class="function"><span class="keyword">fun</span> <span class="title">compareTo</span><span class="params">(other: <span class="type">T</span>)</span></span>: <span class="built_in">Int</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">demo</span><span class="params">(x: <span class="type">Comparable</span>&lt;<span class="type">Number</span>&gt;)</span></span> &#123;</span><br><span class="line">    <span class="keyword">val</span> double: Comparable&lt;<span class="built_in">Double</span>&gt; = x <span class="comment">// ✅ 逆变</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="PECS-原则"><a href="#PECS-原则" class="headerlink" title="PECS 原则"></a>PECS 原则</h3><p><strong>Producer Extends, Consumer Super</strong></p>
+<ul>
+<li><strong>生产者（读取）</strong>：使用 <code>out</code>（协变）</li>
+<li><strong>消费者（写入）</strong>：使用 <code>in</code>（逆变）</li>
+</ul>
+<h2 id="九、最佳实践"><a href="#九、最佳实践" class="headerlink" title="九、最佳实践"></a>九、最佳实践</h2><ol>
+<li><strong>遵循 PECS 原则</strong>：生产者用 out，消费者用 in</li>
+<li><strong>优先使用声明处型变</strong>：在类定义时指定</li>
+<li><strong>合理使用 reified</strong>：需要运行时类型信息时</li>
+<li><strong>避免过度使用星投影</strong>：尽量明确类型</li>
+<li><strong>理解类型关系</strong>：协变保持子类型关系，逆变反转</li>
+</ol>
+<h2 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://juejin.cn/post/7475994574528233511">Kotlin泛型中的协变与逆变</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/yongdaimi/p/17824129.html">Kotlin基础知识_12-泛型的高级特性</a></li>
+<li><a target="_blank" rel="noopener" href="https://time.geekbang.org/column/article/480022">泛型：逆变or协变，傻傻分不清？</a></li>
+</ul>
+<hr>
+<p><em>持续学习中…</em></p>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/Generic/" rel="tag">Generic</a>, <a class="tag-none-link" href="/blog/tags/Kotlin/" rel="tag">Kotlin</a>, <a class="tag-none-link" href="/blog/tags/%E5%8D%8F%E5%8F%98/" rel="tag">协变</a>, <a class="tag-none-link" href="/blog/tags/%E6%B3%9B%E5%9E%8B/" rel="tag">泛型</a>, <a class="tag-none-link" href="/blog/tags/%E9%80%86%E5%8F%98/" rel="tag">逆变</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-03T15:28:50.028Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Android View绘制流程学习-Measure Layout Draw" href="/blog/2026/04/03/Android-View绘制流程学习-Measure-Layout-Draw/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" Android事件分发机制学习" href="/blog/2026/04/03/Android事件分发机制学习/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>

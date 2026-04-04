@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>Android Intent与Intent过滤器深度解析 | Wenyi&#39;s Blog</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/04/Android-Intent%E4%B8%8EIntent%E8%BF%87%E6%BB%A4%E5%99%A8%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="Android, Intent, PendingIntent, 组件通信" />
+  
+  <meta name="description" content="前言Intent 是一种消息传递对象，可用于向其他应用组件请求操作。它支持三种基本用例：启动 Activity、启动服务、传送广播。 一、Intent 类型显式 Intent指定完整的 ComponentName，明确启动哪个组件： 1234val downloadIntent &#x3D; Intent(this, DownloadService::class.java).apply &#123;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android Intent与Intent过滤器深度解析">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/04/Android-Intent%E4%B8%8EIntent%E8%BF%87%E6%BB%A4%E5%99%A8%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:description" content="前言Intent 是一种消息传递对象，可用于向其他应用组件请求操作。它支持三种基本用例：启动 Activity、启动服务、传送广播。 一、Intent 类型显式 Intent指定完整的 ComponentName，明确启动哪个组件： 1234val downloadIntent &#x3D; Intent(this, DownloadService::class.java).apply &#123;">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-04-04T04:50:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T20:48:43.564Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="Intent">
+<meta property="article:tag" content="PendingIntent">
+<meta property="article:tag" content="组件通信">
+<meta name="twitter:card" content="summary">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Android Intent与Intent过滤器深度解析","description":"前言Intent 是一种消息传递对象，可用于向其他应用组件请求操作。它支持三种基本用例：启动 Activity、启动服务、传送广播。\n","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-04T04:50:00.000Z","dateModified":"2026-04-03T20:48:43.564Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/04/Android-Intent%E4%B8%8EIntent%E8%BF%87%E6%BB%A4%E5%99%A8%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/04/Android-Intent%E4%B8%8EIntent%E8%BF%87%E6%BB%A4%E5%99%A8%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Android Intent与Intent过滤器深度解析</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-04T04:50:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-04</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~3.57K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Intent 是一种消息传递对象，可用于向其他应用组件请求操作。它支持三种基本用例：启动 Activity、启动服务、传送广播。</p>
+<h2 id="一、Intent-类型"><a href="#一、Intent-类型" class="headerlink" title="一、Intent 类型"></a>一、Intent 类型</h2><h3 id="显式-Intent"><a href="#显式-Intent" class="headerlink" title="显式 Intent"></a>显式 Intent</h3><p>指定完整的 ComponentName，明确启动哪个组件：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> downloadIntent = Intent(<span class="keyword">this</span>, DownloadService::<span class="keyword">class</span>.java).apply &#123;</span><br><span class="line">    <span class="keyword">data</span> = Uri.parse(fileUrl)</span><br><span class="line">&#125;</span><br><span class="line">startService(downloadIntent)</span><br></pre></td></tr></table></figure>
+
+<h3 id="隐式-Intent"><a href="#隐式-Intent" class="headerlink" title="隐式 Intent"></a>隐式 Intent</h3><p>声明要执行的常规操作，让系统选择合适的组件：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> sendIntent = Intent().apply &#123;</span><br><span class="line">    action = Intent.ACTION_SEND</span><br><span class="line">    putExtra(Intent.EXTRA_TEXT, textMessage)</span><br><span class="line">    type = <span class="string">&quot;text/plain&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    startActivity(sendIntent)</span><br><span class="line">&#125; <span class="keyword">catch</span> (e: ActivityNotFoundException) &#123;</span><br><span class="line">    <span class="comment">// 处理没有应用能处理的情况</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="二、构建-Intent"><a href="#二、构建-Intent" class="headerlink" title="二、构建 Intent"></a>二、构建 Intent</h2><h3 id="主要信息"><a href="#主要信息" class="headerlink" title="主要信息"></a>主要信息</h3><table>
+<thead>
+<tr>
+<th>属性</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>组件名称</td>
+<td>指定目标组件</td>
+</tr>
+<tr>
+<td>操作</td>
+<td>要执行的操作</td>
+</tr>
+<tr>
+<td>数据</td>
+<td>URI 和 MIME 类型</td>
+</tr>
+<tr>
+<td>类别</td>
+<td>组件类型信息</td>
+</tr>
+<tr>
+<td>Extra</td>
+<td>键值对数据</td>
+</tr>
+<tr>
+<td>标志</td>
+<td>元数据</td>
+</tr>
+</tbody></table>
+<h3 id="常见操作"><a href="#常见操作" class="headerlink" title="常见操作"></a>常见操作</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 查看内容</span></span><br><span class="line">Intent.ACTION_VIEW</span><br><span class="line"></span><br><span class="line"><span class="comment">// 分享内容</span></span><br><span class="line">Intent.ACTION_SEND</span><br><span class="line"></span><br><span class="line"><span class="comment">// 编辑内容</span></span><br><span class="line">Intent.ACTION_EDIT</span><br><span class="line"></span><br><span class="line"><span class="comment">// 自定义操作</span></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">val</span> ACTION_TIMETRAVEL = <span class="string">&quot;com.example.action.TIMETRAVEL&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="数据设置"><a href="#数据设置" class="headerlink" title="数据设置"></a>数据设置</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 仅设置 URI</span></span><br><span class="line">intent.setData(uri)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 仅设置 MIME 类型</span></span><br><span class="line">intent.setType(<span class="string">&quot;text/plain&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 同时设置（推荐）</span></span><br><span class="line">intent.setDataAndType(uri, <span class="string">&quot;image/jpeg&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<h2 id="三、Intent-过滤器"><a href="#三、Intent-过滤器" class="headerlink" title="三、Intent 过滤器"></a>三、Intent 过滤器</h2><h3 id="声明过滤器"><a href="#声明过滤器" class="headerlink" title="声明过滤器"></a>声明过滤器</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">activity</span> <span class="attr">android:name</span>=<span class="string">&quot;ShareActivity&quot;</span> <span class="attr">android:exported</span>=<span class="string">&quot;false&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">intent-filter</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">action</span> <span class="attr">android:name</span>=<span class="string">&quot;android.intent.action.SEND&quot;</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">category</span> <span class="attr">android:name</span>=<span class="string">&quot;android.intent.category.DEFAULT&quot;</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">data</span> <span class="attr">android:mimeType</span>=<span class="string">&quot;text/plain&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">intent-filter</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">activity</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="过滤器元素"><a href="#过滤器元素" class="headerlink" title="过滤器元素"></a>过滤器元素</h3><ul>
+<li><strong>action</strong>：声明接受的操作</li>
+<li><strong>category</strong>：声明接受的类别</li>
+<li><strong>data</strong>：声明接受的数据类型</li>
+</ul>
+<h3 id="主入口-Activity"><a href="#主入口-Activity" class="headerlink" title="主入口 Activity"></a>主入口 Activity</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">activity</span> <span class="attr">android:name</span>=<span class="string">&quot;MainActivity&quot;</span> <span class="attr">android:exported</span>=<span class="string">&quot;true&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">intent-filter</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">action</span> <span class="attr">android:name</span>=<span class="string">&quot;android.intent.action.MAIN&quot;</span> /&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">category</span> <span class="attr">android:name</span>=<span class="string">&quot;android.intent.category.LAUNCHER&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">intent-filter</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">activity</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="四、Intent-解析"><a href="#四、Intent-解析" class="headerlink" title="四、Intent 解析"></a>四、Intent 解析</h2><h3 id="操作测试"><a href="#操作测试" class="headerlink" title="操作测试"></a>操作测试</h3><p>Intent 中的操作必须与过滤器中的某项操作匹配。</p>
+<h3 id="类别测试"><a href="#类别测试" class="headerlink" title="类别测试"></a>类别测试</h3><p>Intent 中的每个类别都必须与过滤器中的某个类别匹配。</p>
+<h3 id="数据测试"><a href="#数据测试" class="headerlink" title="数据测试"></a>数据测试</h3><ul>
+<li>Intent 不包含 URI 和 MIME：过滤器未指定</li>
+<li>Intent 包含 URI 但无 MIME：URI 匹配且过滤器未指定 MIME</li>
+<li>Intent 包含 MIME 但无 URI：MIME 匹配且过滤器未指定 URI</li>
+<li>Intent 同时包含：两者都必须匹配</li>
+</ul>
+<h2 id="五、PendingIntent"><a href="#五、PendingIntent" class="headerlink" title="五、PendingIntent"></a>五、PendingIntent</h2><h3 id="创建-PendingIntent"><a href="#创建-PendingIntent" class="headerlink" title="创建 PendingIntent"></a>创建 PendingIntent</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Activity</span></span><br><span class="line"><span class="keyword">val</span> pendingIntent = PendingIntent.getActivity(</span><br><span class="line">    applicationContext,</span><br><span class="line">    REQUEST_CODE,</span><br><span class="line">    intent,</span><br><span class="line">    PendingIntent.FLAG_IMMUTABLE</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment">// Service</span></span><br><span class="line"><span class="keyword">val</span> pendingIntent = PendingIntent.getService(</span><br><span class="line">    applicationContext,</span><br><span class="line">    REQUEST_CODE,</span><br><span class="line">    intent,</span><br><span class="line">    PendingIntent.FLAG_IMMUTABLE</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment">// Broadcast</span></span><br><span class="line"><span class="keyword">val</span> pendingIntent = PendingIntent.getBroadcast(</span><br><span class="line">    applicationContext,</span><br><span class="line">    REQUEST_CODE,</span><br><span class="line">    intent,</span><br><span class="line">    PendingIntent.FLAG_IMMUTABLE</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<h3 id="可变性"><a href="#可变性" class="headerlink" title="可变性"></a>可变性</h3><p>Android 12+ 必须指定可变性：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 不可变（推荐）</span></span><br><span class="line">PendingIntent.FLAG_IMMUTABLE</span><br><span class="line"></span><br><span class="line"><span class="comment">// 可变（特定场景）</span></span><br><span class="line">PendingIntent.FLAG_MUTABLE</span><br></pre></td></tr></table></figure>
+
+<h3 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h3><ul>
+<li>通知操作</li>
+<li>应用微件</li>
+<li>闹钟</li>
+</ul>
+<h2 id="六、安全最佳实践"><a href="#六、安全最佳实践" class="headerlink" title="六、安全最佳实践"></a>六、安全最佳实践</h2><h3 id="1-使用显式-Intent-启动服务"><a href="#1-使用显式-Intent-启动服务" class="headerlink" title="1. 使用显式 Intent 启动服务"></a>1. 使用显式 Intent 启动服务</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 正确</span></span><br><span class="line"><span class="keyword">val</span> intent = Intent(<span class="keyword">this</span>, MyService::<span class="keyword">class</span>.java)</span><br><span class="line">startService(intent)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 错误：隐式 Intent 启动服务存在安全隐患</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="2-验证-Intent"><a href="#2-验证-Intent" class="headerlink" title="2. 验证 Intent"></a>2. 验证 Intent</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (sendIntent.resolveActivity(packageManager) != <span class="literal">null</span>) &#123;</span><br><span class="line">    startActivity(sendIntent)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-使用选择器"><a href="#3-使用选择器" class="headerlink" title="3. 使用选择器"></a>3. 使用选择器</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> chooser = Intent.createChooser(sendIntent, <span class="string">&quot;Share with&quot;</span>)</span><br><span class="line"><span class="keyword">if</span> (sendIntent.resolveActivity(packageManager) != <span class="literal">null</span>) &#123;</span><br><span class="line">    startActivity(chooser)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-检测不安全的-Intent-启动"><a href="#4-检测不安全的-Intent-启动" class="headerlink" title="4. 检测不安全的 Intent 启动"></a>4. 检测不安全的 Intent 启动</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">onCreate</span><span class="params">()</span></span> &#123;</span><br><span class="line">    StrictMode.setVmPolicy(VmPolicy.Builder()</span><br><span class="line">        .detectUnsafeIntentLaunch()</span><br><span class="line">        .penaltyLog()</span><br><span class="line">        .build())</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="七、常见问题"><a href="#七、常见问题" class="headerlink" title="七、常见问题"></a>七、常见问题</h2><h3 id="问题-1：ActivityNotFoundException"><a href="#问题-1：ActivityNotFoundException" class="headerlink" title="问题 1：ActivityNotFoundException"></a>问题 1：ActivityNotFoundException</h3><p><strong>原因</strong>：没有应用能处理隐式 Intent。</p>
+<p><strong>解决方案</strong>：使用 resolveActivity() 验证或 try-catch。</p>
+<h3 id="问题-2：Intent-数据丢失"><a href="#问题-2：Intent-数据丢失" class="headerlink" title="问题 2：Intent 数据丢失"></a>问题 2：Intent 数据丢失</h3><p><strong>原因</strong>：未正确设置 MIME 类型。</p>
+<p><strong>解决方案</strong>：使用 setDataAndType() 同时设置。</p>
+<h3 id="问题-3：PendingIntent-无法触发"><a href="#问题-3：PendingIntent-无法触发" class="headerlink" title="问题 3：PendingIntent 无法触发"></a>问题 3：PendingIntent 无法触发</h3><p><strong>原因</strong>：未正确设置 FLAG_IMMUTABLE 或 FLAG_MUTABLE。</p>
+<p><strong>解决方案</strong>：Android 12+ 必须指定可变性标志。</p>
+<h2 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://developer.android.google.cn/guide/components/intents-filters?hl=zh-cn">Intent 和 Intent 过滤器 | Android Developers</a></li>
+<li><a target="_blank" rel="noopener" href="https://developer.android.google.cn/training/basics/intents?hl=zh-cn">与其他应用互动 | Android Developers</a></li>
+</ul>
+<hr>
+<p><em>深入学习中…</em></p>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/Android/" rel="tag">Android</a>, <a class="tag-none-link" href="/blog/tags/Intent/" rel="tag">Intent</a>, <a class="tag-none-link" href="/blog/tags/PendingIntent/" rel="tag">PendingIntent</a>, <a class="tag-none-link" href="/blog/tags/%E7%BB%84%E4%BB%B6%E9%80%9A%E4%BF%A1/" rel="tag">组件通信</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-03T20:48:43.564Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Kotlin操作符重载Operator Overloading深度解析" href="/blog/2026/04/04/Kotlin操作符重载Operator-Overloading深度解析/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" Kotlin 2.0.20新特性深度解析" href="/blog/2026/04/04/Kotlin-2.0.20新特性深度解析/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>

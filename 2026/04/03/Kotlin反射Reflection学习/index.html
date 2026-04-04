@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>Kotlin反射Reflection学习 | Wenyi&#39;s Blog</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/03/Kotlin%E5%8F%8D%E5%B0%84Reflection%E5%AD%A6%E4%B9%A0/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="KClass, KFunction, Kotlin, Reflection, 反射" />
+  
+  <meta name="description" content="前言反射是一组语言和库特性，允许你在运行时内省程序结构。函数和属性在 Kotlin 中是一等公民，内省它们的能力（例如，在运行时学习属性或函数的名称或类型）在使用函数式或响应式风格时非常重要。 一、添加依赖Gradle123dependencies &#123;    implementation(kotlin(&quot;reflect&quot;))&#125;  Maven12345&lt;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kotlin反射Reflection学习">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/03/Kotlin%E5%8F%8D%E5%B0%84Reflection%E5%AD%A6%E4%B9%A0/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:description" content="前言反射是一组语言和库特性，允许你在运行时内省程序结构。函数和属性在 Kotlin 中是一等公民，内省它们的能力（例如，在运行时学习属性或函数的名称或类型）在使用函数式或响应式风格时非常重要。 一、添加依赖Gradle123dependencies &#123;    implementation(kotlin(&quot;reflect&quot;))&#125;  Maven12345&lt;">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-04-03T23:35:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T15:35:30.884Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="KClass">
+<meta property="article:tag" content="KFunction">
+<meta property="article:tag" content="Kotlin">
+<meta property="article:tag" content="Reflection">
+<meta property="article:tag" content="反射">
+<meta name="twitter:card" content="summary">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Kotlin反射Reflection学习","description":"前言反射是一组语言和库特性，允许你在运行时内省程序结构。函数和属性在 Kotlin 中是一等公民，内省它们的能力（例如，在运行时学习属性或函数的名称或类型）在...","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:35:00.000Z","dateModified":"2026-04-03T15:35:30.884Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Kotlin%E5%8F%8D%E5%B0%84Reflection%E5%AD%A6%E4%B9%A0/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/03/Kotlin%E5%8F%8D%E5%B0%84Reflection%E5%AD%A6%E4%B9%A0/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Kotlin反射Reflection学习</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-03T23:35:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-03</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~3.88K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>反射是一组语言和库特性，允许你在运行时内省程序结构。函数和属性在 Kotlin 中是一等公民，内省它们的能力（例如，在运行时学习属性或函数的名称或类型）在使用函数式或响应式风格时非常重要。</p>
+<h2 id="一、添加依赖"><a href="#一、添加依赖" class="headerlink" title="一、添加依赖"></a>一、添加依赖</h2><h3 id="Gradle"><a href="#Gradle" class="headerlink" title="Gradle"></a>Gradle</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">dependencies &#123;</span><br><span class="line">    implementation(kotlin(<span class="string">&quot;reflect&quot;</span>))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Maven"><a href="#Maven" class="headerlink" title="Maven"></a>Maven</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.jetbrains.kotlin<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>kotlin-reflect<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.3.20<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="二、类引用"><a href="#二、类引用" class="headerlink" title="二、类引用"></a>二、类引用</h2><h3 id="基本语法"><a href="#基本语法" class="headerlink" title="基本语法"></a>基本语法</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> c = MyClass::<span class="keyword">class</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="KClass-类型"><a href="#KClass-类型" class="headerlink" title="KClass 类型"></a>KClass 类型</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> stringClass: KClass&lt;String&gt; = String::<span class="keyword">class</span></span><br><span class="line"><span class="title class_">val</span> <span class="title">listClass</span>: <span class="type">KClass</span>&lt;<span class="type">List&lt;*</span>&gt;&gt; = <span class="title">List</span>:<span class="type">:class</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="绑定类引用"><a href="#绑定类引用" class="headerlink" title="绑定类引用"></a>绑定类引用</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> widget: Widget = ...</span><br><span class="line"><span class="keyword">val</span> actualClass = widget::<span class="keyword">class</span>  <span class="comment">// 获取对象的实际类</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="三、函数引用"><a href="#三、函数引用" class="headerlink" title="三、函数引用"></a>三、函数引用</h2><h3 id="基本使用"><a href="#基本使用" class="headerlink" title="基本使用"></a>基本使用</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">isOdd</span><span class="params">(x: <span class="type">Int</span>)</span></span> = x % <span class="number">2</span> != <span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> numbers = listOf(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>)</span><br><span class="line">println(numbers.filter(::isOdd))  <span class="comment">// [1, 3]</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="函数类型"><a href="#函数类型" class="headerlink" title="函数类型"></a>函数类型</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> predicate: (<span class="built_in">Int</span>) -&gt; <span class="built_in">Boolean</span> = ::isOdd</span><br><span class="line"><span class="comment">// predicate 的类型是 (Int) -&gt; Boolean</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="重载函数"><a href="#重载函数" class="headerlink" title="重载函数"></a>重载函数</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">isOdd</span><span class="params">(x: <span class="type">Int</span>)</span></span> = x % <span class="number">2</span> != <span class="number">0</span></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">isOdd</span><span class="params">(s: <span class="type">String</span>)</span></span> = s == <span class="string">&quot;brillig&quot;</span> || s == <span class="string">&quot;slithy&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> numbers = listOf(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>)</span><br><span class="line">println(numbers.filter(::isOdd))  <span class="comment">// 引用 isOdd(x: Int)</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> predicate: (String) -&gt; <span class="built_in">Boolean</span> = ::isOdd  <span class="comment">// 引用 isOdd(s: String)</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="成员函数引用"><a href="#成员函数引用" class="headerlink" title="成员函数引用"></a>成员函数引用</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> toCharArray = String::toCharArray</span><br></pre></td></tr></table></figure>
+
+<h3 id="扩展函数引用"><a href="#扩展函数引用" class="headerlink" title="扩展函数引用"></a>扩展函数引用</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> String.<span class="title">isEmail</span><span class="params">()</span></span>: <span class="built_in">Boolean</span> = <span class="keyword">this</span>.contains(<span class="string">&quot;@&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> isEmailRef = String::isEmail</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、属性引用"><a href="#四、属性引用" class="headerlink" title="四、属性引用"></a>四、属性引用</h2><h3 id="顶层属性"><a href="#顶层属性" class="headerlink" title="顶层属性"></a>顶层属性</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> x = <span class="number">1</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    println(::x.<span class="keyword">get</span>())    <span class="comment">// 1</span></span><br><span class="line">    println(::x.name)     <span class="comment">// &quot;x&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="KProperty-类型"><a href="#KProperty-类型" class="headerlink" title="KProperty 类型"></a>KProperty 类型</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> prop: KProperty0&lt;<span class="built_in">Int</span>&gt; = ::x</span><br></pre></td></tr></table></figure>
+
+<h3 id="成员属性"><a href="#成员属性" class="headerlink" title="成员属性"></a>成员属性</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Person</span>(<span class="keyword">val</span> name: String, <span class="keyword">val</span> age: <span class="built_in">Int</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> person = Person(<span class="string">&quot;Alice&quot;</span>, <span class="number">25</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> nameProp = Person::name</span><br><span class="line">println(nameProp.<span class="keyword">get</span>(person))  <span class="comment">// &quot;Alice&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="五、构造函数引用"><a href="#五、构造函数引用" class="headerlink" title="五、构造函数引用"></a>五、构造函数引用</h2><h3 id="基本使用-1"><a href="#基本使用-1" class="headerlink" title="基本使用"></a>基本使用</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Person</span>(<span class="keyword">val</span> name: String)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> factory: (String) -&gt; Person = ::Person</span><br><span class="line"><span class="keyword">val</span> person = factory(<span class="string">&quot;Alice&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<h2 id="六、反射-API"><a href="#六、反射-API" class="headerlink" title="六、反射 API"></a>六、反射 API</h2><h3 id="KClass"><a href="#KClass" class="headerlink" title="KClass"></a>KClass</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> cls = String::<span class="keyword">class</span></span><br><span class="line"></span><br><span class="line"><span class="title class_">cls</span>.<span class="title">simpleName</span>      // &quot;<span class="title">String</span>&quot;</span><br><span class="line">cls.qualifiedName   <span class="comment">// &quot;kotlin.String&quot;</span></span><br><span class="line">cls.members         <span class="comment">// 成员列表</span></span><br><span class="line">cls.constructors    <span class="comment">// 构造函数列表</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="KFunction"><a href="#KFunction" class="headerlink" title="KFunction"></a>KFunction</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">add</span><span class="params">(a: <span class="type">Int</span>, b: <span class="type">Int</span>)</span></span> = a + b</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> func = ::add</span><br><span class="line"></span><br><span class="line">func.name           <span class="comment">// &quot;add&quot;</span></span><br><span class="line">func.parameters     <span class="comment">// 参数列表</span></span><br><span class="line">func.returnType     <span class="comment">// 返回类型</span></span><br><span class="line">func.call(<span class="number">1</span>, <span class="number">2</span>)     <span class="comment">// 调用函数，返回 3</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="KProperty"><a href="#KProperty" class="headerlink" title="KProperty"></a>KProperty</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Example</span> &#123;</span><br><span class="line">    <span class="keyword">var</span> value: <span class="built_in">Int</span> = <span class="number">0</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> prop = Example::value</span><br><span class="line"></span><br><span class="line">prop.name           <span class="comment">// &quot;value&quot;</span></span><br><span class="line">prop.getter         <span class="comment">// getter 函数</span></span><br><span class="line">prop.setter         <span class="comment">// setter 函数</span></span><br><span class="line">prop.isMutable      <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="七、实际应用"><a href="#七、实际应用" class="headerlink" title="七、实际应用"></a>七、实际应用</h2><h3 id="1-JSON-序列化"><a href="#1-JSON-序列化" class="headerlink" title="1. JSON 序列化"></a>1. JSON 序列化</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">inline</span> <span class="function"><span class="keyword">fun</span> <span class="type">&lt;<span class="keyword">reified</span> T : Any&gt;</span> <span class="title">fromJson</span><span class="params">(json: <span class="type">String</span>)</span></span>: T &#123;</span><br><span class="line">    <span class="keyword">val</span> cls = T::<span class="keyword">class</span></span><br><span class="line">    <span class="title class_">val</span> <span class="keyword">constructor</span> = <span class="title">cls</span>.<span class="title">primaryConstructor</span>!!</span><br><span class="line">    <span class="comment">// 解析 JSON 并创建实例</span></span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">constructor</span>.callBy(<span class="comment">/* parameters */</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-依赖注入"><a href="#2-依赖注入" class="headerlink" title="2. 依赖注入"></a>2. 依赖注入</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">DIContainer</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> instances = mutableMapOf&lt;KClass&lt;*&gt;, Any&gt;()</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">inline</span> <span class="function"><span class="keyword">fun</span> <span class="type">&lt;<span class="keyword">reified</span> T : Any&gt;</span> <span class="title">get</span><span class="params">()</span></span>: T &#123;</span><br><span class="line">        <span class="keyword">val</span> cls = T::<span class="keyword">class</span></span><br><span class="line">        <span class="title class_">return</span> <span class="title">instances</span>.<span class="title">getOrPut</span>(cls) &#123;</span><br><span class="line">            createInstance(cls)</span><br><span class="line">        &#125; <span class="keyword">as</span> T</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-数据库映射"><a href="#3-数据库映射" class="headerlink" title="3. 数据库映射"></a>3. 数据库映射</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="type">&lt;T : Any&gt;</span> KClass<span class="type">&lt;T&gt;</span>.<span class="title">toTableName</span><span class="params">()</span></span>: String &#123;</span><br><span class="line">    <span class="keyword">return</span> simpleName?.lowercase()?.plus(<span class="string">&quot;s&quot;</span>) ?: <span class="string">&quot;&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// User::class.toTableName() -&gt; &quot;users&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="4-验证框架"><a href="#4-验证框架" class="headerlink" title="4. 验证框架"></a>4. 验证框架</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">annotation</span> <span class="keyword">class</span> <span class="title class_">Validation</span>(<span class="keyword">val</span> rule: String)</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Validator</span> &#123;</span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">validate</span><span class="params">(obj: <span class="type">Any</span>)</span></span>: List&lt;String&gt; &#123;</span><br><span class="line">        <span class="keyword">val</span> errors = mutableListOf&lt;String&gt;()</span><br><span class="line">        obj::<span class="keyword">class</span>.members.forEach &#123; member -&gt;</span><br><span class="line">            member.annotations.filterIsInstance&lt;Validation&gt;().forEach &#123; </span><br><span class="line">                <span class="comment">// 验证逻辑</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> errors</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="八、性能考虑"><a href="#八、性能考虑" class="headerlink" title="八、性能考虑"></a>八、性能考虑</h2><h3 id="反射开销"><a href="#反射开销" class="headerlink" title="反射开销"></a>反射开销</h3><ul>
+<li>反射调用比直接调用慢</li>
+<li>避免在性能敏感代码中使用反射</li>
+<li>缓存反射结果</li>
+</ul>
+<h3 id="最佳实践"><a href="#最佳实践" class="headerlink" title="最佳实践"></a>最佳实践</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ✅ 缓存 KClass</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">val</span> userClass = User::<span class="keyword">class</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// ✅ 缓存 KFunction</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">val</span> createFunction = User::<span class="keyword">class</span>.primaryConstructor!!</span><br></pre></td></tr></table></figure>
+
+<h2 id="九、反射-vs-直接调用"><a href="#九、反射-vs-直接调用" class="headerlink" title="九、反射 vs 直接调用"></a>九、反射 vs 直接调用</h2><table>
+<thead>
+<tr>
+<th>特性</th>
+<th>直接调用</th>
+<th>反射调用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>性能</strong></td>
+<td>快</td>
+<td>慢</td>
+</tr>
+<tr>
+<td><strong>类型安全</strong></td>
+<td>编译时检查</td>
+<td>运行时检查</td>
+</tr>
+<tr>
+<td><strong>灵活性</strong></td>
+<td>固定</td>
+<td>动态</td>
+</tr>
+<tr>
+<td><strong>可读性</strong></td>
+<td>高</td>
+<td>低</td>
+</tr>
+</tbody></table>
+<h2 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://kotlinlang.org/docs/reflection.html">Reflection | Kotlin Documentation</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.baeldung.com/kotlin/reflection">Reflection with Kotlin | Baeldung</a></li>
+<li><a target="_blank" rel="noopener" href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/-k-class/">KClass API</a></li>
+<li><a target="_blank" rel="noopener" href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/-k-function/">KFunction API</a></li>
+</ul>
+<hr>
+<p><em>持续学习中…</em></p>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/KClass/" rel="tag">KClass</a>, <a class="tag-none-link" href="/blog/tags/KFunction/" rel="tag">KFunction</a>, <a class="tag-none-link" href="/blog/tags/Kotlin/" rel="tag">Kotlin</a>, <a class="tag-none-link" href="/blog/tags/Reflection/" rel="tag">Reflection</a>, <a class="tag-none-link" href="/blog/tags/%E5%8F%8D%E5%B0%84/" rel="tag">反射</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-03T15:35:30.884Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Android应用启动优化学习" href="/blog/2026/04/03/Android应用启动优化学习/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" Android内存泄漏检测学习-LeakCanary与MAT" href="/blog/2026/04/03/Android内存泄漏检测学习-LeakCanary与MAT/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>

@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>Android Jetpack组件学习-Room数据库 | Wenyi&#39;s Blog</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/03/Android-Jetpack%E7%BB%84%E4%BB%B6%E5%AD%A6%E4%B9%A0-Room%E6%95%B0%E6%8D%AE%E5%BA%93/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="Android, Jetpack, Kotlin, Room, SQLite" />
+  
+  <meta name="description" content="前言Room 是 Android Jetpack 中的 SQLite 对象映射库，在 SQLite 上提供了一个抽象层，简化了数据库操作。 Room 优势 编译时验证：提供针对 SQL 查询的编译时验证 减少样板代码：提供方便注解，最小化重复和容易出错的代码 简化迁移：简化了数据库迁移路径  主要组件Room 包含三个主要组件：  数据库类 - 保存数据库并作为应用持久性数据底层连接的主要访问点">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android Jetpack组件学习-Room数据库">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/03/Android-Jetpack%E7%BB%84%E4%BB%B6%E5%AD%A6%E4%B9%A0-Room%E6%95%B0%E6%8D%AE%E5%BA%93/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:description" content="前言Room 是 Android Jetpack 中的 SQLite 对象映射库，在 SQLite 上提供了一个抽象层，简化了数据库操作。 Room 优势 编译时验证：提供针对 SQL 查询的编译时验证 减少样板代码：提供方便注解，最小化重复和容易出错的代码 简化迁移：简化了数据库迁移路径  主要组件Room 包含三个主要组件：  数据库类 - 保存数据库并作为应用持久性数据底层连接的主要访问点">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-04-03T16:24:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T08:24:36.072Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="Jetpack">
+<meta property="article:tag" content="Kotlin">
+<meta property="article:tag" content="Room">
+<meta property="article:tag" content="SQLite">
+<meta name="twitter:card" content="summary">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Android Jetpack组件学习-Room数据库","description":"前言Room 是 Android Jetpack 中的 SQLite 对象映射库，在 SQLite 上提供了一个抽象层，简化了数据库操作。\n","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T16:24:00.000Z","dateModified":"2026-04-03T08:24:36.072Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Android-Jetpack%E7%BB%84%E4%BB%B6%E5%AD%A6%E4%B9%A0-Room%E6%95%B0%E6%8D%AE%E5%BA%93/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/03/Android-Jetpack%E7%BB%84%E4%BB%B6%E5%AD%A6%E4%B9%A0-Room%E6%95%B0%E6%8D%AE%E5%BA%93/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Android Jetpack组件学习-Room数据库</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-03T16:24:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-03</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~3.01K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Room 是 Android Jetpack 中的 SQLite 对象映射库，在 SQLite 上提供了一个抽象层，简化了数据库操作。</p>
+<h2 id="Room-优势"><a href="#Room-优势" class="headerlink" title="Room 优势"></a>Room 优势</h2><ul>
+<li><strong>编译时验证</strong>：提供针对 SQL 查询的编译时验证</li>
+<li><strong>减少样板代码</strong>：提供方便注解，最小化重复和容易出错的代码</li>
+<li><strong>简化迁移</strong>：简化了数据库迁移路径</li>
+</ul>
+<h2 id="主要组件"><a href="#主要组件" class="headerlink" title="主要组件"></a>主要组件</h2><p>Room 包含三个主要组件：</p>
+<ol>
+<li><strong>数据库类</strong> - 保存数据库并作为应用持久性数据底层连接的主要访问点</li>
+<li><strong>数据实体</strong> - 表示应用的数据库中的表</li>
+<li><strong>数据访问对象 (DAO)</strong> - 提供在数据库中查询、更新、插入和删除数据的方法</li>
+</ol>
+<h2 id="设置依赖"><a href="#设置依赖" class="headerlink" title="设置依赖"></a>设置依赖</h2><figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">dependencies</span> &#123;</span><br><span class="line">    val room_version = <span class="string">&quot;2.8.4&quot;</span></span><br><span class="line"></span><br><span class="line">    implementation(<span class="string">&quot;androidx.room:room-runtime:$room_version&quot;</span>)</span><br><span class="line">    ksp(<span class="string">&quot;androidx.room:room-compiler:$room_version&quot;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Kotlin Extensions and Coroutines support</span></span><br><span class="line">    implementation(<span class="string">&quot;androidx.room:room-ktx:$room_version&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="数据实体"><a href="#数据实体" class="headerlink" title="数据实体"></a>数据实体</h2><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Entity</span></span><br><span class="line"><span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">User</span>(</span><br><span class="line">    <span class="meta">@PrimaryKey</span> <span class="keyword">val</span> uid: <span class="built_in">Int</span>,</span><br><span class="line">    <span class="meta">@ColumnInfo(name = <span class="string">&quot;first_name&quot;</span>)</span> <span class="keyword">val</span> firstName: String?,</span><br><span class="line">    <span class="meta">@ColumnInfo(name = <span class="string">&quot;last_name&quot;</span>)</span> <span class="keyword">val</span> lastName: String?</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<h2 id="数据访问对象-DAO"><a href="#数据访问对象-DAO" class="headerlink" title="数据访问对象 (DAO)"></a>数据访问对象 (DAO)</h2><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Dao</span></span><br><span class="line"><span class="keyword">interface</span> <span class="title class_">UserDao</span> &#123;</span><br><span class="line">    <span class="meta">@Query(<span class="string">&quot;SELECT * FROM user&quot;</span>)</span></span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">getAll</span><span class="params">()</span></span>: List&lt;User&gt;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Query(<span class="string">&quot;SELECT * FROM user WHERE uid IN (:userIds)&quot;</span>)</span></span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">loadAllByIds</span><span class="params">(userIds: <span class="type">IntArray</span>)</span></span>: List&lt;User&gt;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Query(<span class="string">&quot;SELECT * FROM user WHERE first_name LIKE :first AND &quot;</span> +</span></span><br><span class="line"><span class="meta">           <span class="string">&quot;last_name LIKE :last LIMIT 1&quot;</span>)</span></span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">findByName</span><span class="params">(first: <span class="type">String</span>, last: <span class="type">String</span>)</span></span>: User</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Insert</span></span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">insertAll</span><span class="params">(<span class="keyword">vararg</span> users: <span class="type">User</span>)</span></span></span><br><span class="line"></span><br><span class="line">    <span class="meta">@Delete</span></span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">delete</span><span class="params">(user: <span class="type">User</span>)</span></span></span><br><span class="line"></span><br><span class="line">    <span class="meta">@Update</span></span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">update</span><span class="params">(user: <span class="type">User</span>)</span></span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="数据库类"><a href="#数据库类" class="headerlink" title="数据库类"></a>数据库类</h2><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Database(entities = [User::class], version = 1)</span></span><br><span class="line"><span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title class_">AppDatabase</span> : <span class="type">RoomDatabase</span>() &#123;</span><br><span class="line">    <span class="keyword">abstract</span> <span class="function"><span class="keyword">fun</span> <span class="title">userDao</span><span class="params">()</span></span>: UserDao</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><h3 id="创建数据库实例"><a href="#创建数据库实例" class="headerlink" title="创建数据库实例"></a>创建数据库实例</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> db = Room.databaseBuilder(</span><br><span class="line">    applicationContext,</span><br><span class="line">    AppDatabase::<span class="keyword">class</span>.java, <span class="string">&quot;database-name&quot;</span></span><br><span class="line">).build()</span><br></pre></td></tr></table></figure>
+
+<h3 id="操作数据"><a href="#操作数据" class="headerlink" title="操作数据"></a>操作数据</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> userDao = db.userDao()</span><br><span class="line"></span><br><span class="line"><span class="comment">// 查询</span></span><br><span class="line"><span class="keyword">val</span> users: List&lt;User&gt; = userDao.getAll()</span><br><span class="line"></span><br><span class="line"><span class="comment">// 插入</span></span><br><span class="line">userDao.insertAll(User(<span class="number">1</span>, <span class="string">&quot;John&quot;</span>, <span class="string">&quot;Doe&quot;</span>))</span><br><span class="line"></span><br><span class="line"><span class="comment">// 删除</span></span><br><span class="line">userDao.delete(user)</span><br></pre></td></tr></table></figure>
+
+<h2 id="与-LiveData-配合"><a href="#与-LiveData-配合" class="headerlink" title="与 LiveData 配合"></a>与 LiveData 配合</h2><p>Room 支持 LiveData 返回类型：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Dao</span></span><br><span class="line"><span class="keyword">interface</span> <span class="title class_">UserDao</span> &#123;</span><br><span class="line">    <span class="meta">@Query(<span class="string">&quot;SELECT * FROM user&quot;</span>)</span></span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">getAllLiveData</span><span class="params">()</span></span>: LiveData&lt;List&lt;User&gt;&gt;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="与-Flow-配合"><a href="#与-Flow-配合" class="headerlink" title="与 Flow 配合"></a>与 Flow 配合</h2><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Dao</span></span><br><span class="line"><span class="keyword">interface</span> <span class="title class_">UserDao</span> &#123;</span><br><span class="line">    <span class="meta">@Query(<span class="string">&quot;SELECT * FROM user&quot;</span>)</span></span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">getAllFlow</span><span class="params">()</span></span>: Flow&lt;List&lt;User&gt;&gt;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="与协程配合"><a href="#与协程配合" class="headerlink" title="与协程配合"></a>与协程配合</h2><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Dao</span></span><br><span class="line"><span class="keyword">interface</span> <span class="title class_">UserDao</span> &#123;</span><br><span class="line">    <span class="meta">@Insert</span></span><br><span class="line">    <span class="keyword">suspend</span> <span class="function"><span class="keyword">fun</span> <span class="title">insert</span><span class="params">(user: <span class="type">User</span>)</span></span></span><br><span class="line"></span><br><span class="line">    <span class="meta">@Delete</span></span><br><span class="line">    <span class="keyword">suspend</span> <span class="function"><span class="keyword">fun</span> <span class="title">delete</span><span class="params">(user: <span class="type">User</span>)</span></span></span><br><span class="line"></span><br><span class="line">    <span class="meta">@Query(<span class="string">&quot;SELECT * FROM user&quot;</span>)</span></span><br><span class="line">    <span class="keyword">suspend</span> <span class="function"><span class="keyword">fun</span> <span class="title">getAll</span><span class="params">()</span></span>: List&lt;User&gt;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="数据库迁移"><a href="#数据库迁移" class="headerlink" title="数据库迁移"></a>数据库迁移</h2><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> MIGRATION_1_2 = <span class="keyword">object</span> : Migration(<span class="number">1</span>, <span class="number">2</span>) &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">migrate</span><span class="params">(database: <span class="type">SupportSQLiteDatabase</span>)</span></span> &#123;</span><br><span class="line">        database.execSQL(<span class="string">&quot;ALTER TABLE user ADD COLUMN age INTEGER&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> db = Room.databaseBuilder(</span><br><span class="line">    applicationContext,</span><br><span class="line">    AppDatabase::<span class="keyword">class</span>.java, <span class="string">&quot;database-name&quot;</span></span><br><span class="line">).addMigrations(MIGRATION_1_2).build()</span><br></pre></td></tr></table></figure>
+
+<h2 id="最佳实践"><a href="#最佳实践" class="headerlink" title="最佳实践"></a>最佳实践</h2><ol>
+<li><strong>使用单例模式</strong> - 每个 RoomDatabase 实例成本较高</li>
+<li><strong>在后台线程执行</strong> - 数据库操作不应在主线程</li>
+<li><strong>使用 DAO 接口</strong> - 封装数据库操作</li>
+<li><strong>合理设计迁移</strong> - 避免数据丢失</li>
+</ol>
+<h2 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://developer.android.google.cn/training/data-storage/room?hl=zh-cn">使用 Room 将数据保存到本地数据库</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/shulianghan/article/details/130816155">Room + ViewModel + LiveData 综合使用</a></li>
+<li><a target="_blank" rel="noopener" href="https://juejin.cn/post/7485598788985847820">Android Room 新手使用指南</a></li>
+</ul>
+<h2 id="下一步"><a href="#下一步" class="headerlink" title="下一步"></a>下一步</h2><ul>
+<li>学习 DataStore（SharedPreferences 替代方案）</li>
+<li>学习 Paging 3（分页加载）</li>
+<li>学习 Hilt（依赖注入）</li>
+</ul>
+<hr>
+<p><em>持续学习中…</em></p>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/Android/" rel="tag">Android</a>, <a class="tag-none-link" href="/blog/tags/Jetpack/" rel="tag">Jetpack</a>, <a class="tag-none-link" href="/blog/tags/Kotlin/" rel="tag">Kotlin</a>, <a class="tag-none-link" href="/blog/tags/Room/" rel="tag">Room</a>, <a class="tag-none-link" href="/blog/tags/SQLite/" rel="tag">SQLite</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-03T08:24:36.072Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Android Jetpack组件学习-LiveData" href="/blog/2026/04/03/Android-Jetpack组件学习-LiveData/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" Jetpack Compose入门学习" href="/blog/2026/04/03/Jetpack-Compose入门学习/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>

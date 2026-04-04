@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>Kotlin泛型深度解析-in-out-where | Wenyi&#39;s Blog</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/04/Kotlin%E6%B3%9B%E5%9E%8B%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90-in-out-where/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="Generics, Kotlin, in, out, 型变, 泛型" />
+  
+  <meta name="description" content="前言Kotlin 泛型提供了类型安全的代码复用机制。与 Java 不同，Kotlin 没有通配符类型，而是使用声明处型变和类型投影。 一、泛型基础泛型类1234567class Box&lt;T&gt;(t: T) &#123;    var value &#x3D; t&#125;val box: Box&lt;Int&gt; &#x3D; Box&lt;Int&gt;(1)&#x2F;&#x2F; 或类型推断val box &#x3D; Bo">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kotlin泛型深度解析-in-out-where">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/04/Kotlin%E6%B3%9B%E5%9E%8B%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90-in-out-where/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:description" content="前言Kotlin 泛型提供了类型安全的代码复用机制。与 Java 不同，Kotlin 没有通配符类型，而是使用声明处型变和类型投影。 一、泛型基础泛型类1234567class Box&lt;T&gt;(t: T) &#123;    var value &#x3D; t&#125;val box: Box&lt;Int&gt; &#x3D; Box&lt;Int&gt;(1)&#x2F;&#x2F; 或类型推断val box &#x3D; Bo">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-04-04T02:20:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T18:18:56.472Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="Generics">
+<meta property="article:tag" content="Kotlin">
+<meta property="article:tag" content="in">
+<meta property="article:tag" content="out">
+<meta property="article:tag" content="型变">
+<meta property="article:tag" content="泛型">
+<meta name="twitter:card" content="summary">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Kotlin泛型深度解析-in-out-where","description":"前言Kotlin 泛型提供了类型安全的代码复用机制。与 Java 不同，Kotlin 没有通配符类型，而是使用声明处型变和类型投影。\n","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-04T02:20:00.000Z","dateModified":"2026-04-03T18:18:56.472Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/04/Kotlin%E6%B3%9B%E5%9E%8B%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90-in-out-where/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/04/Kotlin%E6%B3%9B%E5%9E%8B%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90-in-out-where/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Kotlin泛型深度解析-in-out-where</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-04T02:20:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-04</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~4.76K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Kotlin 泛型提供了类型安全的代码复用机制。与 Java 不同，Kotlin 没有通配符类型，而是使用声明处型变和类型投影。</p>
+<h2 id="一、泛型基础"><a href="#一、泛型基础" class="headerlink" title="一、泛型基础"></a>一、泛型基础</h2><h3 id="泛型类"><a href="#泛型类" class="headerlink" title="泛型类"></a>泛型类</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Box</span>&lt;<span class="type">T</span>&gt;(t: T) &#123;</span><br><span class="line">    <span class="keyword">var</span> value = t</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> box: Box&lt;<span class="built_in">Int</span>&gt; = Box&lt;<span class="built_in">Int</span>&gt;(<span class="number">1</span>)</span><br><span class="line"><span class="comment">// 或类型推断</span></span><br><span class="line"><span class="keyword">val</span> box = Box(<span class="number">1</span>)</span><br></pre></td></tr></table></figure>
+
+<h2 id="二、型变"><a href="#二、型变" class="headerlink" title="二、型变"></a>二、型变</h2><h3 id="Java-的问题"><a href="#Java-的问题" class="headerlink" title="Java 的问题"></a>Java 的问题</h3><p>Java 泛型是不变的：<code>List&lt;String&gt;</code> 不是 <code>List&lt;Object&gt;</code> 的子类型。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Java</span></span><br><span class="line">List&lt;String&gt; strs = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;String&gt;();</span><br><span class="line">List&lt;Object&gt; objs = strs; <span class="comment">// 编译错误！</span></span><br><span class="line">objs.add(<span class="number">1</span>); <span class="comment">// 如果允许，会导致运行时异常</span></span><br><span class="line"><span class="type">String</span> <span class="variable">s</span> <span class="operator">=</span> strs.get(<span class="number">0</span>); <span class="comment">// ClassCastException</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="PECS-原则"><a href="#PECS-原则" class="headerlink" title="PECS 原则"></a>PECS 原则</h3><p><strong>Producer-Extends, Consumer-Super</strong>：</p>
+<ul>
+<li>从集合读取（生产者）：使用 <code>? extends T</code></li>
+<li>向集合写入（消费者）：使用 <code>? super T</code></li>
+</ul>
+<h2 id="三、声明处型变"><a href="#三、声明处型变" class="headerlink" title="三、声明处型变"></a>三、声明处型变</h2><h3 id="out-修饰符（协变）"><a href="#out-修饰符（协变）" class="headerlink" title="out 修饰符（协变）"></a>out 修饰符（协变）</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">interface</span> <span class="title class_">Source</span>&lt;<span class="type">out T</span>&gt; &#123;</span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">nextT</span><span class="params">()</span></span>: T</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">demo</span><span class="params">(strs: <span class="type">Source</span>&lt;<span class="type">String</span>&gt;)</span></span> &#123;</span><br><span class="line">    <span class="keyword">val</span> objects: Source&lt;Any&gt; = strs <span class="comment">// OK！</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>规则</strong>：当类型参数 T 声明为 out，它只能出现在 out 位置（返回类型），不能出现在 in 位置（参数类型）。</p>
+<h3 id="in-修饰符（逆变）"><a href="#in-修饰符（逆变）" class="headerlink" title="in 修饰符（逆变）"></a>in 修饰符（逆变）</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">interface</span> <span class="title class_">Comparable</span>&lt;<span class="type">in T</span>&gt; &#123;</span><br><span class="line">    <span class="keyword">operator</span> <span class="function"><span class="keyword">fun</span> <span class="title">compareTo</span><span class="params">(other: <span class="type">T</span>)</span></span>: <span class="built_in">Int</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">demo</span><span class="params">(x: <span class="type">Comparable</span>&lt;<span class="type">Number</span>&gt;)</span></span> &#123;</span><br><span class="line">    x.compareTo(<span class="number">1.0</span>) <span class="comment">// OK</span></span><br><span class="line">    <span class="keyword">val</span> y: Comparable&lt;<span class="built_in">Double</span>&gt; = x <span class="comment">// OK！</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>规则</strong>：当类型参数 T 声明为 in，它只能出现在 in 位置（参数类型），不能出现在 out 位置（返回类型）。</p>
+<h3 id="记忆口诀"><a href="#记忆口诀" class="headerlink" title="记忆口诀"></a>记忆口诀</h3><p><strong>Consumer in, Producer out!</strong></p>
+<h2 id="四、类型投影"><a href="#四、类型投影" class="headerlink" title="四、类型投影"></a>四、类型投影</h2><h3 id="使用处型变"><a href="#使用处型变" class="headerlink" title="使用处型变"></a>使用处型变</h3><p>Array 类不能限制为只返回 T，因为它既有 get（返回 T）也有 set（接受 T）：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Array</span>&lt;<span class="type">T</span>&gt;(<span class="keyword">val</span> size: <span class="built_in">Int</span>) &#123;</span><br><span class="line">    <span class="keyword">operator</span> <span class="function"><span class="keyword">fun</span> <span class="title">get</span><span class="params">(index: <span class="type">Int</span>)</span></span>: T</span><br><span class="line">    <span class="keyword">operator</span> <span class="function"><span class="keyword">fun</span> <span class="title">set</span><span class="params">(index: <span class="type">Int</span>, value: <span class="type">T</span>)</span></span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="解决方案：类型投影"><a href="#解决方案：类型投影" class="headerlink" title="解决方案：类型投影"></a>解决方案：类型投影</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">copy</span><span class="params">(from: <span class="type">Array</span>&lt;<span class="type">out</span> <span class="type">Any</span>&gt;, to: <span class="type">Array</span>&lt;<span class="type">Any</span>&gt;)</span></span> &#123;</span><br><span class="line">    assert(from.size == to.size)</span><br><span class="line">    <span class="keyword">for</span> (i <span class="keyword">in</span> from.indices)</span><br><span class="line">        to[i] = from[i]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> ints: Array&lt;<span class="built_in">Int</span>&gt; = arrayOf(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>)</span><br><span class="line"><span class="keyword">val</span> any = Array&lt;Any&gt;(<span class="number">3</span>) &#123; <span class="string">&quot;&quot;</span> &#125;</span><br><span class="line">copy(ints, any) <span class="comment">// OK！</span></span><br></pre></td></tr></table></figure>
+
+<p><code>Array&lt;out Any&gt;</code> 对应 Java 的 <code>Array&lt;? extends Object&gt;</code>。</p>
+<h3 id="in-投影"><a href="#in-投影" class="headerlink" title="in 投影"></a>in 投影</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">fill</span><span class="params">(dest: <span class="type">Array</span>&lt;<span class="type">in</span> <span class="type">String</span>&gt;, value: <span class="type">String</span>)</span></span> &#123;</span><br><span class="line">    <span class="keyword">for</span> (i <span class="keyword">in</span> dest.indices)</span><br><span class="line">        dest[i] = value</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>Array&lt;in String&gt;</code> 对应 Java 的 <code>Array&lt;? super String&gt;</code>。</p>
+<h2 id="五、星投影"><a href="#五、星投影" class="headerlink" title="五、星投影"></a>五、星投影</h2><p>当不知道类型参数时，使用星投影：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Foo&lt;out T : TUpper&gt; -&gt; Foo&lt;*&gt; 等价于 Foo&lt;out TUpper&gt;</span></span><br><span class="line"><span class="comment">// Foo&lt;in T&gt; -&gt; Foo&lt;*&gt; 等价于 Foo&lt;in Nothing&gt;</span></span><br><span class="line"><span class="comment">// Foo&lt;T : TUpper&gt; -&gt; Foo&lt;*&gt; 等价于 Foo&lt;out TUpper&gt; 用于读取，Foo&lt;in Nothing&gt; 用于写入</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (something <span class="keyword">is</span> List&lt;*&gt;) &#123;</span><br><span class="line">    something.forEach &#123; println(it) &#125; <span class="comment">// 元素类型为 Any?</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="多类型参数"><a href="#多类型参数" class="headerlink" title="多类型参数"></a>多类型参数</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">interface</span> <span class="title class_">Function</span>&lt;<span class="type">in T, out U</span>&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Function&lt;*, Byte&gt; 等价于 Function&lt;in Nothing, Byte&gt;</span></span><br><span class="line"><span class="comment">// Function&lt;String, *&gt; 等价于 Function&lt;String, out Any?&gt;</span></span><br><span class="line"><span class="comment">// Function&lt;*, *&gt; 等价于 Function&lt;in Nothing, out Any?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="六、泛型函数"><a href="#六、泛型函数" class="headerlink" title="六、泛型函数"></a>六、泛型函数</h2><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="type">&lt;T&gt;</span> <span class="title">singletonList</span><span class="params">(item: <span class="type">T</span>)</span></span>: List&lt;T&gt; &#123;</span><br><span class="line">    <span class="keyword">return</span> listOf(item)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="type">&lt;T&gt;</span> T.<span class="title">basicToString</span><span class="params">()</span></span>: String &#123; <span class="comment">// 扩展函数</span></span><br><span class="line">    <span class="keyword">return</span> toString()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 调用</span></span><br><span class="line"><span class="keyword">val</span> l = singletonList&lt;<span class="built_in">Int</span>&gt;(<span class="number">1</span>)</span><br><span class="line"><span class="keyword">val</span> l = singletonList(<span class="number">1</span>) <span class="comment">// 类型推断</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="七、泛型约束"><a href="#七、泛型约束" class="headerlink" title="七、泛型约束"></a>七、泛型约束</h2><h3 id="上界"><a href="#上界" class="headerlink" title="上界"></a>上界</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="type">&lt;T : Comparable&lt;T&gt;</span>&gt; <span class="title">sort</span><span class="params">(list: <span class="type">List</span>&lt;<span class="type">T</span>&gt;)</span></span> &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">sort(listOf(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>)) <span class="comment">// OK：Int 是 Comparable&lt;Int&gt; 的子类型</span></span><br><span class="line">sort(listOf(HashMap&lt;<span class="built_in">Int</span>, String&gt;())) <span class="comment">// 错误：HashMap 不是 Comparable</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="多重约束"><a href="#多重约束" class="headerlink" title="多重约束"></a>多重约束</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="type">&lt;T&gt;</span> <span class="title">copyWhenGreater</span><span class="params">(list: <span class="type">List</span>&lt;<span class="type">T</span>&gt;, threshold: <span class="type">T</span>)</span></span>: List&lt;String&gt;</span><br><span class="line">    <span class="keyword">where</span> T : CharSequence,</span><br><span class="line">          T : Comparable&lt;T&gt; &#123;</span><br><span class="line">    <span class="keyword">return</span> list.filter &#123; it &gt; threshold &#125;.map &#123; it.toString() &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="八、非空类型"><a href="#八、非空类型" class="headerlink" title="八、非空类型"></a>八、非空类型</h2><p>使用 <code>&amp; Any</code> 声明非空类型参数：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">interface</span> <span class="title class_">Game</span>&lt;<span class="type">T</span>&gt; &#123;</span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">load</span><span class="params">(x: <span class="type">T</span> &amp; <span class="type">Any</span>)</span></span>: T &amp; Any</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">interface</span> <span class="title class_">ArcadeGame</span>&lt;<span class="type">T1</span>&gt; : <span class="type">Game</span>&lt;<span class="type">T1</span>&gt; &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">load</span><span class="params">(x: <span class="type">T1</span> &amp; <span class="type">Any</span>)</span></span>: T1 &amp; Any</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="九、类型擦除"><a href="#九、类型擦除" class="headerlink" title="九、类型擦除"></a>九、类型擦除</h2><p>泛型类型检查在编译时进行，运行时类型信息被擦除。</p>
+<h3 id="类型检查限制"><a href="#类型检查限制" class="headerlink" title="类型检查限制"></a>类型检查限制</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 错误：不能检查泛型类型</span></span><br><span class="line"><span class="keyword">if</span> (list <span class="keyword">is</span> List&lt;<span class="built_in">Int</span>&gt;) &#123; &#125; <span class="comment">// 编译错误</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 正确：星投影</span></span><br><span class="line"><span class="keyword">if</span> (list <span class="keyword">is</span> List&lt;*&gt;) &#123;</span><br><span class="line">    list.forEach &#123; println(it) &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="未检查的类型转换"><a href="#未检查的类型转换" class="headerlink" title="未检查的类型转换"></a>未检查的类型转换</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> intsDictionary: Map&lt;String, <span class="built_in">Int</span>&gt; = readDictionary(file) <span class="keyword">as</span> Map&lt;String, <span class="built_in">Int</span>&gt;</span><br><span class="line"><span class="comment">// 警告：Unchecked cast</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 抑制警告</span></span><br><span class="line"><span class="meta">@Suppress(<span class="string">&quot;UNCHECKED_CAST&quot;</span>)</span></span><br><span class="line"><span class="keyword">inline</span> <span class="function"><span class="keyword">fun</span> <span class="type">&lt;<span class="keyword">reified</span> T&gt;</span> List<span class="type">&lt;*&gt;</span>.<span class="title">asListOfType</span><span class="params">()</span></span>: List&lt;T&gt;? =</span><br><span class="line">    <span class="keyword">if</span> (all &#123; it <span class="keyword">is</span> T &#125;)</span><br><span class="line">        <span class="keyword">this</span> <span class="keyword">as</span> List&lt;T&gt;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        <span class="literal">null</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="具体化类型参数"><a href="#具体化类型参数" class="headerlink" title="具体化类型参数"></a>具体化类型参数</h3><p>使用 reified 关键字保留类型信息：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">inline</span> <span class="function"><span class="keyword">fun</span> <span class="type">&lt;<span class="keyword">reified</span> T&gt;</span> List<span class="type">&lt;*&gt;</span>.<span class="title">asListOfType</span><span class="params">()</span></span>: List&lt;T&gt;? =</span><br><span class="line">    <span class="keyword">if</span> (all &#123; it <span class="keyword">is</span> T &#125;)</span><br><span class="line">        <span class="keyword">this</span> <span class="keyword">as</span> List&lt;T&gt;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        <span class="literal">null</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="十、下划线操作符"><a href="#十、下划线操作符" class="headerlink" title="十、下划线操作符"></a>十、下划线操作符</h2><p>使用 _ 自动推断类型参数：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title class_">SomeClass</span>&lt;<span class="type">T</span>&gt; &#123;</span><br><span class="line">    <span class="keyword">abstract</span> <span class="function"><span class="keyword">fun</span> <span class="title">execute</span><span class="params">()</span></span>: T</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">SomeImplementation</span> : <span class="type">SomeClass</span>&lt;<span class="type">String</span>&gt;() &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">execute</span><span class="params">()</span></span>: String = <span class="string">&quot;Test&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">object</span> Runner &#123;</span><br><span class="line">    <span class="keyword">inline</span> <span class="function"><span class="keyword">fun</span> <span class="type">&lt;<span class="keyword">reified</span> S : SomeClass&lt;T&gt;</span>, T&gt; <span class="title">run</span><span class="params">()</span></span>: T &#123;</span><br><span class="line">        <span class="keyword">return</span> S::<span class="keyword">class</span>.java.getDeclaredConstructor().newInstance().execute()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">val</span> s = Runner.run&lt;SomeImplementation, _&gt;() <span class="comment">// T 自动推断为 String</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://kotlinlang.org/docs/generics.html">Generics: in, out, where | Kotlin Documentation</a></li>
+<li><a target="_blank" rel="noopener" href="http://www.angelikalanger.com/GenericsFAQ/JavaGenericsFAQ.html">Java Generics FAQ</a></li>
+</ul>
+<hr>
+<p><em>深入学习中…</em></p>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/Generics/" rel="tag">Generics</a>, <a class="tag-none-link" href="/blog/tags/Kotlin/" rel="tag">Kotlin</a>, <a class="tag-none-link" href="/blog/tags/in/" rel="tag">in</a>, <a class="tag-none-link" href="/blog/tags/out/" rel="tag">out</a>, <a class="tag-none-link" href="/blog/tags/%E5%9E%8B%E5%8F%98/" rel="tag">型变</a>, <a class="tag-none-link" href="/blog/tags/%E6%B3%9B%E5%9E%8B/" rel="tag">泛型</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-03T18:18:56.472Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Android Activity生命周期深度解析" href="/blog/2026/04/04/Android-Activity生命周期深度解析/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" Android ViewModel深度解析" href="/blog/2026/04/04/Android-ViewModel深度解析/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>

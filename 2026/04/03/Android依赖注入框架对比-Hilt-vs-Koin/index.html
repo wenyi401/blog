@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>Android依赖注入框架对比-Hilt vs Koin | Wenyi&#39;s Blog</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/03/Android%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5%E6%A1%86%E6%9E%B6%E5%AF%B9%E6%AF%94-Hilt-vs-Koin/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="Android, Dagger, Hilt, Koin, 依赖注入" />
+  
+  <meta name="description" content="前言在现代 Android 开发中，依赖注入（Dependency Injection）已成为大型项目的基石。Google 官方推出的 Hilt 和社区热门框架 Koin 是两个主流选择。 一、依赖注入概述什么是依赖注入？依赖注入是一种设计模式，通过外部提供对象依赖而非内部创建。 为什么需要依赖注入？ 解耦代码：降低模块间依赖 提高可测试性：方便 Mock 测试 提高可维护性：集中管理依赖 提高复">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android依赖注入框架对比-Hilt vs Koin">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/03/Android%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5%E6%A1%86%E6%9E%B6%E5%AF%B9%E6%AF%94-Hilt-vs-Koin/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:description" content="前言在现代 Android 开发中，依赖注入（Dependency Injection）已成为大型项目的基石。Google 官方推出的 Hilt 和社区热门框架 Koin 是两个主流选择。 一、依赖注入概述什么是依赖注入？依赖注入是一种设计模式，通过外部提供对象依赖而非内部创建。 为什么需要依赖注入？ 解耦代码：降低模块间依赖 提高可测试性：方便 Mock 测试 提高可维护性：集中管理依赖 提高复">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-04-03T23:44:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T15:46:33.532Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="Dagger">
+<meta property="article:tag" content="Hilt">
+<meta property="article:tag" content="Koin">
+<meta property="article:tag" content="依赖注入">
+<meta name="twitter:card" content="summary">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Android依赖注入框架对比-Hilt vs Koin","description":"前言在现代 Android 开发中，依赖注入（Dependency Injection）已成为大型项目的基石。Google 官方推出的 Hilt 和社区热门框...","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:44:00.000Z","dateModified":"2026-04-03T15:46:33.532Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Android%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5%E6%A1%86%E6%9E%B6%E5%AF%B9%E6%AF%94-Hilt-vs-Koin/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/03/Android%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5%E6%A1%86%E6%9E%B6%E5%AF%B9%E6%AF%94-Hilt-vs-Koin/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Android依赖注入框架对比-Hilt vs Koin</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-03T23:44:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-03</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~4.15K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在现代 Android 开发中，依赖注入（Dependency Injection）已成为大型项目的基石。Google 官方推出的 Hilt 和社区热门框架 Koin 是两个主流选择。</p>
+<h2 id="一、依赖注入概述"><a href="#一、依赖注入概述" class="headerlink" title="一、依赖注入概述"></a>一、依赖注入概述</h2><h3 id="什么是依赖注入？"><a href="#什么是依赖注入？" class="headerlink" title="什么是依赖注入？"></a>什么是依赖注入？</h3><p>依赖注入是一种设计模式，通过外部提供对象依赖而非内部创建。</p>
+<h3 id="为什么需要依赖注入？"><a href="#为什么需要依赖注入？" class="headerlink" title="为什么需要依赖注入？"></a>为什么需要依赖注入？</h3><ul>
+<li><strong>解耦代码</strong>：降低模块间依赖</li>
+<li><strong>提高可测试性</strong>：方便 Mock 测试</li>
+<li><strong>提高可维护性</strong>：集中管理依赖</li>
+<li><strong>提高复用性</strong>：依赖可复用</li>
+</ul>
+<h2 id="二、Hilt-vs-Koin-对比"><a href="#二、Hilt-vs-Koin-对比" class="headerlink" title="二、Hilt vs Koin 对比"></a>二、Hilt vs Koin 对比</h2><table>
+<thead>
+<tr>
+<th>特性</th>
+<th>Hilt</th>
+<th>Koin</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>类型</strong></td>
+<td>编译时</td>
+<td>运行时</td>
+</tr>
+<tr>
+<td><strong>语法</strong></td>
+<td>注解</td>
+<td>DSL</td>
+</tr>
+<tr>
+<td><strong>性能</strong></td>
+<td>编译时验证</td>
+<td>运行时解析</td>
+</tr>
+<tr>
+<td><strong>学习曲线</strong></td>
+<td>较陡</td>
+<td>较平缓</td>
+</tr>
+<tr>
+<td><strong>错误检测</strong></td>
+<td>编译时</td>
+<td>运行时</td>
+</tr>
+<tr>
+<td><strong>与 Jetpack 集成</strong></td>
+<td>深度集成</td>
+<td>需要配置</td>
+</tr>
+<tr>
+<td><strong>适用场景</strong></td>
+<td>大型项目</td>
+<td>中小型项目</td>
+</tr>
+</tbody></table>
+<h2 id="三、Hilt-使用"><a href="#三、Hilt-使用" class="headerlink" title="三、Hilt 使用"></a>三、Hilt 使用</h2><h3 id="添加依赖"><a href="#添加依赖" class="headerlink" title="添加依赖"></a>添加依赖</h3><figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">plugins &#123;</span><br><span class="line">    id(<span class="string">&quot;com.google.dagger.hilt.android&quot;</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">dependencies</span> &#123;</span><br><span class="line">    implementation(<span class="string">&quot;com.google.dagger:hilt-android:2.57.1&quot;</span>)</span><br><span class="line">    kapt(<span class="string">&quot;com.google.dagger:hilt-compiler:2.57.1&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Application-配置"><a href="#Application-配置" class="headerlink" title="Application 配置"></a>Application 配置</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@HiltAndroidApp</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyApplication</span> : <span class="type">Application</span>()</span><br></pre></td></tr></table></figure>
+
+<h3 id="Activity-注入"><a href="#Activity-注入" class="headerlink" title="Activity 注入"></a>Activity 注入</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@AndroidEntryPoint</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MainActivity</span> : <span class="type">AppCompatActivity</span>() &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Inject</span> <span class="keyword">lateinit</span> <span class="keyword">var</span> viewModel: MyViewModel</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onCreate</span><span class="params">(savedInstanceState: <span class="type">Bundle</span>?)</span></span> &#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState)</span><br><span class="line">        viewModel.doSomething()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Module-定义"><a href="#Module-定义" class="headerlink" title="Module 定义"></a>Module 定义</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Module</span></span><br><span class="line"><span class="meta">@InstallIn(SingletonComponent::class)</span></span><br><span class="line"><span class="keyword">object</span> NetworkModule &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Provides</span></span><br><span class="line">    <span class="meta">@Singleton</span></span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">provideOkHttpClient</span><span class="params">()</span></span>: OkHttpClient &#123;</span><br><span class="line">        <span class="keyword">return</span> OkHttpClient.Builder().build()</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Provides</span></span><br><span class="line">    <span class="meta">@Singleton</span></span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">provideRetrofit</span><span class="params">(client: <span class="type">OkHttpClient</span>)</span></span>: Retrofit &#123;</span><br><span class="line">        <span class="keyword">return</span> Retrofit.Builder()</span><br><span class="line">            .client(client)</span><br><span class="line">            .baseUrl(<span class="string">&quot;https://api.example.com&quot;</span>)</span><br><span class="line">            .build()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="ViewModel-注入"><a href="#ViewModel-注入" class="headerlink" title="ViewModel 注入"></a>ViewModel 注入</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@HiltViewModel</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyViewModel</span> <span class="meta">@Inject</span> <span class="keyword">constructor</span>(</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> repository: MyRepository</span><br><span class="line">) : ViewModel() &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、Koin-使用"><a href="#四、Koin-使用" class="headerlink" title="四、Koin 使用"></a>四、Koin 使用</h2><h3 id="添加依赖-1"><a href="#添加依赖-1" class="headerlink" title="添加依赖"></a>添加依赖</h3><figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">dependencies</span> &#123;</span><br><span class="line">    implementation(<span class="string">&quot;io.insert-koin:koin-android:4.0.0&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MyApplication</span> : <span class="type">Application</span>() &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onCreate</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate()</span><br><span class="line">        startKoin &#123;</span><br><span class="line">            androidContext(<span class="keyword">this</span><span class="symbol">@MyApplication</span>)</span><br><span class="line">            modules(appModule)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Module-定义-1"><a href="#Module-定义-1" class="headerlink" title="Module 定义"></a>Module 定义</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> appModule = module &#123;</span><br><span class="line">    single &#123; OkHttpClient.Builder().build() &#125;</span><br><span class="line">    single &#123; </span><br><span class="line">        Retrofit.Builder()</span><br><span class="line">            .client(<span class="keyword">get</span>())</span><br><span class="line">            .baseUrl(<span class="string">&quot;https://api.example.com&quot;</span>)</span><br><span class="line">            .build()</span><br><span class="line">    &#125;</span><br><span class="line">    single &#123; MyRepository(<span class="keyword">get</span>()) &#125;</span><br><span class="line">    viewModel &#123; MyViewModel(<span class="keyword">get</span>()) &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Activity-注入-1"><a href="#Activity-注入-1" class="headerlink" title="Activity 注入"></a>Activity 注入</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MainActivity</span> : <span class="type">AppCompatActivity</span>() &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> viewModel: MyViewModel <span class="keyword">by</span> viewModel()</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onCreate</span><span class="params">(savedInstanceState: <span class="type">Bundle</span>?)</span></span> &#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState)</span><br><span class="line">        viewModel.doSomething()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="五、作用域对比"><a href="#五、作用域对比" class="headerlink" title="五、作用域对比"></a>五、作用域对比</h2><h3 id="Hilt-作用域"><a href="#Hilt-作用域" class="headerlink" title="Hilt 作用域"></a>Hilt 作用域</h3><table>
+<thead>
+<tr>
+<th>作用域</th>
+<th>生命周期</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>@Singleton</td>
+<td>应用级别</td>
+</tr>
+<tr>
+<td>@ActivityScoped</td>
+<td>Activity 生命周期</td>
+</tr>
+<tr>
+<td>@FragmentScoped</td>
+<td>Fragment 生命周期</td>
+</tr>
+<tr>
+<td>@ViewModelScoped</td>
+<td>ViewModel 生命周期</td>
+</tr>
+</tbody></table>
+<h3 id="Koin-作用域"><a href="#Koin-作用域" class="headerlink" title="Koin 作用域"></a>Koin 作用域</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 单例</span></span><br><span class="line">single &#123; MyRepository() &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Factory（每次创建新实例）</span></span><br><span class="line">factory &#123; MyUseCase() &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// ViewModel</span></span><br><span class="line">viewModel &#123; MyViewModel(<span class="keyword">get</span>()) &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Scoped</span></span><br><span class="line">scope&lt;MainActivity&gt; &#123;</span><br><span class="line">    scoped &#123; MyComponent() &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="六、测试支持"><a href="#六、测试支持" class="headerlink" title="六、测试支持"></a>六、测试支持</h2><h3 id="Hilt-测试"><a href="#Hilt-测试" class="headerlink" title="Hilt 测试"></a>Hilt 测试</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@HiltAndroidTest</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyTest</span> &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@get:Rule</span></span><br><span class="line">    <span class="keyword">var</span> hiltRule = HiltAndroidRule(<span class="keyword">this</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Inject</span></span><br><span class="line">    <span class="keyword">lateinit</span> <span class="keyword">var</span> repository: MyRepository</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">testSomething</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="comment">// 使用注入的依赖</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Koin-测试"><a href="#Koin-测试" class="headerlink" title="Koin 测试"></a>Koin 测试</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MyTest</span> : <span class="type">KoinTest</span> &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> repository: MyRepository <span class="keyword">by</span> inject()</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Before</span></span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">setup</span><span class="params">()</span></span> &#123;</span><br><span class="line">        startKoin &#123;</span><br><span class="line">            modules(testModule)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">testSomething</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="comment">// 使用注入的依赖</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="七、选择建议"><a href="#七、选择建议" class="headerlink" title="七、选择建议"></a>七、选择建议</h2><h3 id="选择-Hilt-的场景"><a href="#选择-Hilt-的场景" class="headerlink" title="选择 Hilt 的场景"></a>选择 Hilt 的场景</h3><ul>
+<li>✅ 大型企业项目</li>
+<li>✅ 需要编译时验证</li>
+<li>✅ 与 Jetpack 深度集成</li>
+<li>✅ 团队熟悉 Dagger</li>
+</ul>
+<h3 id="选择-Koin-的场景"><a href="#选择-Koin-的场景" class="headerlink" title="选择 Koin 的场景"></a>选择 Koin 的场景</h3><ul>
+<li>✅ 中小型项目</li>
+<li>✅ 追求开发效率</li>
+<li>✅ 团队偏好 Kotlin DSL</li>
+<li>✅ 需要跨平台支持</li>
+</ul>
+<h2 id="八、性能对比"><a href="#八、性能对比" class="headerlink" title="八、性能对比"></a>八、性能对比</h2><table>
+<thead>
+<tr>
+<th>指标</th>
+<th>Hilt</th>
+<th>Koin</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>编译时间</strong></td>
+<td>较长</td>
+<td>较短</td>
+</tr>
+<tr>
+<td><strong>运行时性能</strong></td>
+<td>相当</td>
+<td>相当</td>
+</tr>
+<tr>
+<td><strong>启动时间</strong></td>
+<td>相当</td>
+<td>相当</td>
+</tr>
+</tbody></table>
+<h2 id="九、迁移建议"><a href="#九、迁移建议" class="headerlink" title="九、迁移建议"></a>九、迁移建议</h2><h3 id="从-Dagger-迁移到-Hilt"><a href="#从-Dagger-迁移到-Hilt" class="headerlink" title="从 Dagger 迁移到 Hilt"></a>从 Dagger 迁移到 Hilt</h3><ul>
+<li>使用 @HiltAndroidApp 替代 Application 组件</li>
+<li>使用 @InstallIn 替代 @Module</li>
+<li>使用 @AndroidEntryPoint 标注 Android 类</li>
+</ul>
+<h3 id="从-Koin-迁移到-Hilt"><a href="#从-Koin-迁移到-Hilt" class="headerlink" title="从 Koin 迁移到 Hilt"></a>从 Koin 迁移到 Hilt</h3><ul>
+<li>将 module 转换为 @Module 类</li>
+<li>使用注解替代 DSL</li>
+<li>添加编译器插件</li>
+</ul>
+<h2 id="十、最佳实践"><a href="#十、最佳实践" class="headerlink" title="十、最佳实践"></a>十、最佳实践</h2><ol>
+<li><strong>统一风格</strong>：项目中选择一个框架</li>
+<li><strong>模块化</strong>：按功能划分 Module</li>
+<li><strong>作用域合理</strong>：选择合适的作用域</li>
+<li><strong>测试覆盖</strong>：确保 DI 配置正确</li>
+<li><strong>文档完善</strong>：记录依赖关系</li>
+</ol>
+<h2 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/1944327065231921509">现代 Android 依赖注入之战：Koin 与 Hilt 如何选？</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/vitaviva/article/details/150941451">现代Android依赖注入之战：选择 Koin 还是 Hilt</a></li>
+<li><a target="_blank" rel="noopener" href="https://cloud.tencent.com/developer/article/2595884">Android 中依赖注入（Dagger和Hit）的用法与原理</a></li>
+</ul>
+<hr>
+<p><em>持续学习中…</em></p>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/Android/" rel="tag">Android</a>, <a class="tag-none-link" href="/blog/tags/Dagger/" rel="tag">Dagger</a>, <a class="tag-none-link" href="/blog/tags/Hilt/" rel="tag">Hilt</a>, <a class="tag-none-link" href="/blog/tags/Koin/" rel="tag">Koin</a>, <a class="tag-none-link" href="/blog/tags/%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5/" rel="tag">依赖注入</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-03T15:46:33.532Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Kotlin Collection操作符实战-map filter fold" href="/blog/2026/04/03/Kotlin-Collection操作符实战-map-filter-fold/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" Kotlin协程Job与SupervisorJob取消机制" href="/blog/2026/04/03/Kotlin协程Job与SupervisorJob取消机制/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>

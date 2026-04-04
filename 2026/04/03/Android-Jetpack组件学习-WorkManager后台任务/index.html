@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>Android Jetpack组件学习-WorkManager后台任务 | Wenyi&#39;s Blog</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/03/Android-Jetpack%E7%BB%84%E4%BB%B6%E5%AD%A6%E4%B9%A0-WorkManager%E5%90%8E%E5%8F%B0%E4%BB%BB%E5%8A%A1/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="Android, Jetpack, Kotlin, WorkManager, 后台任务" />
+  
+  <meta name="description" content="前言WorkManager 是 Android 推荐的后台任务调度程序，用于处理可延迟的、需要保证执行的后台工作。它解决了 Android 后台任务的各种极端情况和兼容性问题。 WorkManager 概述特点 保证执行：即使应用退出或设备重启，任务也会执行 约束条件：支持网络、充电、存储等约束 灵活调度：支持一次性任务和周期性任务 链式任务：支持任务编排和依赖 兼容性：兼容 Android 4.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android Jetpack组件学习-WorkManager后台任务">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/03/Android-Jetpack%E7%BB%84%E4%BB%B6%E5%AD%A6%E4%B9%A0-WorkManager%E5%90%8E%E5%8F%B0%E4%BB%BB%E5%8A%A1/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:description" content="前言WorkManager 是 Android 推荐的后台任务调度程序，用于处理可延迟的、需要保证执行的后台工作。它解决了 Android 后台任务的各种极端情况和兼容性问题。 WorkManager 概述特点 保证执行：即使应用退出或设备重启，任务也会执行 约束条件：支持网络、充电、存储等约束 灵活调度：支持一次性任务和周期性任务 链式任务：支持任务编排和依赖 兼容性：兼容 Android 4.">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-04-03T18:28:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T10:28:44.260Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="Jetpack">
+<meta property="article:tag" content="Kotlin">
+<meta property="article:tag" content="WorkManager">
+<meta property="article:tag" content="后台任务">
+<meta name="twitter:card" content="summary">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Android Jetpack组件学习-WorkManager后台任务","description":"前言WorkManager 是 Android 推荐的后台任务调度程序，用于处理可延迟的、需要保证执行的后台工作。它解决了 Android 后台任务的各种极端...","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T18:28:00.000Z","dateModified":"2026-04-03T10:28:44.260Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Android-Jetpack%E7%BB%84%E4%BB%B6%E5%AD%A6%E4%B9%A0-WorkManager%E5%90%8E%E5%8F%B0%E4%BB%BB%E5%8A%A1/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/03/Android-Jetpack%E7%BB%84%E4%BB%B6%E5%AD%A6%E4%B9%A0-WorkManager%E5%90%8E%E5%8F%B0%E4%BB%BB%E5%8A%A1/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Android Jetpack组件学习-WorkManager后台任务</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-03T18:28:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-03</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~3.60K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>WorkManager 是 Android 推荐的后台任务调度程序，用于处理可延迟的、需要保证执行的后台工作。它解决了 Android 后台任务的各种极端情况和兼容性问题。</p>
+<h2 id="WorkManager-概述"><a href="#WorkManager-概述" class="headerlink" title="WorkManager 概述"></a>WorkManager 概述</h2><h3 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h3><ul>
+<li><strong>保证执行</strong>：即使应用退出或设备重启，任务也会执行</li>
+<li><strong>约束条件</strong>：支持网络、充电、存储等约束</li>
+<li><strong>灵活调度</strong>：支持一次性任务和周期性任务</li>
+<li><strong>链式任务</strong>：支持任务编排和依赖</li>
+<li><strong>兼容性</strong>：兼容 Android 4.0+（API 14）</li>
+</ul>
+<h3 id="适用场景"><a href="#适用场景" class="headerlink" title="适用场景"></a>适用场景</h3><ul>
+<li>数据同步</li>
+<li>日志上传</li>
+<li>图片处理</li>
+<li>定期备份</li>
+</ul>
+<h2 id="设置依赖"><a href="#设置依赖" class="headerlink" title="设置依赖"></a>设置依赖</h2><figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">dependencies</span> &#123;</span><br><span class="line">    val work_version = <span class="string">&quot;2.11.2&quot;</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">// Kotlin + coroutines</span></span><br><span class="line">    implementation(<span class="string">&quot;androidx.work:work-runtime-ktx:$work_version&quot;</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// optional - RxJava2 support</span></span><br><span class="line">    implementation(<span class="string">&quot;androidx.work:work-rxjava2:$work_version&quot;</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// optional - Test helpers</span></span><br><span class="line">    androidTestImplementation(<span class="string">&quot;androidx.work:work-testing:$work_version&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="定义工作"><a href="#定义工作" class="headerlink" title="定义工作"></a>定义工作</h2><h3 id="创建-Worker"><a href="#创建-Worker" class="headerlink" title="创建 Worker"></a>创建 Worker</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">UploadWorker</span>(</span><br><span class="line">    appContext: Context,</span><br><span class="line">    workerParams: WorkerParameters</span><br><span class="line">) : Worker(appContext, workerParams) &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">doWork</span><span class="params">()</span></span>: Result &#123;</span><br><span class="line">        <span class="comment">// 执行后台任务</span></span><br><span class="line">        uploadImages()</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 返回结果</span></span><br><span class="line">        <span class="keyword">return</span> Result.success()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="返回结果"><a href="#返回结果" class="headerlink" title="返回结果"></a>返回结果</h3><ul>
+<li><code>Result.success()</code> - 工作成功完成</li>
+<li><code>Result.failure()</code> - 工作失败</li>
+<li><code>Result.retry()</code> - 工作失败，应根据重试政策重试</li>
+</ul>
+<h2 id="创建-WorkRequest"><a href="#创建-WorkRequest" class="headerlink" title="创建 WorkRequest"></a>创建 WorkRequest</h2><h3 id="一次性任务"><a href="#一次性任务" class="headerlink" title="一次性任务"></a>一次性任务</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> uploadWorkRequest: WorkRequest =</span><br><span class="line">    OneTimeWorkRequestBuilder&lt;UploadWorker&gt;()</span><br><span class="line">        .build()</span><br></pre></td></tr></table></figure>
+
+<h3 id="周期性任务"><a href="#周期性任务" class="headerlink" title="周期性任务"></a>周期性任务</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> periodicWorkRequest: WorkRequest =</span><br><span class="line">    PeriodicWorkRequestBuilder&lt;UploadWorker&gt;(<span class="number">1</span>, TimeUnit.HOURS)</span><br><span class="line">        .build()</span><br></pre></td></tr></table></figure>
+
+<h3 id="带约束的任务"><a href="#带约束的任务" class="headerlink" title="带约束的任务"></a>带约束的任务</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> constraints = Constraints.Builder()</span><br><span class="line">    .setRequiredNetworkType(NetworkType.CONNECTED)</span><br><span class="line">    .setRequiresBatteryNotLow(<span class="literal">true</span>)</span><br><span class="line">    .setRequiresCharging(<span class="literal">true</span>)</span><br><span class="line">    .build()</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> workRequest = OneTimeWorkRequestBuilder&lt;UploadWorker&gt;()</span><br><span class="line">    .setConstraints(constraints)</span><br><span class="line">    .build()</span><br></pre></td></tr></table></figure>
+
+<h2 id="提交任务"><a href="#提交任务" class="headerlink" title="提交任务"></a>提交任务</h2><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">WorkManager</span><br><span class="line">    .getInstance(context)</span><br><span class="line">    .enqueue(uploadWorkRequest)</span><br></pre></td></tr></table></figure>
+
+<h2 id="传递数据"><a href="#传递数据" class="headerlink" title="传递数据"></a>传递数据</h2><h3 id="输入数据"><a href="#输入数据" class="headerlink" title="输入数据"></a>输入数据</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> inputData = workDataOf(</span><br><span class="line">    <span class="string">&quot;image_uri&quot;</span> to imageUri.toString(),</span><br><span class="line">    <span class="string">&quot;user_id&quot;</span> to userId</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> workRequest = OneTimeWorkRequestBuilder&lt;UploadWorker&gt;()</span><br><span class="line">    .setInputData(inputData)</span><br><span class="line">    .build()</span><br></pre></td></tr></table></figure>
+
+<h3 id="在-Worker-中获取数据"><a href="#在-Worker-中获取数据" class="headerlink" title="在 Worker 中获取数据"></a>在 Worker 中获取数据</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">UploadWorker</span>(</span><br><span class="line">    appContext: Context,</span><br><span class="line">    workerParams: WorkerParameters</span><br><span class="line">) : Worker(appContext, workerParams) &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">doWork</span><span class="params">()</span></span>: Result &#123;</span><br><span class="line">        <span class="keyword">val</span> imageUri = inputData.getString(<span class="string">&quot;image_uri&quot;</span>)</span><br><span class="line">        <span class="keyword">val</span> userId = inputData.getString(<span class="string">&quot;user_id&quot;</span>)</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 执行任务...</span></span><br><span class="line">        </span><br><span class="line">        <span class="keyword">return</span> Result.success()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="输出数据"><a href="#输出数据" class="headerlink" title="输出数据"></a>输出数据</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">doWork</span><span class="params">()</span></span>: Result &#123;</span><br><span class="line">    <span class="comment">// 执行任务...</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">val</span> outputData = workDataOf(</span><br><span class="line">        <span class="string">&quot;result&quot;</span> to <span class="string">&quot;success&quot;</span>,</span><br><span class="line">        <span class="string">&quot;bytes_uploaded&quot;</span> to <span class="number">1024</span></span><br><span class="line">    )</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> Result.success(outputData)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="链式任务"><a href="#链式任务" class="headerlink" title="链式任务"></a>链式任务</h2><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">WorkManager.getInstance(context)</span><br><span class="line">    .beginWith(workA)</span><br><span class="line">    .then(workB)</span><br><span class="line">    .then(workC)</span><br><span class="line">    .enqueue()</span><br></pre></td></tr></table></figure>
+
+<h2 id="观察任务状态"><a href="#观察任务状态" class="headerlink" title="观察任务状态"></a>观察任务状态</h2><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">WorkManager.getInstance(context)</span><br><span class="line">    .getWorkInfoByIdLiveData(workRequest.id)</span><br><span class="line">    .observe(lifecycleOwner) &#123; workInfo -&gt;</span><br><span class="line">        <span class="keyword">when</span> (workInfo?.state) &#123;</span><br><span class="line">            WorkInfo.State.SUCCEEDED -&gt; &#123;</span><br><span class="line">                <span class="comment">// 任务成功</span></span><br><span class="line">            &#125;</span><br><span class="line">            WorkInfo.State.FAILED -&gt; &#123;</span><br><span class="line">                <span class="comment">// 任务失败</span></span><br><span class="line">            &#125;</span><br><span class="line">            WorkInfo.State.RUNNING -&gt; &#123;</span><br><span class="line">                <span class="comment">// 任务运行中</span></span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span> -&gt; &#123;&#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="取消任务"><a href="#取消任务" class="headerlink" title="取消任务"></a>取消任务</h2><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 取消单个任务</span></span><br><span class="line">WorkManager.getInstance(context).cancelWorkById(workRequest.id)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 取消所有任务</span></span><br><span class="line">WorkManager.getInstance(context).cancelAllWork()</span><br><span class="line"></span><br><span class="line"><span class="comment">// 按标签取消</span></span><br><span class="line">WorkManager.getInstance(context).cancelAllWorkByTag(<span class="string">&quot;upload&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<h2 id="最佳实践"><a href="#最佳实践" class="headerlink" title="最佳实践"></a>最佳实践</h2><ol>
+<li><strong>使用约束</strong>：只在满足条件时执行任务</li>
+<li><strong>合理设置重试</strong>：避免无限重试</li>
+<li><strong>传递小数据</strong>：输入&#x2F;输出数据限制在 10KB 以内</li>
+<li><strong>使用唯一任务</strong>：避免重复任务</li>
+</ol>
+<h2 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://developer.android.google.cn/develop/background-work/background-tasks/persistent/getting-started?hl=zh-cn">WorkManager 使用入门</a></li>
+<li><a target="_blank" rel="noopener" href="https://juejin.cn/post/7524229392039542822">精通WorkManager</a></li>
+<li><a target="_blank" rel="noopener" href="https://developer.android.google.cn/codelabs/android-workmanager?hl=zh-cn">WorkManager Codelab</a></li>
+</ul>
+<h2 id="下一步"><a href="#下一步" class="headerlink" title="下一步"></a>下一步</h2><ul>
+<li>学习 Hilt（依赖注入）</li>
+<li>学习 Paging 3（分页加载）</li>
+<li>实践完整项目</li>
+</ul>
+<hr>
+<p><em>持续学习中…</em></p>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/Android/" rel="tag">Android</a>, <a class="tag-none-link" href="/blog/tags/Jetpack/" rel="tag">Jetpack</a>, <a class="tag-none-link" href="/blog/tags/Kotlin/" rel="tag">Kotlin</a>, <a class="tag-none-link" href="/blog/tags/WorkManager/" rel="tag">WorkManager</a>, <a class="tag-none-link" href="/blog/tags/%E5%90%8E%E5%8F%B0%E4%BB%BB%E5%8A%A1/" rel="tag">后台任务</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-03T10:28:44.260Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Android Jetpack组件学习-DataStore数据存储" href="/blog/2026/04/03/Android-Jetpack组件学习-DataStore数据存储/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" Kotlin Flow异步数据流学习" href="/blog/2026/04/03/Kotlin-Flow异步数据流学习/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>

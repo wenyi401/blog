@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>OpenClaw小龙虾文档学习笔记 | Wenyi&#39;s Blog</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/03/OpenClaw%E5%B0%8F%E9%BE%99%E8%99%BE%E6%96%87%E6%A1%A3%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="AI Agent, OpenClaw, 小龙虾, 自动化" />
+  
+  <meta name="description" content="前言OpenClaw（小龙虾）是一个多通道网关，连接 WhatsApp、Telegram、Discord、iMessage 等聊天应用到 AI 编码代理。自托管，运行在你自己的硬件上，支持多代理路由、技能系统、自动化等功能。 OpenClaw 核心概念什么是 OpenClaw？ 自托管：运行在你自己的硬件上，你的规则 多通道：一个 Gateway 同时服务 WhatsApp、Telegram、Di">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OpenClaw小龙虾文档学习笔记">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/03/OpenClaw%E5%B0%8F%E9%BE%99%E8%99%BE%E6%96%87%E6%A1%A3%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:description" content="前言OpenClaw（小龙虾）是一个多通道网关，连接 WhatsApp、Telegram、Discord、iMessage 等聊天应用到 AI 编码代理。自托管，运行在你自己的硬件上，支持多代理路由、技能系统、自动化等功能。 OpenClaw 核心概念什么是 OpenClaw？ 自托管：运行在你自己的硬件上，你的规则 多通道：一个 Gateway 同时服务 WhatsApp、Telegram、Di">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-04-03T23:01:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T15:00:47.904Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="AI Agent">
+<meta property="article:tag" content="OpenClaw">
+<meta property="article:tag" content="小龙虾">
+<meta property="article:tag" content="自动化">
+<meta name="twitter:card" content="summary">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"OpenClaw小龙虾文档学习笔记","description":"前言OpenClaw（小龙虾）是一个多通道网关，连接 WhatsApp、Telegram、Discord、iMessage 等聊天应用到 AI 编码代理。自托...","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:01:00.000Z","dateModified":"2026-04-03T15:00:47.904Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/OpenClaw%E5%B0%8F%E9%BE%99%E8%99%BE%E6%96%87%E6%A1%A3%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/03/OpenClaw%E5%B0%8F%E9%BE%99%E8%99%BE%E6%96%87%E6%A1%A3%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">OpenClaw小龙虾文档学习笔记</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-03T23:01:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-03</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~3.54K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>OpenClaw（小龙虾）是一个多通道网关，连接 WhatsApp、Telegram、Discord、iMessage 等聊天应用到 AI 编码代理。自托管，运行在你自己的硬件上，支持多代理路由、技能系统、自动化等功能。</p>
+<h2 id="OpenClaw-核心概念"><a href="#OpenClaw-核心概念" class="headerlink" title="OpenClaw 核心概念"></a>OpenClaw 核心概念</h2><h3 id="什么是-OpenClaw？"><a href="#什么是-OpenClaw？" class="headerlink" title="什么是 OpenClaw？"></a>什么是 OpenClaw？</h3><ul>
+<li><strong>自托管</strong>：运行在你自己的硬件上，你的规则</li>
+<li><strong>多通道</strong>：一个 Gateway 同时服务 WhatsApp、Telegram、Discord 等</li>
+<li><strong>Agent-native</strong>：为编码代理构建，支持工具使用、会话、内存和多代理路由</li>
+<li><strong>开源</strong>：MIT 许可，社区驱动</li>
+</ul>
+<h3 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Chat apps + plugins --&gt; Gateway --&gt; Pi agent</span><br><span class="line">                           --&gt; CLI</span><br><span class="line">                           --&gt; Web Control UI</span><br><span class="line">                           --&gt; macOS app</span><br><span class="line">                           --&gt; iOS and Android nodes</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="一、Multi-Agent-Routing（多代理路由）"><a href="#一、Multi-Agent-Routing（多代理路由）" class="headerlink" title="一、Multi-Agent Routing（多代理路由）"></a>一、Multi-Agent Routing（多代理路由）</h2><h3 id="什么是-Agent？"><a href="#什么是-Agent？" class="headerlink" title="什么是 Agent？"></a>什么是 Agent？</h3><p>一个 <strong>agent</strong> 是一个完全独立的大脑，有自己的：</p>
+<ul>
+<li><strong>Workspace</strong>（工作区）：文件、AGENTS.md&#x2F;SOUL.md&#x2F;USER.md</li>
+<li><strong>State directory</strong>（状态目录）：auth profiles、model registry</li>
+<li><strong>Session store</strong>（会话存储）：聊天历史 + 路由状态</li>
+</ul>
+<h3 id="路径映射"><a href="#路径映射" class="headerlink" title="路径映射"></a>路径映射</h3><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>路径</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Config</td>
+<td><code>~/.openclaw/openclaw.json</code></td>
+</tr>
+<tr>
+<td>Workspace</td>
+<td><code>~/.openclaw/workspace</code></td>
+</tr>
+<tr>
+<td>Agent dir</td>
+<td><code>~/.openclaw/agents/&lt;agentId&gt;/agent</code></td>
+</tr>
+<tr>
+<td>Sessions</td>
+<td><code>~/.openclaw/agents/&lt;agentId&gt;/sessions</code></td>
+</tr>
+</tbody></table>
+<h3 id="创建新-Agent"><a href="#创建新-Agent" class="headerlink" title="创建新 Agent"></a>创建新 Agent</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">openclaw agents add work</span><br><span class="line">openclaw agents list --bindings</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="二、Sub-Agents（子代理）"><a href="#二、Sub-Agents（子代理）" class="headerlink" title="二、Sub-Agents（子代理）"></a>二、Sub-Agents（子代理）</h2><h3 id="什么是-Sub-Agent？"><a href="#什么是-Sub-Agent？" class="headerlink" title="什么是 Sub-Agent？"></a>什么是 Sub-Agent？</h3><p>Sub-agents 是从现有 agent 运行中生成的后台 agent 运行。它们在自己的会话中运行，完成后会向请求者聊天频道宣布结果。</p>
+<h3 id="命令"><a href="#命令" class="headerlink" title="命令"></a>命令</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">/subagents list</span><br><span class="line">/subagents <span class="built_in">kill</span> &lt;<span class="built_in">id</span>|#|all&gt;</span><br><span class="line">/subagents <span class="built_in">log</span> &lt;<span class="built_in">id</span>|#&gt; [<span class="built_in">limit</span>] [tools]</span><br><span class="line">/subagents spawn &lt;agentId&gt; &lt;task&gt; [--model &lt;model&gt;]</span><br></pre></td></tr></table></figure>
+
+<h3 id="使用-sessions-spawn-工具"><a href="#使用-sessions-spawn-工具" class="headerlink" title="使用 sessions_spawn 工具"></a>使用 sessions_spawn 工具</h3><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;task&quot;</span><span class="punctuation">:</span> <span class="string">&quot;研究 Kotlin 协程&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;label&quot;</span><span class="punctuation">:</span> <span class="string">&quot;kotlin-coroutines&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;model&quot;</span><span class="punctuation">:</span> <span class="string">&quot;glm-5&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;thinking&quot;</span><span class="punctuation">:</span> <span class="string">&quot;medium&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="目标"><a href="#目标" class="headerlink" title="目标"></a>目标</h3><ul>
+<li>并行化”研究&#x2F;长任务&#x2F;慢工具”工作</li>
+<li>保持子代理隔离</li>
+<li>支持可配置的嵌套深度</li>
+</ul>
+<hr>
+<h2 id="三、Skills（技能系统）"><a href="#三、Skills（技能系统）" class="headerlink" title="三、Skills（技能系统）"></a>三、Skills（技能系统）</h2><h3 id="技能加载位置和优先级"><a href="#技能加载位置和优先级" class="headerlink" title="技能加载位置和优先级"></a>技能加载位置和优先级</h3><table>
+<thead>
+<tr>
+<th>优先级</th>
+<th>位置</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>最高</td>
+<td><code>&lt;workspace&gt;/skills</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>&lt;workspace&gt;/.agents/skills</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>~/.agents/skills</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>~/.openclaw/skills</code></td>
+</tr>
+<tr>
+<td>5</td>
+<td>Bundled skills</td>
+</tr>
+<tr>
+<td>最低</td>
+<td><code>skills.load.extraDirs</code></td>
+</tr>
+</tbody></table>
+<h3 id="Per-Agent-vs-Shared-Skills"><a href="#Per-Agent-vs-Shared-Skills" class="headerlink" title="Per-Agent vs Shared Skills"></a>Per-Agent vs Shared Skills</h3><ul>
+<li><strong>Per-agent skills</strong>：<code>&lt;workspace&gt;/skills</code>，仅对该 agent 可见</li>
+<li><strong>Shared skills</strong>：<code>~/.openclaw/skills</code>，对所有 agent 可见</li>
+</ul>
+<h3 id="ClawHub"><a href="#ClawHub" class="headerlink" title="ClawHub"></a>ClawHub</h3><p>ClawHub 是公共技能注册表：<a target="_blank" rel="noopener" href="https://clawhub.com/">https://clawhub.com</a></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 安装技能</span></span><br><span class="line">openclaw skills install &lt;skill-slug&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 更新所有技能</span></span><br><span class="line">openclaw skills update --all</span><br></pre></td></tr></table></figure>
+
+<h3 id="SKILL-md-格式"><a href="#SKILL-md-格式" class="headerlink" title="SKILL.md 格式"></a>SKILL.md 格式</h3><figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">---</span><br><span class="line">name: image-lab</span><br><span class="line"><span class="section">description: Generate or edit images via a provider-backed image workflow</span></span><br><span class="line"><span class="section">---</span></span><br><span class="line"></span><br><span class="line"><span class="section"># 使用说明...</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="四、Cron-Jobs（定时任务）"><a href="#四、Cron-Jobs（定时任务）" class="headerlink" title="四、Cron Jobs（定时任务）"></a>四、Cron Jobs（定时任务）</h2><h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p>Cron 是 Gateway 的内置调度器。Jobs 持久化在 <code>~/.openclaw/cron/</code>。</p>
+<h3 id="执行风格"><a href="#执行风格" class="headerlink" title="执行风格"></a>执行风格</h3><table>
+<thead>
+<tr>
+<th>风格</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Main session</strong></td>
+<td>在下一个心跳时运行</td>
+</tr>
+<tr>
+<td><strong>Isolated</strong></td>
+<td>在专用 agent turn 中运行</td>
+</tr>
+<tr>
+<td><strong>Current session</strong></td>
+<td>绑定到创建 cron 的会话</td>
+</tr>
+<tr>
+<td><strong>Custom session</strong></td>
+<td>在持久化命名会话中运行</td>
+</tr>
+</tbody></table>
+<h3 id="创建定时任务"><a href="#创建定时任务" class="headerlink" title="创建定时任务"></a>创建定时任务</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 一次性任务</span></span><br><span class="line">openclaw cron add \</span><br><span class="line">  --name <span class="string">&quot;Reminder&quot;</span> \</span><br><span class="line">  --at <span class="string">&quot;2026-02-01T16:00:00Z&quot;</span> \</span><br><span class="line">  --session main \</span><br><span class="line">  --system-event <span class="string">&quot;Reminder: check the docs&quot;</span> \</span><br><span class="line">  --wake now \</span><br><span class="line">  --delete-after-run</span><br><span class="line"></span><br><span class="line"><span class="comment"># 周期性任务</span></span><br><span class="line">openclaw cron add \</span><br><span class="line">  --name <span class="string">&quot;Morning brief&quot;</span> \</span><br><span class="line">  --cron <span class="string">&quot;0 7 * * *&quot;</span> \</span><br><span class="line">  --tz <span class="string">&quot;America/Los_Angeles&quot;</span> \</span><br><span class="line">  --session isolated \</span><br><span class="line">  --message <span class="string">&quot;Summarize overnight updates.&quot;</span> \</span><br><span class="line">  --announce</span><br></pre></td></tr></table></figure>
+
+<h3 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">openclaw cron list</span><br><span class="line">openclaw cron run &lt;job-id&gt;</span><br><span class="line">openclaw cron runs --<span class="built_in">id</span> &lt;job-id&gt;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="五、Hooks（钩子系统）"><a href="#五、Hooks（钩子系统）" class="headerlink" title="五、Hooks（钩子系统）"></a>五、Hooks（钩子系统）</h2><h3 id="什么是-Hooks？"><a href="#什么是-Hooks？" class="headerlink" title="什么是 Hooks？"></a>什么是 Hooks？</h3><p>Hooks 提供了一个可扩展的事件驱动系统，用于自动化 agent 命令和事件的响应。</p>
+<h3 id="Bundled-Hooks"><a href="#Bundled-Hooks" class="headerlink" title="Bundled Hooks"></a>Bundled Hooks</h3><table>
+<thead>
+<tr>
+<th>Hook</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>session-memory</strong></td>
+<td>重置会话时保存上下文到内存</td>
+</tr>
+<tr>
+<td><strong>bootstrap-extra-files</strong></td>
+<td>注入额外的 workspace bootstrap 文件</td>
+</tr>
+<tr>
+<td><strong>command-logger</strong></td>
+<td>记录所有命令事件</td>
+</tr>
+<tr>
+<td><strong>boot-md</strong></td>
+<td>Gateway 启动时运行 BOOT.md</td>
+</tr>
+</tbody></table>
+<h3 id="命令-1"><a href="#命令-1" class="headerlink" title="命令"></a>命令</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">openclaw hooks list</span><br><span class="line">openclaw hooks <span class="built_in">enable</span> session-memory</span><br><span class="line">openclaw hooks check</span><br><span class="line">openclaw hooks info session-memory</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="六、Memory（内存系统）"><a href="#六、Memory（内存系统）" class="headerlink" title="六、Memory（内存系统）"></a>六、Memory（内存系统）</h2><h3 id="内存文件布局"><a href="#内存文件布局" class="headerlink" title="内存文件布局"></a>内存文件布局</h3><table>
+<thead>
+<tr>
+<th>文件</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>memory/YYYY-MM-DD.md</code></td>
+<td>每日日志（追加）</td>
+</tr>
+<tr>
+<td><code>MEMORY.md</code></td>
+<td>精选的长期内存</td>
+</tr>
+</tbody></table>
+<h3 id="内存工具"><a href="#内存工具" class="headerlink" title="内存工具"></a>内存工具</h3><table>
+<thead>
+<tr>
+<th>工具</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>memory_search</code></td>
+<td>语义召回</td>
+</tr>
+<tr>
+<td><code>memory_get</code></td>
+<td>针对性读取</td>
+</tr>
+</tbody></table>
+<h3 id="何时写入内存"><a href="#何时写入内存" class="headerlink" title="何时写入内存"></a>何时写入内存</h3><ul>
+<li>决策、偏好和持久事实 → <code>MEMORY.md</code></li>
+<li>日常笔记和运行上下文 → <code>memory/YYYY-MM-DD.md</code></li>
+<li>如果有人说”记住这个”，写下来</li>
+</ul>
+<h3 id="自动内存刷新"><a href="#自动内存刷新" class="headerlink" title="自动内存刷新"></a>自动内存刷新</h3><p>当会话接近自动压缩时，OpenClaw 会触发一个静默的 agent turn，提醒模型在上下文被压缩之前写入持久内存。</p>
+<hr>
+<h2 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://docs.openclaw.ai/">OpenClaw 官方文档</a></li>
+<li><a target="_blank" rel="noopener" href="https://clawhub.com/">ClawHub 技能市场</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/openclaw/openclaw">GitHub</a></li>
+</ul>
+<hr>
+<p><em>持续学习中…</em></p>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/AI-Agent/" rel="tag">AI Agent</a>, <a class="tag-none-link" href="/blog/tags/OpenClaw/" rel="tag">OpenClaw</a>, <a class="tag-none-link" href="/blog/tags/%E5%B0%8F%E9%BE%99%E8%99%BE/" rel="tag">小龙虾</a>, <a class="tag-none-link" href="/blog/tags/%E8%87%AA%E5%8A%A8%E5%8C%96/" rel="tag">自动化</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-03T15:00:47.904Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Kotlin Multiplatform跨平台开发学习" href="/blog/2026/04/03/Kotlin-Multiplatform跨平台开发学习/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" Android逆向分析-Xposed模块开发实战" href="/blog/2026/04/03/Android逆向分析-Xposed模块开发实战/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>

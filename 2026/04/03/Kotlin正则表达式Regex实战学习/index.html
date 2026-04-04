@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>Kotlin正则表达式Regex实战学习 | Wenyi&#39;s Blog</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/03/Kotlin%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8FRegex%E5%AE%9E%E6%88%98%E5%AD%A6%E4%B9%A0/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="Kotlin, Regex, 匹配, 正则表达式" />
+  
+  <meta name="description" content="前言正则表达式是文本处理的强大工具。Kotlin 提供了简洁易用的 Regex 类，相比 Java 的 Pattern 和 Matcher 更加优雅。 一、创建 Regex使用 Regex 构造函数1val regex &#x3D; Regex(&quot;[a-z]+&quot;)  使用 String.toRegex()1val regex &#x3D; &quot;[a-z]+&quot;.toRegex()">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kotlin正则表达式Regex实战学习">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/03/Kotlin%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8FRegex%E5%AE%9E%E6%88%98%E5%AD%A6%E4%B9%A0/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:description" content="前言正则表达式是文本处理的强大工具。Kotlin 提供了简洁易用的 Regex 类，相比 Java 的 Pattern 和 Matcher 更加优雅。 一、创建 Regex使用 Regex 构造函数1val regex &#x3D; Regex(&quot;[a-z]+&quot;)  使用 String.toRegex()1val regex &#x3D; &quot;[a-z]+&quot;.toRegex()">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-04-03T23:47:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T15:50:27.940Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="Kotlin">
+<meta property="article:tag" content="Regex">
+<meta property="article:tag" content="匹配">
+<meta property="article:tag" content="正则表达式">
+<meta name="twitter:card" content="summary">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Kotlin正则表达式Regex实战学习","description":"前言正则表达式是文本处理的强大工具。Kotlin 提供了简洁易用的 Regex 类，相比 Java 的 Pattern 和 Matcher 更加优雅。...","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:47:00.000Z","dateModified":"2026-04-03T15:50:27.940Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Kotlin%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8FRegex%E5%AE%9E%E6%88%98%E5%AD%A6%E4%B9%A0/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/03/Kotlin%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8FRegex%E5%AE%9E%E6%88%98%E5%AD%A6%E4%B9%A0/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Kotlin正则表达式Regex实战学习</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-03T23:47:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-03</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~5.07K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>正则表达式是文本处理的强大工具。Kotlin 提供了简洁易用的 Regex 类，相比 Java 的 Pattern 和 Matcher 更加优雅。</p>
+<h2 id="一、创建-Regex"><a href="#一、创建-Regex" class="headerlink" title="一、创建 Regex"></a>一、创建 Regex</h2><h3 id="使用-Regex-构造函数"><a href="#使用-Regex-构造函数" class="headerlink" title="使用 Regex 构造函数"></a>使用 Regex 构造函数</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> regex = Regex(<span class="string">&quot;[a-z]+&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="使用-String-toRegex"><a href="#使用-String-toRegex" class="headerlink" title="使用 String.toRegex()"></a>使用 String.toRegex()</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> regex = <span class="string">&quot;[a-z]+&quot;</span>.toRegex()</span><br></pre></td></tr></table></figure>
+
+<h3 id="使用正则表达式字面量"><a href="#使用正则表达式字面量" class="headerlink" title="使用正则表达式字面量"></a>使用正则表达式字面量</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> regex = Regex(<span class="string">&quot;&quot;&quot;\d+&quot;&quot;&quot;</span>)  <span class="comment">// 原始字符串，无需转义</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="二、匹配方法"><a href="#二、匹配方法" class="headerlink" title="二、匹配方法"></a>二、匹配方法</h2><h3 id="matches-完全匹配"><a href="#matches-完全匹配" class="headerlink" title="matches() - 完全匹配"></a>matches() - 完全匹配</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> regex = Regex(<span class="string">&quot;[a-z]+&quot;</span>)</span><br><span class="line"></span><br><span class="line">println(regex.matches(<span class="string">&quot;hello&quot;</span>))  <span class="comment">// true</span></span><br><span class="line">println(regex.matches(<span class="string">&quot;Hello&quot;</span>))  <span class="comment">// false</span></span><br><span class="line">println(regex.matches(<span class="string">&quot;hello123&quot;</span>))  <span class="comment">// false</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="containsMatchIn-部分匹配"><a href="#containsMatchIn-部分匹配" class="headerlink" title="containsMatchIn() - 部分匹配"></a>containsMatchIn() - 部分匹配</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> regex = Regex(<span class="string">&quot;[a-z]+&quot;</span>)</span><br><span class="line"></span><br><span class="line">println(regex.containsMatchIn(<span class="string">&quot;hello123&quot;</span>))  <span class="comment">// true</span></span><br><span class="line">println(regex.containsMatchIn(<span class="string">&quot;123&quot;</span>))  <span class="comment">// false</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="find-查找第一个匹配"><a href="#find-查找第一个匹配" class="headerlink" title="find() - 查找第一个匹配"></a>find() - 查找第一个匹配</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> regex = Regex(<span class="string">&quot;[0-9]+&quot;</span>)</span><br><span class="line"><span class="keyword">val</span> result = regex.find(<span class="string">&quot;abc123def456&quot;</span>)</span><br><span class="line"></span><br><span class="line">println(result?.value)  <span class="comment">// 123</span></span><br><span class="line">println(result?.range)  <span class="comment">// 3..5</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="findAll-查找所有匹配"><a href="#findAll-查找所有匹配" class="headerlink" title="findAll() - 查找所有匹配"></a>findAll() - 查找所有匹配</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> regex = Regex(<span class="string">&quot;[0-9]+&quot;</span>)</span><br><span class="line"><span class="keyword">val</span> results = regex.findAll(<span class="string">&quot;abc123def456&quot;</span>)</span><br><span class="line"></span><br><span class="line">results.forEach &#123;</span><br><span class="line">    println(it.value)  <span class="comment">// 123, 456</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="三、替换方法"><a href="#三、替换方法" class="headerlink" title="三、替换方法"></a>三、替换方法</h2><h3 id="replace-替换所有匹配"><a href="#replace-替换所有匹配" class="headerlink" title="replace() - 替换所有匹配"></a>replace() - 替换所有匹配</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> regex = Regex(<span class="string">&quot;[0-9]+&quot;</span>)</span><br><span class="line"><span class="keyword">val</span> result = regex.replace(<span class="string">&quot;abc123def456&quot;</span>, <span class="string">&quot;X&quot;</span>)</span><br><span class="line"></span><br><span class="line">println(result)  <span class="comment">// abcXdefX</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="replaceFirst-替换第一个匹配"><a href="#replaceFirst-替换第一个匹配" class="headerlink" title="replaceFirst() - 替换第一个匹配"></a>replaceFirst() - 替换第一个匹配</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> regex = Regex(<span class="string">&quot;[0-9]+&quot;</span>)</span><br><span class="line"><span class="keyword">val</span> result = regex.replaceFirst(<span class="string">&quot;abc123def456&quot;</span>, <span class="string">&quot;X&quot;</span>)</span><br><span class="line"></span><br><span class="line">println(result)  <span class="comment">// abcXdef456</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="使用-Lambda-替换"><a href="#使用-Lambda-替换" class="headerlink" title="使用 Lambda 替换"></a>使用 Lambda 替换</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> regex = Regex(<span class="string">&quot;[0-9]+&quot;</span>)</span><br><span class="line"><span class="keyword">val</span> result = regex.replace(<span class="string">&quot;abc123def456&quot;</span>) &#123; </span><br><span class="line">    <span class="string">&quot;[<span class="subst">$&#123;it.value&#125;</span>]&quot;</span> </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">println(result)  <span class="comment">// abc[123]def[456]</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="四、分割方法"><a href="#四、分割方法" class="headerlink" title="四、分割方法"></a>四、分割方法</h2><h3 id="split"><a href="#split" class="headerlink" title="split()"></a>split()</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> regex = Regex(<span class="string">&quot;\\s+&quot;</span>)</span><br><span class="line"><span class="keyword">val</span> parts = regex.split(<span class="string">&quot;hello  world   kotlin&quot;</span>)</span><br><span class="line"></span><br><span class="line">println(parts)  <span class="comment">// [hello, world, kotlin]</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="五、分组捕获"><a href="#五、分组捕获" class="headerlink" title="五、分组捕获"></a>五、分组捕获</h2><h3 id="基本分组"><a href="#基本分组" class="headerlink" title="基本分组"></a>基本分组</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> regex = Regex(<span class="string">&quot;(\\d&#123;4&#125;)-(\\d&#123;2&#125;)-(\\d&#123;2&#125;)&quot;</span>)</span><br><span class="line"><span class="keyword">val</span> text = <span class="string">&quot;2026-04-03&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> match = regex.find(text)</span><br><span class="line"><span class="keyword">if</span> (match != <span class="literal">null</span>) &#123;</span><br><span class="line">    <span class="keyword">val</span> (year, month, day) = match.destructured</span><br><span class="line">    println(<span class="string">&quot;Year: <span class="variable">$year</span>, Month: <span class="variable">$month</span>, Day: <span class="variable">$day</span>&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="命名分组"><a href="#命名分组" class="headerlink" title="命名分组"></a>命名分组</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> regex = Regex(<span class="string">&quot;(?&lt;year&gt;\\d&#123;4&#125;)-(?&lt;month&gt;\\d&#123;2&#125;)-(?&lt;day&gt;\\d&#123;2&#125;)&quot;</span>)</span><br><span class="line"><span class="keyword">val</span> text = <span class="string">&quot;2026-04-03&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> match = regex.find(text)</span><br><span class="line"><span class="keyword">if</span> (match != <span class="literal">null</span>) &#123;</span><br><span class="line">    <span class="keyword">val</span> groups = match.groups <span class="keyword">as</span>? MatchNamedGroupCollection</span><br><span class="line">    <span class="keyword">val</span> year = groups?.<span class="keyword">get</span>(<span class="string">&quot;year&quot;</span>)?.value</span><br><span class="line">    <span class="keyword">val</span> month = groups?.<span class="keyword">get</span>(<span class="string">&quot;month&quot;</span>)?.value</span><br><span class="line">    <span class="keyword">val</span> day = groups?.<span class="keyword">get</span>(<span class="string">&quot;day&quot;</span>)?.value</span><br><span class="line">    </span><br><span class="line">    println(<span class="string">&quot;Year: <span class="variable">$year</span>, Month: <span class="variable">$month</span>, Day: <span class="variable">$day</span>&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="六、常用正则表达式"><a href="#六、常用正则表达式" class="headerlink" title="六、常用正则表达式"></a>六、常用正则表达式</h2><h3 id="邮箱验证"><a href="#邮箱验证" class="headerlink" title="邮箱验证"></a>邮箱验证</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> emailRegex = Regex(<span class="string">&quot;[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]&#123;2,&#125;&quot;</span>)</span><br><span class="line"></span><br><span class="line">println(emailRegex.matches(<span class="string">&quot;user@example.com&quot;</span>))  <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="手机号验证"><a href="#手机号验证" class="headerlink" title="手机号验证"></a>手机号验证</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> phoneRegex = Regex(<span class="string">&quot;1[3-9]\\d&#123;9&#125;&quot;</span>)</span><br><span class="line"></span><br><span class="line">println(phoneRegex.matches(<span class="string">&quot;13812345678&quot;</span>))  <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="URL-验证"><a href="#URL-验证" class="headerlink" title="URL 验证"></a>URL 验证</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> urlRegex = Regex(<span class="string">&quot;https?://[\\w.-]+\\.[a-zA-Z]&#123;2,&#125;(/.*)?&quot;</span>)</span><br><span class="line"></span><br><span class="line">println(urlRegex.matches(<span class="string">&quot;https://example.com/path&quot;</span>))  <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="IP-地址验证"><a href="#IP-地址验证" class="headerlink" title="IP 地址验证"></a>IP 地址验证</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> ipRegex = Regex(<span class="string">&quot;\\d&#123;1,3&#125;\\.\\d&#123;1,3&#125;\\.\\d&#123;1,3&#125;\\.\\d&#123;1,3&#125;&quot;</span>)</span><br><span class="line"></span><br><span class="line">println(ipRegex.matches(<span class="string">&quot;192.168.1.1&quot;</span>))  <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="七、正则表达式语法"><a href="#七、正则表达式语法" class="headerlink" title="七、正则表达式语法"></a>七、正则表达式语法</h2><table>
+<thead>
+<tr>
+<th>表达式</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>.</code></td>
+<td>任意字符</td>
+</tr>
+<tr>
+<td><code>\\d</code></td>
+<td>数字</td>
+</tr>
+<tr>
+<td><code>\\w</code></td>
+<td>字母、数字、下划线</td>
+</tr>
+<tr>
+<td><code>\\s</code></td>
+<td>空白字符</td>
+</tr>
+<tr>
+<td><code>^</code></td>
+<td>行首</td>
+</tr>
+<tr>
+<td><code>$</code></td>
+<td>行尾</td>
+</tr>
+<tr>
+<td><code>*</code></td>
+<td>0 次或多次</td>
+</tr>
+<tr>
+<td><code>+</code></td>
+<td>1 次或多次</td>
+</tr>
+<tr>
+<td><code>?</code></td>
+<td>0 次或 1 次</td>
+</tr>
+<tr>
+<td><code>{n}</code></td>
+<td>恰好 n 次</td>
+</tr>
+<tr>
+<td><code>{n,}</code></td>
+<td>至少 n 次</td>
+</tr>
+<tr>
+<td><code>{n,m}</code></td>
+<td>n 到 m 次</td>
+</tr>
+<tr>
+<td><code>[]</code></td>
+<td>字符集</td>
+</tr>
+<tr>
+<td><code>()</code></td>
+<td>分组</td>
+</tr>
+<tr>
+<td>&#96;</td>
+<td>&#96;</td>
+</tr>
+</tbody></table>
+<h2 id="八、实战应用"><a href="#八、实战应用" class="headerlink" title="八、实战应用"></a>八、实战应用</h2><h3 id="1-提取邮箱地址"><a href="#1-提取邮箱地址" class="headerlink" title="1. 提取邮箱地址"></a>1. 提取邮箱地址</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> text = <span class="string">&quot;联系我们: support@example.com 或 sales@example.org&quot;</span></span><br><span class="line"><span class="keyword">val</span> emailRegex = Regex(<span class="string">&quot;[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]&#123;2,&#125;&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> emails = emailRegex.findAll(text).map &#123; it.value &#125;.toList()</span><br><span class="line">println(emails)  <span class="comment">// [support@example.com, sales@example.org]</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="2-验证密码强度"><a href="#2-验证密码强度" class="headerlink" title="2. 验证密码强度"></a>2. 验证密码强度</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">isStrongPassword</span><span class="params">(password: <span class="type">String</span>)</span></span>: <span class="built_in">Boolean</span> &#123;</span><br><span class="line">    <span class="keyword">val</span> hasUpperCase = Regex(<span class="string">&quot;[A-Z]&quot;</span>).containsMatchIn(password)</span><br><span class="line">    <span class="keyword">val</span> hasLowerCase = Regex(<span class="string">&quot;[a-z]&quot;</span>).containsMatchIn(password)</span><br><span class="line">    <span class="keyword">val</span> hasDigit = Regex(<span class="string">&quot;\\d&quot;</span>).containsMatchIn(password)</span><br><span class="line">    <span class="keyword">val</span> hasSpecial = Regex(<span class="string">&quot;[!@#\$%^&amp;*]&quot;</span>).containsMatchIn(password)</span><br><span class="line">    <span class="keyword">val</span> isLongEnough = password.length &gt;= <span class="number">8</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> hasUpperCase &amp;&amp; hasLowerCase &amp;&amp; hasDigit &amp;&amp; hasSpecial &amp;&amp; isLongEnough</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-解析-CSV"><a href="#3-解析-CSV" class="headerlink" title="3. 解析 CSV"></a>3. 解析 CSV</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> csv = <span class="string">&quot;name,age,city\nAlice,25,Beijing\nBob,30,Shanghai&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> rows = csv.split(<span class="string">&quot;\n&quot;</span>).drop(<span class="number">1</span>)  <span class="comment">// 跳过表头</span></span><br><span class="line">rows.forEach &#123; row -&gt;</span><br><span class="line">    <span class="keyword">val</span> columns = row.split(<span class="string">&quot;,&quot;</span>)</span><br><span class="line">    println(<span class="string">&quot;Name: <span class="subst">$&#123;columns[<span class="number">0</span>]&#125;</span>, Age: <span class="subst">$&#123;columns[<span class="number">1</span>]&#125;</span>, City: <span class="subst">$&#123;columns[<span class="number">2</span>]&#125;</span>&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="九、性能考虑"><a href="#九、性能考虑" class="headerlink" title="九、性能考虑"></a>九、性能考虑</h2><h3 id="预编译正则表达式"><a href="#预编译正则表达式" class="headerlink" title="预编译正则表达式"></a>预编译正则表达式</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ❌ 错误：每次都创建新的 Regex</span></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">isValidEmail</span><span class="params">(email: <span class="type">String</span>)</span></span> = </span><br><span class="line">    Regex(<span class="string">&quot;[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]&#123;2,&#125;&quot;</span>).matches(email)</span><br><span class="line"></span><br><span class="line"><span class="comment">// ✅ 正确：预编译</span></span><br><span class="line"><span class="keyword">val</span> emailRegex = Regex(<span class="string">&quot;[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]&#123;2,&#125;&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">isValidEmail</span><span class="params">(email: <span class="type">String</span>)</span></span> = emailRegex.matches(email)</span><br></pre></td></tr></table></figure>
+
+<h2 id="十、最佳实践"><a href="#十、最佳实践" class="headerlink" title="十、最佳实践"></a>十、最佳实践</h2><ol>
+<li><strong>使用原始字符串</strong>：避免双重转义</li>
+<li><strong>预编译正则表达式</strong>：提高性能</li>
+<li><strong>命名分组</strong>：提高可读性</li>
+<li><strong>合理使用量词</strong>：避免贪婪匹配</li>
+<li><strong>测试边界情况</strong>：确保正则表达式正确</li>
+</ol>
+<h2 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://geek-docs.com/kotlin/kotlin-tutorial/regularexpressions.html">Kotlin 正则表达式 - 极客教程</a></li>
+<li><a target="_blank" rel="noopener" href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/-regex/">Regex | Kotlin API</a></li>
+<li><a target="_blank" rel="noopener" href="https://juejin.cn/post/7250009145914835004">Kotlin：正则Regex原来这么方便</a></li>
+</ul>
+<hr>
+<p><em>持续学习中…</em></p>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/Kotlin/" rel="tag">Kotlin</a>, <a class="tag-none-link" href="/blog/tags/Regex/" rel="tag">Regex</a>, <a class="tag-none-link" href="/blog/tags/%E5%8C%B9%E9%85%8D/" rel="tag">匹配</a>, <a class="tag-none-link" href="/blog/tags/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F/" rel="tag">正则表达式</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-03T15:50:27.940Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Jetpack Compose Material Design组件学习" href="/blog/2026/04/03/Jetpack-Compose-Material-Design组件学习/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" Android WorkManager后台任务调度学习" href="/blog/2026/04/03/Android-WorkManager后台任务调度学习/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>

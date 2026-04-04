@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>Android事件分发机制学习 | Wenyi&#39;s Blog</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/03/Android%E4%BA%8B%E4%BB%B6%E5%88%86%E5%8F%91%E6%9C%BA%E5%88%B6%E5%AD%A6%E4%B9%A0/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="Android, TouchEvent, dispatchTouchEvent, 事件分发" />
+  
+  <meta name="description" content="前言Android 的触摸事件分发是 UI 交互的核心机制。事件从 Activity 开始，经由 Window 和 DecorView，层层传递给目标 View。 一、事件分发顺序传递路径1Activity → Window → DecorView → ViewGroup → View  三个核心方法   方法 描述 返回值    dispatchTouchEvent 分发事件 true：消费；f">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android事件分发机制学习">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/03/Android%E4%BA%8B%E4%BB%B6%E5%88%86%E5%8F%91%E6%9C%BA%E5%88%B6%E5%AD%A6%E4%B9%A0/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:description" content="前言Android 的触摸事件分发是 UI 交互的核心机制。事件从 Activity 开始，经由 Window 和 DecorView，层层传递给目标 View。 一、事件分发顺序传递路径1Activity → Window → DecorView → ViewGroup → View  三个核心方法   方法 描述 返回值    dispatchTouchEvent 分发事件 true：消费；f">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-04-03T23:28:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T15:28:50.028Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="TouchEvent">
+<meta property="article:tag" content="dispatchTouchEvent">
+<meta property="article:tag" content="事件分发">
+<meta name="twitter:card" content="summary">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Android事件分发机制学习","description":"前言Android 的触摸事件分发是 UI 交互的核心机制。事件从 Activity 开始，经由 Window 和 DecorView，层层传递给目标 Vie...","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:28:00.000Z","dateModified":"2026-04-03T15:28:50.028Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Android%E4%BA%8B%E4%BB%B6%E5%88%86%E5%8F%91%E6%9C%BA%E5%88%B6%E5%AD%A6%E4%B9%A0/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/03/Android%E4%BA%8B%E4%BB%B6%E5%88%86%E5%8F%91%E6%9C%BA%E5%88%B6%E5%AD%A6%E4%B9%A0/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Android事件分发机制学习</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-03T23:28:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-03</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~4.11K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Android 的触摸事件分发是 UI 交互的核心机制。事件从 Activity 开始，经由 Window 和 DecorView，层层传递给目标 View。</p>
+<h2 id="一、事件分发顺序"><a href="#一、事件分发顺序" class="headerlink" title="一、事件分发顺序"></a>一、事件分发顺序</h2><h3 id="传递路径"><a href="#传递路径" class="headerlink" title="传递路径"></a>传递路径</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Activity → Window → DecorView → ViewGroup → View</span><br></pre></td></tr></table></figure>
+
+<h3 id="三个核心方法"><a href="#三个核心方法" class="headerlink" title="三个核心方法"></a>三个核心方法</h3><table>
+<thead>
+<tr>
+<th>方法</th>
+<th>描述</th>
+<th>返回值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>dispatchTouchEvent</strong></td>
+<td>分发事件</td>
+<td>true：消费；false：继续传递</td>
+</tr>
+<tr>
+<td><strong>onInterceptTouchEvent</strong></td>
+<td>拦截事件</td>
+<td>true：拦截；false：不拦截</td>
+</tr>
+<tr>
+<td><strong>onTouchEvent</strong></td>
+<td>处理事件</td>
+<td>true：消费；false：不消费</td>
+</tr>
+</tbody></table>
+<h2 id="二、dispatchTouchEvent"><a href="#二、dispatchTouchEvent" class="headerlink" title="二、dispatchTouchEvent"></a>二、dispatchTouchEvent</h2><h3 id="Activity"><a href="#Activity" class="headerlink" title="Activity"></a>Activity</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">dispatchTouchEvent</span><span class="params">(ev: <span class="type">MotionEvent</span>)</span></span>: <span class="built_in">Boolean</span> &#123;</span><br><span class="line">    <span class="comment">// 先分发给 Window</span></span><br><span class="line">    <span class="keyword">if</span> (window.superDispatchTouchEvent(ev)) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 如果没有被消费，调用自己的 onTouchEvent</span></span><br><span class="line">    <span class="keyword">return</span> onTouchEvent(ev)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="ViewGroup"><a href="#ViewGroup" class="headerlink" title="ViewGroup"></a>ViewGroup</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">dispatchTouchEvent</span><span class="params">(ev: <span class="type">MotionEvent</span>)</span></span>: <span class="built_in">Boolean</span> &#123;</span><br><span class="line">    <span class="comment">// 检查是否拦截</span></span><br><span class="line">    <span class="keyword">val</span> intercepted = onInterceptTouchEvent(ev)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> (!intercepted) &#123;</span><br><span class="line">        <span class="comment">// 分发给子 View</span></span><br><span class="line">        <span class="keyword">for</span> (i <span class="keyword">in</span> childCount - <span class="number">1</span> downTo <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">val</span> child = getChildAt(i)</span><br><span class="line">            <span class="keyword">if</span> (child.dispatchTouchEvent(ev)) &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 自己处理</span></span><br><span class="line">    <span class="keyword">return</span> onTouchEvent(ev)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="View"><a href="#View" class="headerlink" title="View"></a>View</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">dispatchTouchEvent</span><span class="params">(ev: <span class="type">MotionEvent</span>)</span></span>: <span class="built_in">Boolean</span> &#123;</span><br><span class="line">    <span class="comment">// 先检查 OnTouchListener</span></span><br><span class="line">    <span class="keyword">if</span> (onTouchListener?.onTouch(<span class="keyword">this</span>, ev) == <span class="literal">true</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 调用 onTouchEvent</span></span><br><span class="line">    <span class="keyword">return</span> onTouchEvent(ev)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="三、onInterceptTouchEvent"><a href="#三、onInterceptTouchEvent" class="headerlink" title="三、onInterceptTouchEvent"></a>三、onInterceptTouchEvent</h2><h3 id="ViewGroup-拦截"><a href="#ViewGroup-拦截" class="headerlink" title="ViewGroup 拦截"></a>ViewGroup 拦截</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onInterceptTouchEvent</span><span class="params">(ev: <span class="type">MotionEvent</span>)</span></span>: <span class="built_in">Boolean</span> &#123;</span><br><span class="line">    <span class="keyword">when</span> (ev.action) &#123;</span><br><span class="line">        MotionEvent.ACTION_DOWN -&gt; &#123;</span><br><span class="line">            <span class="comment">// 按下时不拦截</span></span><br><span class="line">            <span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">        &#125;</span><br><span class="line">        MotionEvent.ACTION_MOVE -&gt; &#123;</span><br><span class="line">            <span class="comment">// 移动时判断是否拦截</span></span><br><span class="line">            <span class="keyword">if</span> (shouldIntercept) &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="滑动冲突处理"><a href="#滑动冲突处理" class="headerlink" title="滑动冲突处理"></a>滑动冲突处理</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 外部拦截法</span></span><br><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onInterceptTouchEvent</span><span class="params">(ev: <span class="type">MotionEvent</span>)</span></span>: <span class="built_in">Boolean</span> &#123;</span><br><span class="line">    <span class="keyword">when</span> (ev.action) &#123;</span><br><span class="line">        MotionEvent.ACTION_DOWN -&gt; &#123;</span><br><span class="line">            mLastX = ev.x</span><br><span class="line">            mLastY = ev.y</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">        &#125;</span><br><span class="line">        MotionEvent.ACTION_MOVE -&gt; &#123;</span><br><span class="line">            <span class="keyword">val</span> dx = ev.x - mLastX</span><br><span class="line">            <span class="keyword">val</span> dy = ev.y - mLastY</span><br><span class="line">            </span><br><span class="line">            <span class="comment">// 判断滑动方向</span></span><br><span class="line">            <span class="keyword">if</span> (Math.abs(dx) &gt; Math.abs(dy)) &#123;</span><br><span class="line">                <span class="comment">// 水平滑动，拦截</span></span><br><span class="line">                <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、onTouchEvent"><a href="#四、onTouchEvent" class="headerlink" title="四、onTouchEvent"></a>四、onTouchEvent</h2><h3 id="处理事件"><a href="#处理事件" class="headerlink" title="处理事件"></a>处理事件</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onTouchEvent</span><span class="params">(ev: <span class="type">MotionEvent</span>)</span></span>: <span class="built_in">Boolean</span> &#123;</span><br><span class="line">    <span class="keyword">when</span> (ev.action) &#123;</span><br><span class="line">        MotionEvent.ACTION_DOWN -&gt; &#123;</span><br><span class="line">            <span class="comment">// 按下</span></span><br><span class="line">            <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">        &#125;</span><br><span class="line">        MotionEvent.ACTION_MOVE -&gt; &#123;</span><br><span class="line">            <span class="comment">// 移动</span></span><br><span class="line">            <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">        &#125;</span><br><span class="line">        MotionEvent.ACTION_UP -&gt; &#123;</span><br><span class="line">            <span class="comment">// 抬起</span></span><br><span class="line">            performClick()</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">super</span>.onTouchEvent(ev)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="点击事件"><a href="#点击事件" class="headerlink" title="点击事件"></a>点击事件</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onTouchEvent</span><span class="params">(ev: <span class="type">MotionEvent</span>)</span></span>: <span class="built_in">Boolean</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (ev.action == MotionEvent.ACTION_UP) &#123;</span><br><span class="line">        <span class="comment">// 检查是否是点击</span></span><br><span class="line">        <span class="keyword">if</span> (isClick(ev)) &#123;</span><br><span class="line">            performClick()</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="五、事件分发流程图"><a href="#五、事件分发流程图" class="headerlink" title="五、事件分发流程图"></a>五、事件分发流程图</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">Activity.dispatchTouchEvent()</span><br><span class="line">    │</span><br><span class="line">    ▼</span><br><span class="line">Window.superDispatchTouchEvent()</span><br><span class="line">    │</span><br><span class="line">    ▼</span><br><span class="line">DecorView.dispatchTouchEvent()</span><br><span class="line">    │</span><br><span class="line">    ▼</span><br><span class="line">ViewGroup.dispatchTouchEvent()</span><br><span class="line">    │</span><br><span class="line">    ├── onInterceptTouchEvent()?</span><br><span class="line">    │       │</span><br><span class="line">    │       ├── true → ViewGroup.onTouchEvent()</span><br><span class="line">    │       └── false → 子 View.dispatchTouchEvent()</span><br><span class="line">    │</span><br><span class="line">    ▼</span><br><span class="line">View.dispatchTouchEvent()</span><br><span class="line">    │</span><br><span class="line">    ├── OnTouchListener.onTouch()?</span><br><span class="line">    │       │</span><br><span class="line">    │       ├── true → 返回</span><br><span class="line">    │       └── false → View.onTouchEvent()</span><br><span class="line">    │</span><br><span class="line">    ▼</span><br><span class="line">View.onTouchEvent()</span><br><span class="line">    │</span><br><span class="line">    ├── true → 消费</span><br><span class="line">    └── false → 返回父 View</span><br></pre></td></tr></table></figure>
+
+<h2 id="六、常见问题"><a href="#六、常见问题" class="headerlink" title="六、常见问题"></a>六、常见问题</h2><h3 id="Q1-如何让子-View-不拦截事件？"><a href="#Q1-如何让子-View-不拦截事件？" class="headerlink" title="Q1: 如何让子 View 不拦截事件？"></a>Q1: 如何让子 View 不拦截事件？</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 子 View 调用</span></span><br><span class="line">parent.requestDisallowInterceptTouchEvent(<span class="literal">true</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="Q2-如何处理滑动冲突？"><a href="#Q2-如何处理滑动冲突？" class="headerlink" title="Q2: 如何处理滑动冲突？"></a>Q2: 如何处理滑动冲突？</h3><ol>
+<li><strong>外部拦截法</strong>：父 View 在 onInterceptTouchEvent 中拦截</li>
+<li><strong>内部拦截法</strong>：子 View 在 dispatchTouchEvent 中处理</li>
+</ol>
+<h3 id="Q3-OnClickListener-何时触发？"><a href="#Q3-OnClickListener-何时触发？" class="headerlink" title="Q3: OnClickListener 何时触发？"></a>Q3: OnClickListener 何时触发？</h3><p>在 onTouchEvent 的 ACTION_UP 中，如果检测到是点击，则调用 performClick()。</p>
+<h2 id="七、最佳实践"><a href="#七、最佳实践" class="headerlink" title="七、最佳实践"></a>七、最佳实践</h2><ol>
+<li><strong>优先使用 OnTouchListener</strong>：可以提前拦截事件</li>
+<li><strong>合理拦截</strong>：在 ACTION_DOWN 中不拦截</li>
+<li><strong>处理滑动冲突</strong>：明确滑动方向</li>
+<li><strong>避免事件透传</strong>：注意透明 View 的事件传递</li>
+<li><strong>及时消费</strong>：不处理的事件返回 false</li>
+</ol>
+<h2 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_33209777/article/details/135147729">Android事件分发机制详解</a></li>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/653059612">最详细的 Android View 的事件分发原理</a></li>
+<li><a target="_blank" rel="noopener" href="https://yanfukun.com/read/anroid-dev1/event">Android事件传递机制详解</a></li>
+</ul>
+<hr>
+<p><em>持续学习中…</em></p>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/Android/" rel="tag">Android</a>, <a class="tag-none-link" href="/blog/tags/TouchEvent/" rel="tag">TouchEvent</a>, <a class="tag-none-link" href="/blog/tags/dispatchTouchEvent/" rel="tag">dispatchTouchEvent</a>, <a class="tag-none-link" href="/blog/tags/%E4%BA%8B%E4%BB%B6%E5%88%86%E5%8F%91/" rel="tag">事件分发</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-03T15:28:50.028Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Kotlin泛型进阶-协变与逆变" href="/blog/2026/04/03/Kotlin泛型进阶-协变与逆变/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" Android ANR问题分析与解决" href="/blog/2026/04/03/Android-ANR问题分析与解决/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>

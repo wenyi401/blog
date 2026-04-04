@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>Kotlin Coroutines Channel通道学习 | Wenyi&#39;s Blog</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/03/Kotlin-Coroutines-Channel%E9%80%9A%E9%81%93%E5%AD%A6%E4%B9%A0/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="Channel, Coroutines, Kotlin, 协程, 并发" />
+  
+  <meta name="description" content="前言Deferred values 提供了一种便捷的方式在协程之间传输单个值。Channel 提供了一种在流中传输值的方法。 一、Channel 基础概念Channel 在概念上与 BlockingQueue 非常相似。一个关键区别是，它用挂起的 send 替代了阻塞的 put 操作，用挂起的 receive 替代了阻塞的 take 操作。 基本使用1234567891011import kotl">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kotlin Coroutines Channel通道学习">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/03/Kotlin-Coroutines-Channel%E9%80%9A%E9%81%93%E5%AD%A6%E4%B9%A0/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:description" content="前言Deferred values 提供了一种便捷的方式在协程之间传输单个值。Channel 提供了一种在流中传输值的方法。 一、Channel 基础概念Channel 在概念上与 BlockingQueue 非常相似。一个关键区别是，它用挂起的 send 替代了阻塞的 put 操作，用挂起的 receive 替代了阻塞的 take 操作。 基本使用1234567891011import kotl">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-04-03T23:13:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T15:12:25.260Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="Channel">
+<meta property="article:tag" content="Coroutines">
+<meta property="article:tag" content="Kotlin">
+<meta property="article:tag" content="协程">
+<meta property="article:tag" content="并发">
+<meta name="twitter:card" content="summary">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Kotlin Coroutines Channel通道学习","description":"前言Deferred values 提供了一种便捷的方式在协程之间传输单个值。Channel 提供了一种在流中传输值的方法。\n","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:13:00.000Z","dateModified":"2026-04-03T15:12:25.260Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Kotlin-Coroutines-Channel%E9%80%9A%E9%81%93%E5%AD%A6%E4%B9%A0/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/03/Kotlin-Coroutines-Channel%E9%80%9A%E9%81%93%E5%AD%A6%E4%B9%A0/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Kotlin Coroutines Channel通道学习</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-03T23:13:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-03</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~3.62K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Deferred values 提供了一种便捷的方式在协程之间传输单个值。Channel 提供了一种在流中传输值的方法。</p>
+<h2 id="一、Channel-基础"><a href="#一、Channel-基础" class="headerlink" title="一、Channel 基础"></a>一、Channel 基础</h2><h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><p><code>Channel</code> 在概念上与 <code>BlockingQueue</code> 非常相似。一个关键区别是，它用挂起的 <code>send</code> 替代了阻塞的 <code>put</code> 操作，用挂起的 <code>receive</code> 替代了阻塞的 <code>take</code> 操作。</p>
+<h3 id="基本使用"><a href="#基本使用" class="headerlink" title="基本使用"></a>基本使用</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> kotlinx.coroutines.*</span><br><span class="line"><span class="keyword">import</span> kotlinx.coroutines.channels.*</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> = runBlocking &#123;</span><br><span class="line">    <span class="keyword">val</span> channel = Channel&lt;<span class="built_in">Int</span>&gt;()</span><br><span class="line">    launch &#123;</span><br><span class="line">        <span class="keyword">for</span> (x <span class="keyword">in</span> <span class="number">1.</span><span class="number">.5</span>) channel.send(x * x)</span><br><span class="line">    &#125;</span><br><span class="line">    repeat(<span class="number">5</span>) &#123; println(channel.receive()) &#125;</span><br><span class="line">    println(<span class="string">&quot;Done!&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>输出：</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">1</span><br><span class="line">4</span><br><span class="line">9</span><br><span class="line">16</span><br><span class="line">25</span><br><span class="line">Done!</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="二、关闭和迭代"><a href="#二、关闭和迭代" class="headerlink" title="二、关闭和迭代"></a>二、关闭和迭代</h2><h3 id="关闭通道"><a href="#关闭通道" class="headerlink" title="关闭通道"></a>关闭通道</h3><p>与队列不同，通道可以关闭以表示不再有元素到来。</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> channel = Channel&lt;<span class="built_in">Int</span>&gt;()</span><br><span class="line">launch &#123;</span><br><span class="line">    <span class="keyword">for</span> (x <span class="keyword">in</span> <span class="number">1.</span><span class="number">.5</span>) channel.send(x * x)</span><br><span class="line">    channel.close() <span class="comment">// 发送完毕</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 使用 for 循环接收元素</span></span><br><span class="line"><span class="keyword">for</span> (y <span class="keyword">in</span> channel) println(y)</span><br><span class="line">println(<span class="string">&quot;Done!&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="关闭的保证"><a href="#关闭的保证" class="headerlink" title="关闭的保证"></a>关闭的保证</h3><p>迭代会在接收到关闭令牌时停止，保证所有在关闭之前发送的元素都会被接收。</p>
+<hr>
+<h2 id="三、构建通道生产者"><a href="#三、构建通道生产者" class="headerlink" title="三、构建通道生产者"></a>三、构建通道生产者</h2><h3 id="生产者-消费者模式"><a href="#生产者-消费者模式" class="headerlink" title="生产者-消费者模式"></a>生产者-消费者模式</h3><p>生产协程产生元素序列是一个非常常见的模式。</p>
+<h3 id="produce-构建器"><a href="#produce-构建器" class="headerlink" title="produce 构建器"></a>produce 构建器</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> CoroutineScope.<span class="title">produceSquares</span><span class="params">()</span></span>: ReceiveChannel&lt;<span class="built_in">Int</span>&gt; = produce &#123;</span><br><span class="line">    <span class="keyword">for</span> (x <span class="keyword">in</span> <span class="number">1.</span><span class="number">.5</span>) send(x * x)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> = runBlocking &#123;</span><br><span class="line">    <span class="keyword">val</span> squares = produceSquares()</span><br><span class="line">    squares.consumeEach &#123; println(it) &#125;</span><br><span class="line">    println(<span class="string">&quot;Done!&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="consumeEach"><a href="#consumeEach" class="headerlink" title="consumeEach"></a>consumeEach</h3><p>替代 for 循环的消费端扩展函数。</p>
+<hr>
+<h2 id="四、管道"><a href="#四、管道" class="headerlink" title="四、管道"></a>四、管道</h2><h3 id="概念-1"><a href="#概念-1" class="headerlink" title="概念"></a>概念</h3><p>管道是一种模式，一个协程产生（可能是无限的）值流：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> CoroutineScope.<span class="title">produceNumbers</span><span class="params">()</span></span> = produce&lt;<span class="built_in">Int</span>&gt; &#123;</span><br><span class="line">    <span class="keyword">var</span> x = <span class="number">1</span></span><br><span class="line">    <span class="keyword">while</span> (<span class="literal">true</span>) send(x++) <span class="comment">// 无限流</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>另一个协程消费该流，进行处理，并产生其他结果：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> CoroutineScope.<span class="title">square</span><span class="params">(numbers: <span class="type">ReceiveChannel</span>&lt;<span class="type">Int</span>&gt;)</span></span>: ReceiveChannel&lt;<span class="built_in">Int</span>&gt; = produce &#123;</span><br><span class="line">    <span class="keyword">for</span> (x <span class="keyword">in</span> numbers) send(x * x)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="使用管道"><a href="#使用管道" class="headerlink" title="使用管道"></a>使用管道</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> = runBlocking &#123;</span><br><span class="line">    <span class="keyword">val</span> numbers = produceNumbers()</span><br><span class="line">    <span class="keyword">val</span> squares = square(numbers)</span><br><span class="line">    repeat(<span class="number">5</span>) &#123;</span><br><span class="line">        println(squares.receive())</span><br><span class="line">    &#125;</span><br><span class="line">    println(<span class="string">&quot;Done!&quot;</span>)</span><br><span class="line">    coroutineContext.cancelChildren()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="五、素数管道示例"><a href="#五、素数管道示例" class="headerlink" title="五、素数管道示例"></a>五、素数管道示例</h2><h3 id="生成数字流"><a href="#生成数字流" class="headerlink" title="生成数字流"></a>生成数字流</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> CoroutineScope.<span class="title">numbersFrom</span><span class="params">(start: <span class="type">Int</span>)</span></span> = produce&lt;<span class="built_in">Int</span>&gt; &#123;</span><br><span class="line">    <span class="keyword">var</span> x = start</span><br><span class="line">    <span class="keyword">while</span> (<span class="literal">true</span>) send(x++)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="过滤管道"><a href="#过滤管道" class="headerlink" title="过滤管道"></a>过滤管道</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> CoroutineScope.<span class="title">filter</span><span class="params">(numbers: <span class="type">ReceiveChannel</span>&lt;<span class="type">Int</span>&gt;, prime: <span class="type">Int</span>)</span></span> = produce&lt;<span class="built_in">Int</span>&gt; &#123;</span><br><span class="line">    <span class="keyword">for</span> (x <span class="keyword">in</span> numbers) <span class="keyword">if</span> (x % prime != <span class="number">0</span>) send(x)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="生成素数"><a href="#生成素数" class="headerlink" title="生成素数"></a>生成素数</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> = runBlocking &#123;</span><br><span class="line">    <span class="keyword">var</span> cur = numbersFrom(<span class="number">2</span>)</span><br><span class="line">    repeat(<span class="number">10</span>) &#123;</span><br><span class="line">        <span class="keyword">val</span> prime = cur.receive()</span><br><span class="line">        println(prime)</span><br><span class="line">        cur = filter(cur, prime)</span><br><span class="line">    &#125;</span><br><span class="line">    coroutineContext.cancelChildren()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>输出：</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">2</span><br><span class="line">3</span><br><span class="line">5</span><br><span class="line">7</span><br><span class="line">11</span><br><span class="line">13</span><br><span class="line">17</span><br><span class="line">19</span><br><span class="line">23</span><br><span class="line">29</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="六、Channel-类型"><a href="#六、Channel-类型" class="headerlink" title="六、Channel 类型"></a>六、Channel 类型</h2><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>Channel&lt;T&gt;()</code></td>
+<td>无限容量的通道</td>
+</tr>
+<tr>
+<td><code>Channel&lt;T&gt;(capacity)</code></td>
+<td>指定容量的通道</td>
+</tr>
+<tr>
+<td><code>RendezvousChannel</code></td>
+<td>容量为 0，发送和接收必须同时进行</td>
+</tr>
+<tr>
+<td><code>ArrayChannel</code></td>
+<td>固定容量的通道</td>
+</tr>
+<tr>
+<td><code>ConflatedChannel</code></td>
+<td>只保留最新值，旧值会被覆盖</td>
+</tr>
+</tbody></table>
+<h3 id="指定容量"><a href="#指定容量" class="headerlink" title="指定容量"></a>指定容量</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 容量为 10 的通道</span></span><br><span class="line"><span class="keyword">val</span> channel = Channel&lt;<span class="built_in">Int</span>&gt;(<span class="number">10</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 只有最新值的通道</span></span><br><span class="line"><span class="keyword">val</span> conflatedChannel = Channel&lt;<span class="built_in">Int</span>&gt;(Channel.CONFLATED)</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="七、缓冲和溢出策略"><a href="#七、缓冲和溢出策略" class="headerlink" title="七、缓冲和溢出策略"></a>七、缓冲和溢出策略</h2><h3 id="BufferOverflow-策略"><a href="#BufferOverflow-策略" class="headerlink" title="BufferOverflow 策略"></a>BufferOverflow 策略</h3><table>
+<thead>
+<tr>
+<th>策略</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>SUSPEND</code></td>
+<td>挂起发送者（默认）</td>
+</tr>
+<tr>
+<td><code>DROP_OLDEST</code></td>
+<td>丢弃最旧的元素</td>
+</tr>
+<tr>
+<td><code>DROP_LATEST</code></td>
+<td>丢弃最新的元素</td>
+</tr>
+</tbody></table>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> channel = Channel&lt;<span class="built_in">Int</span>&gt;(</span><br><span class="line">    capacity = <span class="number">10</span>,</span><br><span class="line">    onBufferOverflow = BufferOverflow.DROP_OLDEST</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="八、Select-表达式"><a href="#八、Select-表达式" class="headerlink" title="八、Select 表达式"></a>八、Select 表达式</h2><h3 id="从多个通道接收"><a href="#从多个通道接收" class="headerlink" title="从多个通道接收"></a>从多个通道接收</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">suspend</span> <span class="function"><span class="keyword">fun</span> <span class="title">selectFromChannels</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">val</span> channel1 = Channel&lt;<span class="built_in">Int</span>&gt;()</span><br><span class="line">    <span class="keyword">val</span> channel2 = Channel&lt;String&gt;()</span><br><span class="line">    </span><br><span class="line">    select&lt;<span class="built_in">Unit</span>&gt; &#123;</span><br><span class="line">        channel1.onReceive &#123; value -&gt;</span><br><span class="line">            println(<span class="string">&quot;Received from channel1: <span class="variable">$value</span>&quot;</span>)</span><br><span class="line">        &#125;</span><br><span class="line">        channel2.onReceive &#123; value -&gt;</span><br><span class="line">            println(<span class="string">&quot;Received from channel2: <span class="variable">$value</span>&quot;</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="九、Channel-vs-Flow"><a href="#九、Channel-vs-Flow" class="headerlink" title="九、Channel vs Flow"></a>九、Channel vs Flow</h2><table>
+<thead>
+<tr>
+<th>特性</th>
+<th>Channel</th>
+<th>Flow</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>类型</strong></td>
+<td>热流</td>
+<td>冷流</td>
+</tr>
+<tr>
+<td><strong>多个消费者</strong></td>
+<td>每个消费者收到不同元素</td>
+<td>每个消费者重新执行</td>
+</tr>
+<tr>
+<td><strong>状态</strong></td>
+<td>有状态</td>
+<td>无状态</td>
+</tr>
+<tr>
+<td><strong>使用场景</strong></td>
+<td>并发通信、事件流</td>
+<td>数据流转换</td>
+</tr>
+<tr>
+<td><strong>背压</strong></td>
+<td>支持</td>
+<td>支持</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="十、最佳实践"><a href="#十、最佳实践" class="headerlink" title="十、最佳实践"></a>十、最佳实践</h2><ol>
+<li><strong>及时关闭通道</strong>：避免资源泄漏</li>
+<li><strong>使用 produce 构建器</strong>：简化生产者代码</li>
+<li><strong>处理异常</strong>：使用 try-catch 或 catch</li>
+<li><strong>取消协程</strong>：使用 cancelChildren() 或作用域</li>
+<li><strong>选择合适的容量</strong>：根据需求选择 Channel 类型</li>
+</ol>
+<hr>
+<h2 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://kotlinlang.org/docs/channels.html">Channels | Kotlin Documentation</a></li>
+<li><a target="_blank" rel="noopener" href="https://book.kotlincn.net/text/channels.html">通道 · Kotlin 官方文档 中文版</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/gitblog_00076/article/details/147286309">告别回调地狱：Kotlin协程Channel实战指南</a></li>
+</ul>
+<hr>
+<p><em>持续学习中…</em></p>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/Channel/" rel="tag">Channel</a>, <a class="tag-none-link" href="/blog/tags/Coroutines/" rel="tag">Coroutines</a>, <a class="tag-none-link" href="/blog/tags/Kotlin/" rel="tag">Kotlin</a>, <a class="tag-none-link" href="/blog/tags/%E5%8D%8F%E7%A8%8B/" rel="tag">协程</a>, <a class="tag-none-link" href="/blog/tags/%E5%B9%B6%E5%8F%91/" rel="tag">并发</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-03T15:12:25.260Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Android Jetpack Navigation组件学习" href="/blog/2026/04/03/Android-Jetpack-Navigation组件学习/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" Android图片加载库对比-Coil vs Glide" href="/blog/2026/04/03/Android图片加载库对比-Coil-vs-Glide/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>

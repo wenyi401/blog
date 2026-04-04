@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>Android WebView与JSBridge交互学习 | Wenyi&#39;s Blog</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/03/Android-WebView%E4%B8%8EJSBridge%E4%BA%A4%E4%BA%92%E5%AD%A6%E4%B9%A0/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="Android, Hybrid, JSBridge, JavaScript, WebView" />
+  
+  <meta name="description" content="前言Hybrid 混合开发通过 WebView 承载 H5 业务，Native 提供基础能力，平衡了灵活性和性能。JSBridge 是实现 WebView 与 JavaScript 双向交互的核心技术。 一、WebView 基础配置WebSettings 配置1234567891011121314151617181920val webView: WebView &#x3D; findViewById(R.i">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android WebView与JSBridge交互学习">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/03/Android-WebView%E4%B8%8EJSBridge%E4%BA%A4%E4%BA%92%E5%AD%A6%E4%B9%A0/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:description" content="前言Hybrid 混合开发通过 WebView 承载 H5 业务，Native 提供基础能力，平衡了灵活性和性能。JSBridge 是实现 WebView 与 JavaScript 双向交互的核心技术。 一、WebView 基础配置WebSettings 配置1234567891011121314151617181920val webView: WebView &#x3D; findViewById(R.i">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-04-03T23:18:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T15:19:13.396Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="Hybrid">
+<meta property="article:tag" content="JSBridge">
+<meta property="article:tag" content="JavaScript">
+<meta property="article:tag" content="WebView">
+<meta name="twitter:card" content="summary">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Android WebView与JSBridge交互学习","description":"前言Hybrid 混合开发通过 WebView 承载 H5 业务，Native 提供基础能力，平衡了灵活性和性能。JSBridge 是实现 WebView 与...","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:18:00.000Z","dateModified":"2026-04-03T15:19:13.396Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Android-WebView%E4%B8%8EJSBridge%E4%BA%A4%E4%BA%92%E5%AD%A6%E4%B9%A0/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/03/Android-WebView%E4%B8%8EJSBridge%E4%BA%A4%E4%BA%92%E5%AD%A6%E4%B9%A0/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Android WebView与JSBridge交互学习</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-03T23:18:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-03</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~6.01K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Hybrid 混合开发通过 WebView 承载 H5 业务，Native 提供基础能力，平衡了灵活性和性能。JSBridge 是实现 WebView 与 JavaScript 双向交互的核心技术。</p>
+<h2 id="一、WebView-基础配置"><a href="#一、WebView-基础配置" class="headerlink" title="一、WebView 基础配置"></a>一、WebView 基础配置</h2><h3 id="WebSettings-配置"><a href="#WebSettings-配置" class="headerlink" title="WebSettings 配置"></a>WebSettings 配置</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> webView: WebView = findViewById(R.id.webView)</span><br><span class="line"></span><br><span class="line">webView.settings.apply &#123;</span><br><span class="line">    <span class="comment">// 启用 JavaScript</span></span><br><span class="line">    javaScriptEnabled = <span class="literal">true</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 启用 DOM 存储</span></span><br><span class="line">    domStorageEnabled = <span class="literal">true</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 设置缓存模式</span></span><br><span class="line">    cacheMode = WebSettings.LOAD_DEFAULT</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 支持缩放</span></span><br><span class="line">    setSupportZoom(<span class="literal">true</span>)</span><br><span class="line">    builtInZoomControls = <span class="literal">true</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 自适应屏幕</span></span><br><span class="line">    useWideViewPort = <span class="literal">true</span></span><br><span class="line">    loadWithOverviewMode = <span class="literal">true</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="WebViewClient-定制"><a href="#WebViewClient-定制" class="headerlink" title="WebViewClient 定制"></a>WebViewClient 定制</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">webView.webViewClient = <span class="keyword">object</span> : WebViewClient() &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">shouldOverrideUrlLoading</span><span class="params">(view: <span class="type">WebView</span>, url: <span class="type">String</span>)</span></span>: <span class="built_in">Boolean</span> &#123;</span><br><span class="line">        <span class="comment">// 拦截 URL 跳转</span></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onPageStarted</span><span class="params">(view: <span class="type">WebView</span>, url: <span class="type">String</span>, favicon: <span class="type">Bitmap</span>?)</span></span> &#123;</span><br><span class="line">        <span class="comment">// 页面开始加载</span></span><br><span class="line">        showLoading()</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onPageFinished</span><span class="params">(view: <span class="type">WebView</span>, url: <span class="type">String</span>)</span></span> &#123;</span><br><span class="line">        <span class="comment">// 页面加载完成</span></span><br><span class="line">        hideLoading()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="二、JavaScript-调用-Android"><a href="#二、JavaScript-调用-Android" class="headerlink" title="二、JavaScript 调用 Android"></a>二、JavaScript 调用 Android</h2><h3 id="方式一：addJavascriptInterface"><a href="#方式一：addJavascriptInterface" class="headerlink" title="方式一：addJavascriptInterface"></a>方式一：addJavascriptInterface</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">WebAppInterface</span>(<span class="keyword">private</span> <span class="keyword">val</span> context: Context) &#123;</span><br><span class="line">    <span class="meta">@JavascriptInterface</span></span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">showToast</span><span class="params">(message: <span class="type">String</span>)</span></span> &#123;</span><br><span class="line">        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@JavascriptInterface</span></span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">getUserInfo</span><span class="params">()</span></span>: String &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;&#123;\&quot;name\&quot;:\&quot;Alice\&quot;,\&quot;age\&quot;:25&#125;&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 添加 JavaScript 接口</span></span><br><span class="line">webView.addJavascriptInterface(WebAppInterface(<span class="keyword">this</span>), <span class="string">&quot;Android&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// JavaScript 调用</span></span><br><span class="line"><span class="comment">// Android.showToast(&quot;Hello from JS!&quot;)</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="方式二：WebViewClient-拦截"><a href="#方式二：WebViewClient-拦截" class="headerlink" title="方式二：WebViewClient 拦截"></a>方式二：WebViewClient 拦截</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">webView.webViewClient = <span class="keyword">object</span> : WebViewClient() &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">shouldOverrideUrlLoading</span><span class="params">(view: <span class="type">WebView</span>, request: <span class="type">WebResourceRequest</span>)</span></span>: <span class="built_in">Boolean</span> &#123;</span><br><span class="line">        <span class="keyword">val</span> url = request.url.toString()</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 拦截自定义协议</span></span><br><span class="line">        <span class="keyword">if</span> (url.startsWith(<span class="string">&quot;jsbridge://&quot;</span>)) &#123;</span><br><span class="line">            handleJsBridge(url)</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">handleJsBridge</span><span class="params">(url: <span class="type">String</span>)</span></span> &#123;</span><br><span class="line">    <span class="comment">// 解析 URL 参数并执行 Native 方法</span></span><br><span class="line">    <span class="keyword">val</span> uri = Uri.parse(url)</span><br><span class="line">    <span class="keyword">val</span> action = uri.host</span><br><span class="line">    <span class="keyword">val</span> params = uri.queryParameterNames</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="三、Android-调用-JavaScript"><a href="#三、Android-调用-JavaScript" class="headerlink" title="三、Android 调用 JavaScript"></a>三、Android 调用 JavaScript</h2><h3 id="方式一：loadUrl"><a href="#方式一：loadUrl" class="headerlink" title="方式一：loadUrl"></a>方式一：loadUrl</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 调用无返回值的 JS 函数</span></span><br><span class="line">webView.loadUrl(<span class="string">&quot;javascript:showMessage(&#x27;Hello from Android!&#x27;)&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="方式二：evaluateJavascript"><a href="#方式二：evaluateJavascript" class="headerlink" title="方式二：evaluateJavascript"></a>方式二：evaluateJavascript</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 调用有返回值的 JS 函数</span></span><br><span class="line">webView.evaluateJavascript(<span class="string">&quot;javascript:getUserInfo()&quot;</span>) &#123; result -&gt;</span><br><span class="line">    <span class="comment">// 处理返回值</span></span><br><span class="line">    Log.d(<span class="string">&quot;WebView&quot;</span>, <span class="string">&quot;Result: <span class="variable">$result</span>&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、JSBridge-框架"><a href="#四、JSBridge-框架" class="headerlink" title="四、JSBridge 框架"></a>四、JSBridge 框架</h2><h3 id="定义-Handler"><a href="#定义-Handler" class="headerlink" title="定义 Handler"></a>定义 Handler</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">JsBridge</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> handlers = mutableMapOf&lt;String, BridgeHandler&gt;()</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">registerHandler</span><span class="params">(name: <span class="type">String</span>, handler: <span class="type">BridgeHandler</span>)</span></span> &#123;</span><br><span class="line">        handlers[name] = handler</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">callHandler</span><span class="params">(name: <span class="type">String</span>, <span class="keyword">data</span>: <span class="type">String</span>, callback: (<span class="type">String</span>) -&gt; <span class="type">Unit</span>)</span></span> &#123;</span><br><span class="line">        handlers[name]?.handle(<span class="keyword">data</span>, callback)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">interface</span> <span class="title class_">BridgeHandler</span> &#123;</span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">handle</span><span class="params">(<span class="keyword">data</span>: <span class="type">String</span>, callback: (<span class="type">String</span>) -&gt; <span class="type">Unit</span>)</span></span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="注册处理器"><a href="#注册处理器" class="headerlink" title="注册处理器"></a>注册处理器</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">jsBridge.registerHandler(<span class="string">&quot;getUserInfo&quot;</span>, <span class="keyword">object</span> : BridgeHandler &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">handle</span><span class="params">(<span class="keyword">data</span>: <span class="type">String</span>, callback: (<span class="type">String</span>) -&gt; <span class="type">Unit</span>)</span></span> &#123;</span><br><span class="line">        <span class="keyword">val</span> userInfo = getUserInfo()</span><br><span class="line">        callback(userInfo)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">jsBridge.registerHandler(<span class="string">&quot;openCamera&quot;</span>, <span class="keyword">object</span> : BridgeHandler &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">handle</span><span class="params">(<span class="keyword">data</span>: <span class="type">String</span>, callback: (<span class="type">String</span>) -&gt; <span class="type">Unit</span>)</span></span> &#123;</span><br><span class="line">        openCamera()</span><br><span class="line">        callback(<span class="string">&quot;&#123;\&quot;success\&quot;:true&#125;&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<h2 id="五、完整示例"><a href="#五、完整示例" class="headerlink" title="五、完整示例"></a>五、完整示例</h2><h3 id="Android-端"><a href="#Android-端" class="headerlink" title="Android 端"></a>Android 端</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MainActivity</span> : <span class="type">AppCompatActivity</span>() &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">lateinit</span> <span class="keyword">var</span> webView: WebView</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">lateinit</span> <span class="keyword">var</span> jsBridge: JsBridge</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onCreate</span><span class="params">(savedInstanceState: <span class="type">Bundle</span>?)</span></span> &#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState)</span><br><span class="line">        setContentView(R.layout.activity_main)</span><br><span class="line">        </span><br><span class="line">        webView = findViewById(R.id.webView)</span><br><span class="line">        jsBridge = JsBridge(webView)</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 配置 WebView</span></span><br><span class="line">        setupWebView()</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 注册 JSBridge 处理器</span></span><br><span class="line">        registerHandlers()</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 加载页面</span></span><br><span class="line">        webView.loadUrl(<span class="string">&quot;file:///android_asset/index.html&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">setupWebView</span><span class="params">()</span></span> &#123;</span><br><span class="line">        webView.settings.javaScriptEnabled = <span class="literal">true</span></span><br><span class="line">        webView.addJavascriptInterface(jsBridge, <span class="string">&quot;JsBridge&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">registerHandlers</span><span class="params">()</span></span> &#123;</span><br><span class="line">        jsBridge.registerHandler(<span class="string">&quot;getLocation&quot;</span>) &#123; <span class="keyword">data</span>, callback -&gt;</span><br><span class="line">            <span class="keyword">val</span> location = getLastLocation()</span><br><span class="line">            callback(location)</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        jsBridge.registerHandler(<span class="string">&quot;takePhoto&quot;</span>) &#123; <span class="keyword">data</span>, callback -&gt;</span><br><span class="line">            takePhoto()</span><br><span class="line">            callback(<span class="string">&quot;&#123;\&quot;status\&quot;:\&quot;success\&quot;&#125;&quot;</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="JavaScript-端"><a href="#JavaScript-端" class="headerlink" title="JavaScript 端"></a>JavaScript 端</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 调用 Native 方法</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">getLocation</span>(<span class="params"></span>) &#123;</span><br><span class="line">    <span class="title class_">JsBridge</span>.<span class="title function_">callHandler</span>(<span class="string">&#x27;getLocation&#x27;</span>, <span class="string">&#x27;&#x27;</span>, <span class="keyword">function</span>(<span class="params">response</span>) &#123;</span><br><span class="line">        <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Location: &#x27;</span> + response);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">takePhoto</span>(<span class="params"></span>) &#123;</span><br><span class="line">    <span class="title class_">JsBridge</span>.<span class="title function_">callHandler</span>(<span class="string">&#x27;takePhoto&#x27;</span>, <span class="string">&#x27;&#x27;</span>, <span class="keyword">function</span>(<span class="params">response</span>) &#123;</span><br><span class="line">        <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Photo result: &#x27;</span> + response);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 注册 JS 方法供 Native 调用</span></span><br><span class="line"><span class="title class_">JsBridge</span>.<span class="title function_">registerHandler</span>(<span class="string">&#x27;showMessage&#x27;</span>, <span class="keyword">function</span>(<span class="params">data, callback</span>) &#123;</span><br><span class="line">    <span class="title function_">alert</span>(data);</span><br><span class="line">    <span class="title function_">callback</span>(<span class="string">&#x27;Message shown&#x27;</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h2 id="六、安全注意事项"><a href="#六、安全注意事项" class="headerlink" title="六、安全注意事项"></a>六、安全注意事项</h2><table>
+<thead>
+<tr>
+<th>安全问题</th>
+<th>解决方案</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>远程代码执行</strong></td>
+<td>仅加载可信来源</td>
+</tr>
+<tr>
+<td><strong>敏感信息泄露</strong></td>
+<td>限制 JavaScriptInterface 暴露的方法</td>
+</tr>
+<tr>
+<td><strong>URL 欺骗</strong></td>
+<td>验证 URL 来源</td>
+</tr>
+<tr>
+<td><strong>跨站脚本攻击</strong></td>
+<td>过滤输入参数</td>
+</tr>
+</tbody></table>
+<h2 id="七、性能优化"><a href="#七、性能优化" class="headerlink" title="七、性能优化"></a>七、性能优化</h2><ol>
+<li><strong>预加载 WebView</strong>：提前初始化 WebView</li>
+<li><strong>缓存策略</strong>：合理使用缓存</li>
+<li><strong>懒加载</strong>：延迟加载非必要内容</li>
+<li><strong>内存管理</strong>：及时销毁 WebView</li>
+</ol>
+<h2 id="八、调试技巧"><a href="#八、调试技巧" class="headerlink" title="八、调试技巧"></a>八、调试技巧</h2><h3 id="启用调试模式"><a href="#启用调试模式" class="headerlink" title="启用调试模式"></a>启用调试模式</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.KITKAT) &#123;</span><br><span class="line">    WebView.setWebContentsDebuggingEnabled(<span class="literal">true</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Chrome-DevTools"><a href="#Chrome-DevTools" class="headerlink" title="Chrome DevTools"></a>Chrome DevTools</h3><ol>
+<li>连接设备</li>
+<li>打开 <code>chrome://inspect</code></li>
+<li>选择 WebView 进行调试</li>
+</ol>
+<h2 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://developer.android.com/develop/ui/views/layout/webapps/native-api-access-jsbridge">Access native APIs with JavaScript bridge</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/wragony/Android-JsBridge">Android-JsBridge - GitHub</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/xwdrhgr/article/details/159736520">WebView与Hybrid混合开发完全指南</a></li>
+</ul>
+<hr>
+<p><em>持续学习中…</em></p>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/Android/" rel="tag">Android</a>, <a class="tag-none-link" href="/blog/tags/Hybrid/" rel="tag">Hybrid</a>, <a class="tag-none-link" href="/blog/tags/JSBridge/" rel="tag">JSBridge</a>, <a class="tag-none-link" href="/blog/tags/JavaScript/" rel="tag">JavaScript</a>, <a class="tag-none-link" href="/blog/tags/WebView/" rel="tag">WebView</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-03T15:19:13.396Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Kotlin扩展函数与DSL构建学习" href="/blog/2026/04/03/Kotlin扩展函数与DSL构建学习/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" Kotlin委托模式学习-类委托与属性委托" href="/blog/2026/04/03/Kotlin委托模式学习-类委托与属性委托/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>

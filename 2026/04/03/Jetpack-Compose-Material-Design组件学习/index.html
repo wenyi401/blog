@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>Jetpack Compose Material Design组件学习 | Wenyi&#39;s Blog</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/03/Jetpack-Compose-Material-Design%E7%BB%84%E4%BB%B6%E5%AD%A6%E4%B9%A0/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="Android, Jetpack Compose, Material Design, UI组件" />
+  
+  <meta name="description" content="前言Jetpack Compose 提供了 Material Design 的实现，后者是一个用于创建数字界面的综合设计系统。您可以使用可组合函数来实现 Material 组件。 一、Material Design 3添加依赖1234dependencies &#123;    implementation(&quot;androidx.compose.material3:material3:1.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Jetpack Compose Material Design组件学习">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/03/Jetpack-Compose-Material-Design%E7%BB%84%E4%BB%B6%E5%AD%A6%E4%B9%A0/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:description" content="前言Jetpack Compose 提供了 Material Design 的实现，后者是一个用于创建数字界面的综合设计系统。您可以使用可组合函数来实现 Material 组件。 一、Material Design 3添加依赖1234dependencies &#123;    implementation(&quot;androidx.compose.material3:material3:1.">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-04-03T23:46:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T15:48:43.200Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="Jetpack Compose">
+<meta property="article:tag" content="Material Design">
+<meta property="article:tag" content="UI组件">
+<meta name="twitter:card" content="summary">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Jetpack Compose Material Design组件学习","description":"前言Jetpack Compose 提供了 Material Design 的实现，后者是一个用于创建数字界面的综合设计系统。您可以使用可组合函数来实现 Ma...","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:46:00.000Z","dateModified":"2026-04-03T15:48:43.200Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Jetpack-Compose-Material-Design%E7%BB%84%E4%BB%B6%E5%AD%A6%E4%B9%A0/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/03/Jetpack-Compose-Material-Design%E7%BB%84%E4%BB%B6%E5%AD%A6%E4%B9%A0/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Jetpack Compose Material Design组件学习</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-03T23:46:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-03</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~6.53K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Jetpack Compose 提供了 Material Design 的实现，后者是一个用于创建数字界面的综合设计系统。您可以使用可组合函数来实现 Material 组件。</p>
+<h2 id="一、Material-Design-3"><a href="#一、Material-Design-3" class="headerlink" title="一、Material Design 3"></a>一、Material Design 3</h2><h3 id="添加依赖"><a href="#添加依赖" class="headerlink" title="添加依赖"></a>添加依赖</h3><figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">dependencies</span> &#123;</span><br><span class="line">    implementation(<span class="string">&quot;androidx.compose.material3:material3:1.3.1&quot;</span>)</span><br><span class="line">    implementation(<span class="string">&quot;androidx.compose.material3:material3-window-size-class:1.3.1&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="MaterialTheme"><a href="#MaterialTheme" class="headerlink" title="MaterialTheme"></a>MaterialTheme</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">MaterialTheme &#123;</span><br><span class="line">    <span class="comment">// 应用内容</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="二、常用组件"><a href="#二、常用组件" class="headerlink" title="二、常用组件"></a>二、常用组件</h2><h3 id="Button"><a href="#Button" class="headerlink" title="Button"></a>Button</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">Button(onClick = &#123; &#125;) &#123;</span><br><span class="line">    Text(<span class="string">&quot;Button&quot;</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">OutlinedButton(onClick = &#123; &#125;) &#123;</span><br><span class="line">    Text(<span class="string">&quot;Outlined Button&quot;</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">TextButton(onClick = &#123; &#125;) &#123;</span><br><span class="line">    Text(<span class="string">&quot;Text Button&quot;</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">FilledTonalButton(onClick = &#123; &#125;) &#123;</span><br><span class="line">    Text(<span class="string">&quot;Tonal Button&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Card"><a href="#Card" class="headerlink" title="Card"></a>Card</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Card(</span><br><span class="line">    modifier = Modifier</span><br><span class="line">        .fillMaxWidth()</span><br><span class="line">        .padding(<span class="number">16.</span>dp)</span><br><span class="line">) &#123;</span><br><span class="line">    Column(</span><br><span class="line">        modifier = Modifier.padding(<span class="number">16.</span>dp)</span><br><span class="line">    ) &#123;</span><br><span class="line">        Text(<span class="string">&quot;Card Title&quot;</span>, style = MaterialTheme.typography.headlineSmall)</span><br><span class="line">        Text(<span class="string">&quot;Card content&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="TextField"><a href="#TextField" class="headerlink" title="TextField"></a>TextField</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> text <span class="keyword">by</span> remember &#123; mutableStateOf(<span class="string">&quot;&quot;</span>) &#125;</span><br><span class="line"></span><br><span class="line">OutlinedTextField(</span><br><span class="line">    value = text,</span><br><span class="line">    onValueChange = &#123; text = it &#125;,</span><br><span class="line">    label = &#123; Text(<span class="string">&quot;Label&quot;</span>) &#125;,</span><br><span class="line">    modifier = Modifier.fillMaxWidth()</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">TextField(</span><br><span class="line">    value = text,</span><br><span class="line">    onValueChange = &#123; text = it &#125;,</span><br><span class="line">    label = &#123; Text(<span class="string">&quot;Label&quot;</span>) &#125;</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<h3 id="IconButton"><a href="#IconButton" class="headerlink" title="IconButton"></a>IconButton</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">IconButton(onClick = &#123; &#125;) &#123;</span><br><span class="line">    Icon(Icons.Default.Favorite, contentDescription = <span class="string">&quot;Favorite&quot;</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">IconToggleButton(checked = isChecked, onCheckedChange = &#123; &#125;) &#123;</span><br><span class="line">    Icon(Icons.Default.Favorite, contentDescription = <span class="string">&quot;Favorite&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="FloatingActionButton"><a href="#FloatingActionButton" class="headerlink" title="FloatingActionButton"></a>FloatingActionButton</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">FloatingActionButton(onClick = &#123; &#125;) &#123;</span><br><span class="line">    Icon(Icons.Default.Add, contentDescription = <span class="string">&quot;Add&quot;</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">ExtendedFloatingActionButton(</span><br><span class="line">    onClick = &#123; &#125;,</span><br><span class="line">    icon = &#123; Icon(Icons.Default.Add, contentDescription = <span class="string">&quot;Add&quot;</span>) &#125;,</span><br><span class="line">    text = &#123; Text(<span class="string">&quot;Add&quot;</span>) &#125;</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<h2 id="三、布局组件"><a href="#三、布局组件" class="headerlink" title="三、布局组件"></a>三、布局组件</h2><h3 id="Scaffold"><a href="#Scaffold" class="headerlink" title="Scaffold"></a>Scaffold</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">Scaffold(</span><br><span class="line">    topBar = &#123;</span><br><span class="line">        TopAppBar(</span><br><span class="line">            title = &#123; Text(<span class="string">&quot;Title&quot;</span>) &#125;</span><br><span class="line">        )</span><br><span class="line">    &#125;,</span><br><span class="line">    floatingActionButton = &#123;</span><br><span class="line">        FloatingActionButton(onClick = &#123; &#125;) &#123;</span><br><span class="line">            Icon(Icons.Default.Add, contentDescription = <span class="string">&quot;Add&quot;</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">) &#123; padding -&gt;</span><br><span class="line">    Column(modifier = Modifier.padding(padding)) &#123;</span><br><span class="line">        Text(<span class="string">&quot;Content&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="BottomNavigation"><a href="#BottomNavigation" class="headerlink" title="BottomNavigation"></a>BottomNavigation</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">NavigationBar &#123;</span><br><span class="line">    items.forEach &#123; item -&gt;</span><br><span class="line">        NavigationBarItem(</span><br><span class="line">            icon = &#123; Icon(item.icon, contentDescription = item.label) &#125;,</span><br><span class="line">            label = &#123; Text(item.label) &#125;,</span><br><span class="line">            selected = item.selected,</span><br><span class="line">            onClick = &#123; &#125;</span><br><span class="line">        )</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="NavigationDrawer"><a href="#NavigationDrawer" class="headerlink" title="NavigationDrawer"></a>NavigationDrawer</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">ModalNavigationDrawer(</span><br><span class="line">    drawerContent = &#123;</span><br><span class="line">        ModalDrawerSheet &#123;</span><br><span class="line">            Text(<span class="string">&quot;Drawer content&quot;</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">) &#123;</span><br><span class="line">    <span class="comment">// 主内容</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、对话框"><a href="#四、对话框" class="headerlink" title="四、对话框"></a>四、对话框</h2><h3 id="AlertDialog"><a href="#AlertDialog" class="headerlink" title="AlertDialog"></a>AlertDialog</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">AlertDialog(</span><br><span class="line">    onDismissRequest = &#123; &#125;,</span><br><span class="line">    title = &#123; Text(<span class="string">&quot;Title&quot;</span>) &#125;,</span><br><span class="line">    text = &#123; Text(<span class="string">&quot;Message&quot;</span>) &#125;,</span><br><span class="line">    confirmButton = &#123;</span><br><span class="line">        TextButton(onClick = &#123; &#125;) &#123;</span><br><span class="line">            Text(<span class="string">&quot;Confirm&quot;</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    dismissButton = &#123;</span><br><span class="line">        TextButton(onClick = &#123; &#125;) &#123;</span><br><span class="line">            Text(<span class="string">&quot;Dismiss&quot;</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<h3 id="DatePicker"><a href="#DatePicker" class="headerlink" title="DatePicker"></a>DatePicker</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> datePickerState = rememberDatePickerState()</span><br><span class="line">DatePicker(</span><br><span class="line">    state = datePickerState,</span><br><span class="line">    modifier = Modifier.padding(<span class="number">16.</span>dp)</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<h2 id="五、信息展示"><a href="#五、信息展示" class="headerlink" title="五、信息展示"></a>五、信息展示</h2><h3 id="Chip"><a href="#Chip" class="headerlink" title="Chip"></a>Chip</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">FilterChip(</span><br><span class="line">    selected = isSelected,</span><br><span class="line">    onClick = &#123; &#125;,</span><br><span class="line">    label = &#123; Text(<span class="string">&quot;Chip&quot;</span>) &#125;</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">InputChip(</span><br><span class="line">    selected = isSelected,</span><br><span class="line">    onClick = &#123; &#125;,</span><br><span class="line">    label = &#123; Text(<span class="string">&quot;Input Chip&quot;</span>) &#125;</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">AssistChip(</span><br><span class="line">    onClick = &#123; &#125;,</span><br><span class="line">    label = &#123; Text(<span class="string">&quot;Assist Chip&quot;</span>) &#125;</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<h3 id="Badge"><a href="#Badge" class="headerlink" title="Badge"></a>Badge</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">BadgedBox(</span><br><span class="line">    badge = &#123;</span><br><span class="line">        Badge &#123; Text(<span class="string">&quot;8&quot;</span>) &#125;</span><br><span class="line">    &#125;</span><br><span class="line">) &#123;</span><br><span class="line">    Icon(Icons.Default.Mail, contentDescription = <span class="string">&quot;Mail&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="ProgressIndicator"><a href="#ProgressIndicator" class="headerlink" title="ProgressIndicator"></a>ProgressIndicator</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">LinearProgressIndicator(</span><br><span class="line">    modifier = Modifier.fillMaxWidth()</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">CircularProgressIndicator()</span><br><span class="line"></span><br><span class="line">LinearProgressIndicator(</span><br><span class="line">    progress = &#123; <span class="number">0.7f</span> &#125;</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<h3 id="Slider"><a href="#Slider" class="headerlink" title="Slider"></a>Slider</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> sliderValue <span class="keyword">by</span> remember &#123; mutableFloatStateOf(<span class="number">0f</span>) &#125;</span><br><span class="line"></span><br><span class="line">Slider(</span><br><span class="line">    value = sliderValue,</span><br><span class="line">    onValueChange = &#123; sliderValue = it &#125;,</span><br><span class="line">    valueRange = <span class="number">0f</span>.<span class="number">.100f</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<h2 id="六、Switch"><a href="#六、Switch" class="headerlink" title="六、Switch"></a>六、Switch</h2><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> checked <span class="keyword">by</span> remember &#123; mutableStateOf(<span class="literal">false</span>) &#125;</span><br><span class="line"></span><br><span class="line">Switch(</span><br><span class="line">    checked = checked,</span><br><span class="line">    onCheckedChange = &#123; checked = it &#125;</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">Checkbox(</span><br><span class="line">    checked = checked,</span><br><span class="line">    onCheckedChange = &#123; checked = it &#125;</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">RadioButton(</span><br><span class="line">    selected = selected,</span><br><span class="line">    onClick = &#123; &#125;</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<h2 id="七、List-组件"><a href="#七、List-组件" class="headerlink" title="七、List 组件"></a>七、List 组件</h2><h3 id="LazyColumn"><a href="#LazyColumn" class="headerlink" title="LazyColumn"></a>LazyColumn</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">LazyColumn &#123;</span><br><span class="line">    items(items) &#123; item -&gt;</span><br><span class="line">        ListItem(</span><br><span class="line">            headlineContent = &#123; Text(item.title) &#125;,</span><br><span class="line">            supportingContent = &#123; Text(item.subtitle) &#125;,</span><br><span class="line">            leadingContent = &#123;</span><br><span class="line">                Icon(Icons.Default.Person, contentDescription = <span class="literal">null</span>)</span><br><span class="line">            &#125;,</span><br><span class="line">            trailingContent = &#123;</span><br><span class="line">                Icon(Icons.Default.ArrowForward, contentDescription = <span class="literal">null</span>)</span><br><span class="line">            &#125;</span><br><span class="line">        )</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="LazyRow"><a href="#LazyRow" class="headerlink" title="LazyRow"></a>LazyRow</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">LazyRow &#123;</span><br><span class="line">    items(items) &#123; item -&gt;</span><br><span class="line">        Card &#123;</span><br><span class="line">            Text(item.name)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="八、主题配置"><a href="#八、主题配置" class="headerlink" title="八、主题配置"></a>八、主题配置</h2><h3 id="Color-Scheme"><a href="#Color-Scheme" class="headerlink" title="Color Scheme"></a>Color Scheme</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">val</span> LightColorScheme = lightColorScheme(</span><br><span class="line">    primary = Purple40,</span><br><span class="line">    secondary = PurpleGrey40,</span><br><span class="line">    tertiary = Pink40</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">val</span> DarkColorScheme = darkColorScheme(</span><br><span class="line">    primary = Purple80,</span><br><span class="line">    secondary = PurpleGrey80,</span><br><span class="line">    tertiary = Pink80</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">MaterialTheme(</span><br><span class="line">    colorScheme = <span class="keyword">if</span> (darkTheme) DarkColorScheme <span class="keyword">else</span> LightColorScheme</span><br><span class="line">) &#123;</span><br><span class="line">    <span class="comment">// 应用内容</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Typography"><a href="#Typography" class="headerlink" title="Typography"></a>Typography</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> Typography = Typography(</span><br><span class="line">    bodyLarge = TextStyle(</span><br><span class="line">        fontFamily = FontFamily.Default,</span><br><span class="line">        fontWeight = FontWeight.Normal,</span><br><span class="line">        fontSize = <span class="number">16.</span>sp,</span><br><span class="line">        lineHeight = <span class="number">24.</span>sp,</span><br><span class="line">        letterSpacing = <span class="number">0.5</span>.sp</span><br><span class="line">    )</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">MaterialTheme(typography = Typography) &#123;</span><br><span class="line">    <span class="comment">// 应用内容</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="九、最佳实践"><a href="#九、最佳实践" class="headerlink" title="九、最佳实践"></a>九、最佳实践</h2><ol>
+<li><strong>使用 MaterialTheme</strong>：确保一致的设计</li>
+<li><strong>合理使用组件</strong>：根据场景选择合适的组件</li>
+<li><strong>遵循 Material Design 指南</strong>：保持设计一致性</li>
+<li><strong>测试深色模式</strong>：确保深色主题正常显示</li>
+<li><strong>无障碍设计</strong>：添加 contentDescription</li>
+</ol>
+<h2 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://developer.android.com/develop/ui/compose/components?hl=zh-cn">Material 组件 | Jetpack Compose | Android Developers</a></li>
+<li><a target="_blank" rel="noopener" href="https://m3.material.io/develop/android/jetpack-compose">Material Design 3 for Jetpack Compose</a></li>
+<li><a target="_blank" rel="noopener" href="https://juejin.cn/post/7374343669208301577">Compose 中的 Material Design 3</a></li>
+</ul>
+<hr>
+<p><em>持续学习中…</em></p>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/Android/" rel="tag">Android</a>, <a class="tag-none-link" href="/blog/tags/Jetpack-Compose/" rel="tag">Jetpack Compose</a>, <a class="tag-none-link" href="/blog/tags/Material-Design/" rel="tag">Material Design</a>, <a class="tag-none-link" href="/blog/tags/UI%E7%BB%84%E4%BB%B6/" rel="tag">UI组件</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-03T15:48:43.200Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Kotlin协程Job与SupervisorJob取消机制" href="/blog/2026/04/03/Kotlin协程Job与SupervisorJob取消机制/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" Kotlin正则表达式Regex实战学习" href="/blog/2026/04/03/Kotlin正则表达式Regex实战学习/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>

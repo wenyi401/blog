@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>Kotlin Flow异步数据流学习 | Wenyi&#39;s Blog</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/03/Kotlin-Flow%E5%BC%82%E6%AD%A5%E6%95%B0%E6%8D%AE%E6%B5%81%E5%AD%A6%E4%B9%A0/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="Flow, Kotlin, 协程, 异步编程" />
+  
+  <meta name="description" content="前言Kotlin Flow 是一种异步数据流处理方式，用于表示多个异步计算的值。它是 Kotlin 协程的重要组成部分，提供了一种简洁、类型安全的方式来处理异步数据流。 Flow 概述为什么需要 Flow？ ** suspending 函数**：返回单个异步值 集合：返回多个同步值 Flow：返回多个异步值  基本使用12345678910111213import kotlinx.coroutin">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kotlin Flow异步数据流学习">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/03/Kotlin-Flow%E5%BC%82%E6%AD%A5%E6%95%B0%E6%8D%AE%E6%B5%81%E5%AD%A6%E4%B9%A0/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:description" content="前言Kotlin Flow 是一种异步数据流处理方式，用于表示多个异步计算的值。它是 Kotlin 协程的重要组成部分，提供了一种简洁、类型安全的方式来处理异步数据流。 Flow 概述为什么需要 Flow？ ** suspending 函数**：返回单个异步值 集合：返回多个同步值 Flow：返回多个异步值  基本使用12345678910111213import kotlinx.coroutin">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-04-03T19:09:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T11:09:40.252Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="Flow">
+<meta property="article:tag" content="Kotlin">
+<meta property="article:tag" content="协程">
+<meta property="article:tag" content="异步编程">
+<meta name="twitter:card" content="summary">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Kotlin Flow异步数据流学习","description":"前言Kotlin Flow 是一种异步数据流处理方式，用于表示多个异步计算的值。它是 Kotlin 协程的重要组成部分，提供了一种简洁、类型安全的方式来处理异...","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T19:09:00.000Z","dateModified":"2026-04-03T11:09:40.252Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Kotlin-Flow%E5%BC%82%E6%AD%A5%E6%95%B0%E6%8D%AE%E6%B5%81%E5%AD%A6%E4%B9%A0/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/03/Kotlin-Flow%E5%BC%82%E6%AD%A5%E6%95%B0%E6%8D%AE%E6%B5%81%E5%AD%A6%E4%B9%A0/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Kotlin Flow异步数据流学习</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-03T19:09:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-03</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~3.17K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Kotlin Flow 是一种异步数据流处理方式，用于表示多个异步计算的值。它是 Kotlin 协程的重要组成部分，提供了一种简洁、类型安全的方式来处理异步数据流。</p>
+<h2 id="Flow-概述"><a href="#Flow-概述" class="headerlink" title="Flow 概述"></a>Flow 概述</h2><h3 id="为什么需要-Flow？"><a href="#为什么需要-Flow？" class="headerlink" title="为什么需要 Flow？"></a>为什么需要 Flow？</h3><ul>
+<li>** suspending 函数**：返回单个异步值</li>
+<li><strong>集合</strong>：返回多个同步值</li>
+<li><strong>Flow</strong>：返回多个异步值</li>
+</ul>
+<h3 id="基本使用"><a href="#基本使用" class="headerlink" title="基本使用"></a>基本使用</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> kotlinx.coroutines.*</span><br><span class="line"><span class="keyword">import</span> kotlinx.coroutines.flow.*</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">simple</span><span class="params">()</span></span>: Flow&lt;<span class="built_in">Int</span>&gt; = flow &#123; <span class="comment">// flow 构建器</span></span><br><span class="line">    <span class="keyword">for</span> (i <span class="keyword">in</span> <span class="number">1.</span><span class="number">.3</span>) &#123;</span><br><span class="line">        delay(<span class="number">100</span>) <span class="comment">// 模拟异步操作</span></span><br><span class="line">        emit(i) <span class="comment">// 发射值</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> = runBlocking&lt;<span class="built_in">Unit</span>&gt; &#123;</span><br><span class="line">    simple().collect &#123; value -&gt; println(value) &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Flow-特点"><a href="#Flow-特点" class="headerlink" title="Flow 特点"></a>Flow 特点</h2><h3 id="1-冷流（Cold-Stream）"><a href="#1-冷流（Cold-Stream）" class="headerlink" title="1. 冷流（Cold Stream）"></a>1. 冷流（Cold Stream）</h3><p>Flow 是冷流，代码在收集时才运行：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">simple</span><span class="params">()</span></span>: Flow&lt;<span class="built_in">Int</span>&gt; = flow &#123;</span><br><span class="line">    println(<span class="string">&quot;Flow started&quot;</span>)</span><br><span class="line">    <span class="keyword">for</span> (i <span class="keyword">in</span> <span class="number">1.</span><span class="number">.3</span>) &#123;</span><br><span class="line">        delay(<span class="number">100</span>)</span><br><span class="line">        emit(i)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> = runBlocking&lt;<span class="built_in">Unit</span>&gt; &#123;</span><br><span class="line">    println(<span class="string">&quot;Calling simple function...&quot;</span>)</span><br><span class="line">    <span class="keyword">val</span> flow = simple() <span class="comment">// 此时不会执行</span></span><br><span class="line">    println(<span class="string">&quot;Calling collect...&quot;</span>)</span><br><span class="line">    flow.collect &#123; value -&gt; println(value) &#125; <span class="comment">// 此时才执行</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-不阻塞主线程"><a href="#2-不阻塞主线程" class="headerlink" title="2. 不阻塞主线程"></a>2. 不阻塞主线程</h3><p>Flow 可以在不阻塞主线程的情况下处理异步数据：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> = runBlocking&lt;<span class="built_in">Unit</span>&gt; &#123;</span><br><span class="line">    launch &#123;</span><br><span class="line">        <span class="keyword">for</span> (k <span class="keyword">in</span> <span class="number">1.</span><span class="number">.3</span>) &#123;</span><br><span class="line">            println(<span class="string">&quot;I&#x27;m not blocked <span class="variable">$k</span>&quot;</span>)</span><br><span class="line">            delay(<span class="number">100</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    simple().collect &#123; value -&gt; println(value) &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-协程取消支持"><a href="#3-协程取消支持" class="headerlink" title="3. 协程取消支持"></a>3. 协程取消支持</h3><p>Flow 遵循协程的取消机制：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> = runBlocking&lt;<span class="built_in">Unit</span>&gt; &#123;</span><br><span class="line">    withTimeoutOrNull(<span class="number">250</span>) &#123;</span><br><span class="line">        simple().collect &#123; value -&gt; println(value) &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    println(<span class="string">&quot;Done&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Flow-构建器"><a href="#Flow-构建器" class="headerlink" title="Flow 构建器"></a>Flow 构建器</h2><h3 id="1-flow-…"><a href="#1-flow-…" class="headerlink" title="1. flow { … }"></a>1. flow { … }</h3><p>最基本的构建器：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">simple</span><span class="params">()</span></span>: Flow&lt;<span class="built_in">Int</span>&gt; = flow &#123;</span><br><span class="line">    <span class="keyword">for</span> (i <span class="keyword">in</span> <span class="number">1.</span><span class="number">.3</span>) &#123;</span><br><span class="line">        emit(i)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-flowOf"><a href="#2-flowOf" class="headerlink" title="2. flowOf()"></a>2. flowOf()</h3><p>定义固定值的 Flow：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">flowOf(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>).collect &#123; value -&gt; println(value) &#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-asFlow"><a href="#3-asFlow" class="headerlink" title="3. asFlow()"></a>3. asFlow()</h3><p>将集合&#x2F;序列转换为 Flow：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(<span class="number">1.</span><span class="number">.3</span>).asFlow().collect &#123; value -&gt; println(value) &#125;</span><br><span class="line">listOf(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>).asFlow().collect &#123; value -&gt; println(value) &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Flow-操作符"><a href="#Flow-操作符" class="headerlink" title="Flow 操作符"></a>Flow 操作符</h2><h3 id="中间操作符"><a href="#中间操作符" class="headerlink" title="中间操作符"></a>中间操作符</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> = runBlocking&lt;<span class="built_in">Unit</span>&gt; &#123;</span><br><span class="line">    (<span class="number">1.</span><span class="number">.10</span>).asFlow()</span><br><span class="line">        .filter &#123; it % <span class="number">2</span> == <span class="number">0</span> &#125; <span class="comment">// 过滤偶数</span></span><br><span class="line">        .map &#123; it * it &#125; <span class="comment">// 平方</span></span><br><span class="line">        .collect &#123; value -&gt; println(value) &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="常用操作符"><a href="#常用操作符" class="headerlink" title="常用操作符"></a>常用操作符</h3><table>
+<thead>
+<tr>
+<th>操作符</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>map</td>
+<td>转换每个值</td>
+</tr>
+<tr>
+<td>filter</td>
+<td>过滤值</td>
+</tr>
+<tr>
+<td>take</td>
+<td>取前 n 个值</td>
+</tr>
+<tr>
+<td>drop</td>
+<td>丢弃前 n 个值</td>
+</tr>
+<tr>
+<td>onEach</td>
+<td>对每个值执行操作</td>
+</tr>
+<tr>
+<td>onStart</td>
+<td>Flow 开始时执行</td>
+</tr>
+<tr>
+<td>onCompletion</td>
+<td>Flow 完成时执行</td>
+</tr>
+<tr>
+<td>catch</td>
+<td>捕获异常</td>
+</tr>
+<tr>
+<td>retry</td>
+<td>重试</td>
+</tr>
+</tbody></table>
+<h2 id="终端操作符"><a href="#终端操作符" class="headerlink" title="终端操作符"></a>终端操作符</h2><h3 id="collect"><a href="#collect" class="headerlink" title="collect"></a>collect</h3><p>收集 Flow 中的所有值：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">flow.collect &#123; value -&gt; println(value) &#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="toList"><a href="#toList" class="headerlink" title="toList"></a>toList</h3><p>将 Flow 转换为 List：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> list = flow.toList()</span><br></pre></td></tr></table></figure>
+
+<h3 id="first-last"><a href="#first-last" class="headerlink" title="first &#x2F; last"></a>first &#x2F; last</h3><p>获取第一个&#x2F;最后一个值：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> first = flow.first()</span><br><span class="line"><span class="keyword">val</span> last = flow.last()</span><br></pre></td></tr></table></figure>
+
+<h3 id="collectLatest"><a href="#collectLatest" class="headerlink" title="collectLatest"></a>collectLatest</h3><p>只收集最新的值：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">flow.collectLatest &#123; value -&gt;</span><br><span class="line">    delay(<span class="number">100</span>)</span><br><span class="line">    println(value)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="背压处理"><a href="#背压处理" class="headerlink" title="背压处理"></a>背压处理</h2><h3 id="buffer"><a href="#buffer" class="headerlink" title="buffer"></a>buffer</h3><p>使用缓冲区处理背压：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">flow</span><br><span class="line">    .buffer(<span class="number">10</span>)</span><br><span class="line">    .collect &#123; value -&gt; println(value) &#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="conflate"><a href="#conflate" class="headerlink" title="conflate"></a>conflate</h3><p>只保留最新值：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">flow</span><br><span class="line">    .conflate()</span><br><span class="line">    .collect &#123; value -&gt; println(value) &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="冷流-vs-热流"><a href="#冷流-vs-热流" class="headerlink" title="冷流 vs 热流"></a>冷流 vs 热流</h2><h3 id="冷流（Flow）"><a href="#冷流（Flow）" class="headerlink" title="冷流（Flow）"></a>冷流（Flow）</h3><ul>
+<li>每次收集都会重新执行</li>
+<li>没有订阅者时不产生数据</li>
+</ul>
+<h3 id="热流（SharedFlow-StateFlow）"><a href="#热流（SharedFlow-StateFlow）" class="headerlink" title="热流（SharedFlow, StateFlow）"></a>热流（SharedFlow, StateFlow）</h3><ul>
+<li>多个订阅者共享同一个流</li>
+<li>没有订阅者时也可能产生数据</li>
+</ul>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> sharedFlow = MutableSharedFlow&lt;<span class="built_in">Int</span>&gt;()</span><br><span class="line">sharedFlow.emit(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> stateFlow = MutableStateFlow(<span class="number">0</span>)</span><br><span class="line">stateFlow.value = <span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://kotlinlang.org/docs/flow.html">Kotlin Flow 官方文档</a></li>
+<li><a target="_blank" rel="noopener" href="https://jishuzhan.net/article/1941771856213749761">Kotlin 协程：Channel 与 Flow 深度对比</a></li>
+<li><a target="_blank" rel="noopener" href="https://juejin.cn/post/7597623395907829806">Flow 与 Channel 驯服异步数据流</a></li>
+</ul>
+<h2 id="下一步"><a href="#下一步" class="headerlink" title="下一步"></a>下一步</h2><ul>
+<li>学习 Kotlin Channel</li>
+<li>学习 SharedFlow 和 StateFlow</li>
+<li>实践 Flow 在 Android 项目中的应用</li>
+</ul>
+<hr>
+<p><em>持续学习中…</em></p>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/Flow/" rel="tag">Flow</a>, <a class="tag-none-link" href="/blog/tags/Kotlin/" rel="tag">Kotlin</a>, <a class="tag-none-link" href="/blog/tags/%E5%8D%8F%E7%A8%8B/" rel="tag">协程</a>, <a class="tag-none-link" href="/blog/tags/%E5%BC%82%E6%AD%A5%E7%BC%96%E7%A8%8B/" rel="tag">异步编程</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-03T11:09:40.252Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Android Jetpack组件学习-WorkManager后台任务" href="/blog/2026/04/03/Android-Jetpack组件学习-WorkManager后台任务/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" Lua在Android中的深度应用" href="/blog/2026/04/03/Lua在Android中的深度应用/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>

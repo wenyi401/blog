@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>Android JNI NDK Native开发学习 | Wenyi&#39;s Blog</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/03/Android-JNI-NDK-Native%E5%BC%80%E5%8F%91%E5%AD%A6%E4%B9%A0/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="Android, C++, JNI, NDK, Native" />
+  
+  <meta name="description" content="前言Android NDK（Native Development Kit）是一套工具，允许在 Android 应用中使用 C 和 C++ 代码。JNI（Java Native Interface）是 Java 和 Native 代码之间的桥梁。 一、NDK 概述什么是 NDK？ 用于编译 C&#x2F;C++ 代码的工具集 生成 .so 动态库 支持 ARM、x86 等架构  为什么使用 NDK？">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android JNI NDK Native开发学习">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/03/Android-JNI-NDK-Native%E5%BC%80%E5%8F%91%E5%AD%A6%E4%B9%A0/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:description" content="前言Android NDK（Native Development Kit）是一套工具，允许在 Android 应用中使用 C 和 C++ 代码。JNI（Java Native Interface）是 Java 和 Native 代码之间的桥梁。 一、NDK 概述什么是 NDK？ 用于编译 C&#x2F;C++ 代码的工具集 生成 .so 动态库 支持 ARM、x86 等架构  为什么使用 NDK？">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-04-03T23:42:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T15:43:03.292Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="C++">
+<meta property="article:tag" content="JNI">
+<meta property="article:tag" content="NDK">
+<meta property="article:tag" content="Native">
+<meta name="twitter:card" content="summary">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Android JNI NDK Native开发学习","description":"前言Android NDK（Native Development Kit）是一套工具，允许在 Android 应用中使用 C 和 C++ 代码。JNI（Jav...","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:42:00.000Z","dateModified":"2026-04-03T15:43:03.292Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Android-JNI-NDK-Native%E5%BC%80%E5%8F%91%E5%AD%A6%E4%B9%A0/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/03/Android-JNI-NDK-Native%E5%BC%80%E5%8F%91%E5%AD%A6%E4%B9%A0/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Android JNI NDK Native开发学习</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-03T23:42:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-03</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~4.89K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Android NDK（Native Development Kit）是一套工具，允许在 Android 应用中使用 C 和 C++ 代码。JNI（Java Native Interface）是 Java 和 Native 代码之间的桥梁。</p>
+<h2 id="一、NDK-概述"><a href="#一、NDK-概述" class="headerlink" title="一、NDK 概述"></a>一、NDK 概述</h2><h3 id="什么是-NDK？"><a href="#什么是-NDK？" class="headerlink" title="什么是 NDK？"></a>什么是 NDK？</h3><ul>
+<li>用于编译 C&#x2F;C++ 代码的工具集</li>
+<li>生成 .so 动态库</li>
+<li>支持 ARM、x86 等架构</li>
+</ul>
+<h3 id="为什么使用-NDK？"><a href="#为什么使用-NDK？" class="headerlink" title="为什么使用 NDK？"></a>为什么使用 NDK？</h3><table>
+<thead>
+<tr>
+<th>场景</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>性能优化</strong></td>
+<td>计算密集型任务</td>
+</tr>
+<tr>
+<td><strong>代码复用</strong></td>
+<td>使用现有 C&#x2F;C++ 库</td>
+</tr>
+<tr>
+<td><strong>安全保护</strong></td>
+<td>代码难以逆向</td>
+</tr>
+<tr>
+<td><strong>跨平台</strong></td>
+<td>共享核心逻辑</td>
+</tr>
+</tbody></table>
+<h2 id="二、配置-NDK-项目"><a href="#二、配置-NDK-项目" class="headerlink" title="二、配置 NDK 项目"></a>二、配置 NDK 项目</h2><h3 id="build-gradle"><a href="#build-gradle" class="headerlink" title="build.gradle"></a>build.gradle</h3><figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">android &#123;</span><br><span class="line">    defaultConfig &#123;</span><br><span class="line">        ndk &#123;</span><br><span class="line">            abiFilters <span class="string">&#x27;armeabi-v7a&#x27;</span>, <span class="string">&#x27;arm64-v8a&#x27;</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    externalNativeBuild &#123;</span><br><span class="line">        cmake &#123;</span><br><span class="line">            path <span class="string">&quot;src/main/cpp/CMakeLists.txt&quot;</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="CMakeLists-txt"><a href="#CMakeLists-txt" class="headerlink" title="CMakeLists.txt"></a>CMakeLists.txt</h3><figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">cmake_minimum_required</span>(VERSION <span class="number">3.4</span>.<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">add_library</span>(</span><br><span class="line">    native-lib</span><br><span class="line">    SHARED</span><br><span class="line">    native-lib.cpp</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">find_library</span>(</span><br><span class="line">    log-lib</span><br><span class="line">    log</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">target_link_libraries</span>(</span><br><span class="line">    native-lib</span><br><span class="line">    <span class="variable">$&#123;log-lib&#125;</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<h2 id="三、JNI-基础"><a href="#三、JNI-基础" class="headerlink" title="三、JNI 基础"></a>三、JNI 基础</h2><h3 id="声明-Native-方法"><a href="#声明-Native-方法" class="headerlink" title="声明 Native 方法"></a>声明 Native 方法</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">NativeLib</span> &#123;</span><br><span class="line">    <span class="keyword">external</span> <span class="function"><span class="keyword">fun</span> <span class="title">stringFromJNI</span><span class="params">()</span></span>: String</span><br><span class="line">    <span class="keyword">external</span> <span class="function"><span class="keyword">fun</span> <span class="title">add</span><span class="params">(a: <span class="type">Int</span>, b: <span class="type">Int</span>)</span></span>: <span class="built_in">Int</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">companion</span> <span class="keyword">object</span> &#123;</span><br><span class="line">        <span class="keyword">init</span> &#123;</span><br><span class="line">            System.loadLibrary(<span class="string">&quot;native-lib&quot;</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="实现-JNI-方法"><a href="#实现-JNI-方法" class="headerlink" title="实现 JNI 方法"></a>实现 JNI 方法</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;jni.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">extern</span> <span class="string">&quot;C&quot;</span> <span class="function">JNIEXPORT jstring JNICALL</span></span><br><span class="line"><span class="function"><span class="title">Java_com_example_myapp_NativeLib_stringFromJNI</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">    JNIEnv* env,</span></span></span><br><span class="line"><span class="params"><span class="function">    jobject <span class="comment">/* this */</span>)</span> </span>&#123;</span><br><span class="line">    std::string hello = <span class="string">&quot;Hello from C++&quot;</span>;</span><br><span class="line">    <span class="keyword">return</span> env-&gt;<span class="built_in">NewStringUTF</span>(hello.<span class="built_in">c_str</span>());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">extern</span> <span class="string">&quot;C&quot;</span> <span class="function">JNIEXPORT jint JNICALL</span></span><br><span class="line"><span class="function"><span class="title">Java_com_example_myapp_NativeLib_add</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">    JNIEnv* env,</span></span></span><br><span class="line"><span class="params"><span class="function">    jobject <span class="comment">/* this */</span>,</span></span></span><br><span class="line"><span class="params"><span class="function">    jint a,</span></span></span><br><span class="line"><span class="params"><span class="function">    jint b)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> a + b;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、JNI-类型映射"><a href="#四、JNI-类型映射" class="headerlink" title="四、JNI 类型映射"></a>四、JNI 类型映射</h2><table>
+<thead>
+<tr>
+<th>Java 类型</th>
+<th>JNI 类型</th>
+<th>C++ 类型</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>boolean</td>
+<td>jboolean</td>
+<td>uint8_t</td>
+</tr>
+<tr>
+<td>byte</td>
+<td>jbyte</td>
+<td>int8_t</td>
+</tr>
+<tr>
+<td>char</td>
+<td>jchar</td>
+<td>uint16_t</td>
+</tr>
+<tr>
+<td>short</td>
+<td>jshort</td>
+<td>int16_t</td>
+</tr>
+<tr>
+<td>int</td>
+<td>jint</td>
+<td>int32_t</td>
+</tr>
+<tr>
+<td>long</td>
+<td>jlong</td>
+<td>int64_t</td>
+</tr>
+<tr>
+<td>float</td>
+<td>jfloat</td>
+<td>float</td>
+</tr>
+<tr>
+<td>double</td>
+<td>jdouble</td>
+<td>double</td>
+</tr>
+<tr>
+<td>String</td>
+<td>jstring</td>
+<td>-</td>
+</tr>
+<tr>
+<td>Object</td>
+<td>jobject</td>
+<td>-</td>
+</tr>
+<tr>
+<td>Class</td>
+<td>jclass</td>
+<td>-</td>
+</tr>
+</tbody></table>
+<h2 id="五、字符串处理"><a href="#五、字符串处理" class="headerlink" title="五、字符串处理"></a>五、字符串处理</h2><h3 id="Java-字符串-→-C-字符串"><a href="#Java-字符串-→-C-字符串" class="headerlink" title="Java 字符串 → C++ 字符串"></a>Java 字符串 → C++ 字符串</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">extern</span> <span class="string">&quot;C&quot;</span> <span class="function">JNIEXPORT <span class="type">void</span> JNICALL</span></span><br><span class="line"><span class="function"><span class="title">Java_com_example_myapp_processString</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">    JNIEnv* env,</span></span></span><br><span class="line"><span class="params"><span class="function">    jobject <span class="comment">/* this */</span>,</span></span></span><br><span class="line"><span class="params"><span class="function">    jstring javaString)</span> </span>&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="type">const</span> <span class="type">char</span>* cString = env-&gt;<span class="built_in">GetStringUTFChars</span>(javaString, <span class="literal">nullptr</span>);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 使用 cString</span></span><br><span class="line">    </span><br><span class="line">    env-&gt;<span class="built_in">ReleaseStringUTFChars</span>(javaString, cString);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="C-字符串-→-Java-字符串"><a href="#C-字符串-→-Java-字符串" class="headerlink" title="C++ 字符串 → Java 字符串"></a>C++ 字符串 → Java 字符串</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">extern</span> <span class="string">&quot;C&quot;</span> <span class="function">JNIEXPORT jstring JNICALL</span></span><br><span class="line"><span class="function"><span class="title">Java_com_example_myapp_getString</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">    JNIEnv* env,</span></span></span><br><span class="line"><span class="params"><span class="function">    jobject <span class="comment">/* this */</span>)</span> </span>&#123;</span><br><span class="line">    </span><br><span class="line">    std::string str = <span class="string">&quot;Hello&quot;</span>;</span><br><span class="line">    <span class="keyword">return</span> env-&gt;<span class="built_in">NewStringUTF</span>(str.<span class="built_in">c_str</span>());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="六、数组处理"><a href="#六、数组处理" class="headerlink" title="六、数组处理"></a>六、数组处理</h2><h3 id="获取数组元素"><a href="#获取数组元素" class="headerlink" title="获取数组元素"></a>获取数组元素</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">extern</span> <span class="string">&quot;C&quot;</span> <span class="function">JNIEXPORT jint JNICALL</span></span><br><span class="line"><span class="function"><span class="title">Java_com_example_myapp_sumArray</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">    JNIEnv* env,</span></span></span><br><span class="line"><span class="params"><span class="function">    jobject <span class="comment">/* this */</span>,</span></span></span><br><span class="line"><span class="params"><span class="function">    jintArray array)</span> </span>&#123;</span><br><span class="line">    </span><br><span class="line">    jint* elements = env-&gt;<span class="built_in">GetIntArrayElements</span>(array, <span class="literal">nullptr</span>);</span><br><span class="line">    jsize length = env-&gt;<span class="built_in">GetArrayLength</span>(array);</span><br><span class="line">    </span><br><span class="line">    jint sum = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; length; i++) &#123;</span><br><span class="line">        sum += elements[i];</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    env-&gt;<span class="built_in">ReleaseIntArrayElements</span>(array, elements, <span class="number">0</span>);</span><br><span class="line">    <span class="keyword">return</span> sum;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="七、调用-Java-方法"><a href="#七、调用-Java-方法" class="headerlink" title="七、调用 Java 方法"></a>七、调用 Java 方法</h2><h3 id="获取类和方法"><a href="#获取类和方法" class="headerlink" title="获取类和方法"></a>获取类和方法</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">extern</span> <span class="string">&quot;C&quot;</span> <span class="function">JNIEXPORT <span class="type">void</span> JNICALL</span></span><br><span class="line"><span class="function"><span class="title">Java_com_example_myapp_callJavaMethod</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">    JNIEnv* env,</span></span></span><br><span class="line"><span class="params"><span class="function">    jobject obj)</span> </span>&#123;</span><br><span class="line">    </span><br><span class="line">    jclass clazz = env-&gt;<span class="built_in">GetObjectClass</span>(obj);</span><br><span class="line">    jmethodID method = env-&gt;<span class="built_in">GetMethodID</span>(clazz, <span class="string">&quot;javaMethod&quot;</span>, <span class="string">&quot;()V&quot;</span>);</span><br><span class="line">    </span><br><span class="line">    env-&gt;<span class="built_in">CallVoidMethod</span>(obj, method);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="方法签名"><a href="#方法签名" class="headerlink" title="方法签名"></a>方法签名</h3><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>签名</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>void</td>
+<td>V</td>
+</tr>
+<tr>
+<td>boolean</td>
+<td>Z</td>
+</tr>
+<tr>
+<td>byte</td>
+<td>B</td>
+</tr>
+<tr>
+<td>char</td>
+<td>C</td>
+</tr>
+<tr>
+<td>short</td>
+<td>S</td>
+</tr>
+<tr>
+<td>int</td>
+<td>I</td>
+</tr>
+<tr>
+<td>long</td>
+<td>J</td>
+</tr>
+<tr>
+<td>float</td>
+<td>F</td>
+</tr>
+<tr>
+<td>double</td>
+<td>D</td>
+</tr>
+<tr>
+<td>String</td>
+<td>Ljava&#x2F;lang&#x2F;String;</td>
+</tr>
+</tbody></table>
+<h2 id="八、动态注册"><a href="#八、动态注册" class="headerlink" title="八、动态注册"></a>八、动态注册</h2><h3 id="JNI-OnLoad"><a href="#JNI-OnLoad" class="headerlink" title="JNI_OnLoad"></a>JNI_OnLoad</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> JNINativeMethod methods[] = &#123;</span><br><span class="line">    &#123;<span class="string">&quot;stringFromJNI&quot;</span>, <span class="string">&quot;()Ljava/lang/String;&quot;</span>, (<span class="type">void</span>*)stringFromJNI&#125;,</span><br><span class="line">    &#123;<span class="string">&quot;add&quot;</span>, <span class="string">&quot;(II)I&quot;</span>, (<span class="type">void</span>*)add&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function">jint <span class="title">JNI_OnLoad</span><span class="params">(JavaVM* vm, <span class="type">void</span>* reserved)</span> </span>&#123;</span><br><span class="line">    JNIEnv* env;</span><br><span class="line">    <span class="keyword">if</span> (vm-&gt;<span class="built_in">GetEnv</span>((<span class="type">void</span>**)&amp;env, JNI_VERSION_1_6) != JNI_OK) &#123;</span><br><span class="line">        <span class="keyword">return</span> JNI_ERR;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    jclass clazz = env-&gt;<span class="built_in">FindClass</span>(<span class="string">&quot;com/example/myapp/NativeLib&quot;</span>);</span><br><span class="line">    env-&gt;<span class="built_in">RegisterNatives</span>(clazz, methods, <span class="built_in">sizeof</span>(methods) / <span class="built_in">sizeof</span>(methods[<span class="number">0</span>]));</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> JNI_VERSION_1_6;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="九、性能优化"><a href="#九、性能优化" class="headerlink" title="九、性能优化"></a>九、性能优化</h2><h3 id="1-减少-JNI-调用"><a href="#1-减少-JNI-调用" class="headerlink" title="1. 减少 JNI 调用"></a>1. 减少 JNI 调用</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ❌ 错误：频繁调用 JNI</span></span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">1000</span>; i++) &#123;</span><br><span class="line">    env-&gt;<span class="built_in">CallVoidMethod</span>(obj, method, i);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// ✅ 正确：批量处理</span></span><br><span class="line"><span class="built_in">processBatch</span>(env, obj, data, <span class="number">1000</span>);</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-缓存-JNI-引用"><a href="#2-缓存-JNI-引用" class="headerlink" title="2. 缓存 JNI 引用"></a>2. 缓存 JNI 引用</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> jmethodID gMethod = <span class="literal">nullptr</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">init</span><span class="params">(JNIEnv* env, jclass clazz)</span> </span>&#123;</span><br><span class="line">    gMethod = env-&gt;<span class="built_in">GetMethodID</span>(clazz, <span class="string">&quot;method&quot;</span>, <span class="string">&quot;()V&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-使用直接缓冲区"><a href="#3-使用直接缓冲区" class="headerlink" title="3. 使用直接缓冲区"></a>3. 使用直接缓冲区</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jobject buffer = env-&gt;<span class="built_in">NewDirectByteBuffer</span>(data, size);</span><br></pre></td></tr></table></figure>
+
+<h2 id="十、调试技巧"><a href="#十、调试技巧" class="headerlink" title="十、调试技巧"></a>十、调试技巧</h2><h3 id="日志输出"><a href="#日志输出" class="headerlink" title="日志输出"></a>日志输出</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;android/log.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, <span class="string">&quot;Native&quot;</span>, __VA_ARGS__)</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">LOGD</span>(<span class="string">&quot;Value: %d&quot;</span>, value);</span><br></pre></td></tr></table></figure>
+
+<h3 id="检查异常"><a href="#检查异常" class="headerlink" title="检查异常"></a>检查异常</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (env-&gt;<span class="built_in">ExceptionCheck</span>()) &#123;</span><br><span class="line">    env-&gt;<span class="built_in">ExceptionDescribe</span>();</span><br><span class="line">    env-&gt;<span class="built_in">ExceptionClear</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://developer.android.com/ndk/guides/">Get started with the NDK | Android Developers</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.zhifeiya.cn/post/2026/1/24/d5433e42">Android NDK开发实战：JNI调用与性能优化技巧</a></li>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/547250316">Ndk 系列：Jni 从入门到实践</a></li>
+</ul>
+<hr>
+<p><em>持续学习中…</em></p>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/Android/" rel="tag">Android</a>, <a class="tag-none-link" href="/blog/tags/C/" rel="tag">C++</a>, <a class="tag-none-link" href="/blog/tags/JNI/" rel="tag">JNI</a>, <a class="tag-none-link" href="/blog/tags/NDK/" rel="tag">NDK</a>, <a class="tag-none-link" href="/blog/tags/Native/" rel="tag">Native</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-03T15:43:03.292Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Kotlin Flow操作符实战-map filter transform" href="/blog/2026/04/03/Kotlin-Flow操作符实战-map-filter-transform/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" Kotlin Scope Functions详解-let run with apply also" href="/blog/2026/04/03/Kotlin-Scope-Functions详解-let-run-with-apply-also/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>

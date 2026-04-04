@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>Kotlin集合框架深度解析 | Wenyi&#39;s Blog</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/04/Kotlin%E9%9B%86%E5%90%88%E6%A1%86%E6%9E%B6%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="Collections, Kotlin, List, Map, Set" />
+  
+  <meta name="description" content="前言Kotlin 标准库提供了一套全面的集合管理工具。集合是一组可变数量的项目，包含三种基本类型：List、Set 和 Map。 一、集合类型概览   类型 特点 示例    List 有序，可重复 电话号码   Set 无序，唯一 彩票号码   Map 键值对，键唯一 员工 ID 与职位   二、只读与可变集合Kotlin 为每种集合类型提供两个接口：  只读接口：提供访问操作 可变接口：扩展只">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kotlin集合框架深度解析">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/04/Kotlin%E9%9B%86%E5%90%88%E6%A1%86%E6%9E%B6%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:description" content="前言Kotlin 标准库提供了一套全面的集合管理工具。集合是一组可变数量的项目，包含三种基本类型：List、Set 和 Map。 一、集合类型概览   类型 特点 示例    List 有序，可重复 电话号码   Set 无序，唯一 彩票号码   Map 键值对，键唯一 员工 ID 与职位   二、只读与可变集合Kotlin 为每种集合类型提供两个接口：  只读接口：提供访问操作 可变接口：扩展只">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-04-04T02:50:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T18:48:57.988Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="Collections">
+<meta property="article:tag" content="Kotlin">
+<meta property="article:tag" content="List">
+<meta property="article:tag" content="Map">
+<meta property="article:tag" content="Set">
+<meta name="twitter:card" content="summary">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Kotlin集合框架深度解析","description":"前言Kotlin 标准库提供了一套全面的集合管理工具。集合是一组可变数量的项目，包含三种基本类型：List、Set 和 Map。\n","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-04T02:50:00.000Z","dateModified":"2026-04-03T18:48:57.988Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/04/Kotlin%E9%9B%86%E5%90%88%E6%A1%86%E6%9E%B6%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/04/Kotlin%E9%9B%86%E5%90%88%E6%A1%86%E6%9E%B6%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Kotlin集合框架深度解析</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-04T02:50:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-04</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~4.80K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Kotlin 标准库提供了一套全面的集合管理工具。集合是一组可变数量的项目，包含三种基本类型：List、Set 和 Map。</p>
+<h2 id="一、集合类型概览"><a href="#一、集合类型概览" class="headerlink" title="一、集合类型概览"></a>一、集合类型概览</h2><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>特点</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>List</td>
+<td>有序，可重复</td>
+<td>电话号码</td>
+</tr>
+<tr>
+<td>Set</td>
+<td>无序，唯一</td>
+<td>彩票号码</td>
+</tr>
+<tr>
+<td>Map</td>
+<td>键值对，键唯一</td>
+<td>员工 ID 与职位</td>
+</tr>
+</tbody></table>
+<h2 id="二、只读与可变集合"><a href="#二、只读与可变集合" class="headerlink" title="二、只读与可变集合"></a>二、只读与可变集合</h2><p>Kotlin 为每种集合类型提供两个接口：</p>
+<ul>
+<li><strong>只读接口</strong>：提供访问操作</li>
+<li><strong>可变接口</strong>：扩展只读接口，提供写操作</li>
+</ul>
+<h3 id="只读集合是协变的"><a href="#只读集合是协变的" class="headerlink" title="只读集合是协变的"></a>只读集合是协变的</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 如果 Rectangle 继承 Shape</span></span><br><span class="line"><span class="comment">// 则 List&lt;Rectangle&gt; 是 List&lt;Shape&gt; 的子类型</span></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">printShapes</span><span class="params">(shapes: <span class="type">List</span>&lt;<span class="type">Shape</span>&gt;)</span></span> &#123;</span><br><span class="line">    shapes.forEach &#123; println(it) &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> rectangles: List&lt;Rectangle&gt; = listOf(Rectangle(), Rectangle())</span><br><span class="line">printShapes(rectangles) <span class="comment">// OK</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="可变集合不是协变的"><a href="#可变集合不是协变的" class="headerlink" title="可变集合不是协变的"></a>可变集合不是协变的</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 错误：MutableList&lt;Rectangle&gt; 不是 MutableList&lt;Shape&gt; 的子类型</span></span><br><span class="line"><span class="keyword">val</span> rectangles: MutableList&lt;Rectangle&gt; = mutableListOf()</span><br><span class="line"><span class="keyword">val</span> shapes: MutableList&lt;Shape&gt; = rectangles <span class="comment">// 编译错误！</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="三、Collection-接口"><a href="#三、Collection-接口" class="headerlink" title="三、Collection 接口"></a>三、Collection 接口</h2><p>Collection 是集合层次结构的根接口：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">printAll</span><span class="params">(strings: <span class="type">Collection</span>&lt;<span class="type">String</span>&gt;)</span></span> &#123;</span><br><span class="line">    <span class="keyword">for</span> (s <span class="keyword">in</span> strings) print(<span class="string">&quot;<span class="variable">$s</span> &quot;</span>)</span><br><span class="line">    println()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> stringList = listOf(<span class="string">&quot;one&quot;</span>, <span class="string">&quot;two&quot;</span>, <span class="string">&quot;one&quot;</span>)</span><br><span class="line">printAll(stringList) <span class="comment">// one two one</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> stringSet = setOf(<span class="string">&quot;one&quot;</span>, <span class="string">&quot;two&quot;</span>, <span class="string">&quot;three&quot;</span>)</span><br><span class="line">printAll(stringSet) <span class="comment">// one two three</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="四、List"><a href="#四、List" class="headerlink" title="四、List"></a>四、List</h2><h3 id="基本操作"><a href="#基本操作" class="headerlink" title="基本操作"></a>基本操作</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> numbers = listOf(<span class="string">&quot;one&quot;</span>, <span class="string">&quot;two&quot;</span>, <span class="string">&quot;three&quot;</span>, <span class="string">&quot;four&quot;</span>)</span><br><span class="line"></span><br><span class="line">println(<span class="string">&quot;元素数量: <span class="subst">$&#123;numbers.size&#125;</span>&quot;</span>)</span><br><span class="line">println(<span class="string">&quot;第三个元素: <span class="subst">$&#123;numbers[<span class="number">2</span>]&#125;</span>&quot;</span>)</span><br><span class="line">println(<span class="string">&quot;元素 two 的索引: <span class="subst">$&#123;numbers.indexOf(<span class="string">&quot;two&quot;</span>)&#125;</span>&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="元素相等性"><a href="#元素相等性" class="headerlink" title="元素相等性"></a>元素相等性</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">Person</span>(<span class="keyword">var</span> name: String, <span class="keyword">var</span> age: <span class="built_in">Int</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> bob = Person(<span class="string">&quot;Bob&quot;</span>, <span class="number">31</span>)</span><br><span class="line"><span class="keyword">val</span> people = listOf(Person(<span class="string">&quot;Adam&quot;</span>, <span class="number">20</span>), bob, bob)</span><br><span class="line"><span class="keyword">val</span> people2 = listOf(Person(<span class="string">&quot;Adam&quot;</span>, <span class="number">20</span>), Person(<span class="string">&quot;Bob&quot;</span>, <span class="number">31</span>), bob)</span><br><span class="line"></span><br><span class="line">println(people == people2) <span class="comment">// true</span></span><br><span class="line">bob.age = <span class="number">32</span></span><br><span class="line">println(people == people2) <span class="comment">// false</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="MutableList"><a href="#MutableList" class="headerlink" title="MutableList"></a>MutableList</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> numbers = mutableListOf(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>)</span><br><span class="line">numbers.add(<span class="number">5</span>)</span><br><span class="line">numbers.removeAt(<span class="number">1</span>)</span><br><span class="line">numbers[<span class="number">0</span>] = <span class="number">0</span></span><br><span class="line">numbers.shuffle()</span><br><span class="line">println(numbers)</span><br></pre></td></tr></table></figure>
+
+<h3 id="List-vs-Array"><a href="#List-vs-Array" class="headerlink" title="List vs Array"></a>List vs Array</h3><table>
+<thead>
+<tr>
+<th>特性</th>
+<th>List</th>
+<th>Array</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>大小</td>
+<td>可变</td>
+<td>固定</td>
+</tr>
+<tr>
+<td>类型</td>
+<td>泛型</td>
+<td>具体化</td>
+</tr>
+<tr>
+<td>性能</td>
+<td>稍慢</td>
+<td>更快</td>
+</tr>
+</tbody></table>
+<p><strong>默认实现</strong>：MutableList 默认使用 ArrayList。</p>
+<h2 id="五、Set"><a href="#五、Set" class="headerlink" title="五、Set"></a>五、Set</h2><h3 id="基本操作-1"><a href="#基本操作-1" class="headerlink" title="基本操作"></a>基本操作</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> numbers = setOf(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>)</span><br><span class="line"></span><br><span class="line">println(<span class="string">&quot;元素数量: <span class="subst">$&#123;numbers.size&#125;</span>&quot;</span>)</span><br><span class="line"><span class="keyword">if</span> (numbers.contains(<span class="number">1</span>)) println(<span class="string">&quot;1 在集合中&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> numbersBackwards = setOf(<span class="number">4</span>, <span class="number">3</span>, <span class="number">2</span>, <span class="number">1</span>)</span><br><span class="line">println(<span class="string">&quot;集合相等: <span class="subst">$&#123;numbers == numbersBackwards&#125;</span>&quot;</span>) <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="唯一性"><a href="#唯一性" class="headerlink" title="唯一性"></a>唯一性</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> numbers = setOf(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">4</span>)</span><br><span class="line">println(numbers) <span class="comment">// [1, 2, 3, 4]</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="MutableSet"><a href="#MutableSet" class="headerlink" title="MutableSet"></a>MutableSet</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> numbers = mutableSetOf(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>)</span><br><span class="line">numbers.add(<span class="number">4</span>)</span><br><span class="line">numbers.remove(<span class="number">2</span>)</span><br><span class="line">println(numbers) <span class="comment">// [1, 3, 4]</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="实现类型"><a href="#实现类型" class="headerlink" title="实现类型"></a>实现类型</h3><ul>
+<li><strong>LinkedHashSet</strong>（默认）：保留插入顺序</li>
+<li><strong>HashSet</strong>：不保证顺序，内存占用更少</li>
+</ul>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> linkedSet = setOf(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>) <span class="comment">// LinkedHashSet</span></span><br><span class="line"><span class="keyword">val</span> hashSet = hashSetOf(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>) <span class="comment">// HashSet</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="六、Map"><a href="#六、Map" class="headerlink" title="六、Map"></a>六、Map</h2><h3 id="基本操作-2"><a href="#基本操作-2" class="headerlink" title="基本操作"></a>基本操作</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> numbersMap = mapOf(<span class="string">&quot;key1&quot;</span> to <span class="number">1</span>, <span class="string">&quot;key2&quot;</span> to <span class="number">2</span>, <span class="string">&quot;key3&quot;</span> to <span class="number">3</span>, <span class="string">&quot;key4&quot;</span> to <span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">println(<span class="string">&quot;所有键: <span class="subst">$&#123;numbersMap.keys&#125;</span>&quot;</span>)</span><br><span class="line">println(<span class="string">&quot;所有值: <span class="subst">$&#123;numbersMap.values&#125;</span>&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (<span class="string">&quot;key2&quot;</span> <span class="keyword">in</span> numbersMap) &#123;</span><br><span class="line">    println(<span class="string">&quot;key2 的值: <span class="subst">$&#123;numbersMap[<span class="string">&quot;key2&quot;</span>]&#125;</span>&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="相等性"><a href="#相等性" class="headerlink" title="相等性"></a>相等性</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> numbersMap = mapOf(<span class="string">&quot;key1&quot;</span> to <span class="number">1</span>, <span class="string">&quot;key2&quot;</span> to <span class="number">2</span>, <span class="string">&quot;key3&quot;</span> to <span class="number">3</span>)</span><br><span class="line"><span class="keyword">val</span> anotherMap = mapOf(<span class="string">&quot;key2&quot;</span> to <span class="number">2</span>, <span class="string">&quot;key1&quot;</span> to <span class="number">1</span>, <span class="string">&quot;key3&quot;</span> to <span class="number">3</span>)</span><br><span class="line"></span><br><span class="line">println(<span class="string">&quot;Map 相等: <span class="subst">$&#123;numbersMap == anotherMap&#125;</span>&quot;</span>) <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="MutableMap"><a href="#MutableMap" class="headerlink" title="MutableMap"></a>MutableMap</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> numbersMap = mutableMapOf(<span class="string">&quot;one&quot;</span> to <span class="number">1</span>, <span class="string">&quot;two&quot;</span> to <span class="number">2</span>)</span><br><span class="line">numbersMap.put(<span class="string">&quot;three&quot;</span>, <span class="number">3</span>)</span><br><span class="line">numbersMap[<span class="string">&quot;one&quot;</span>] = <span class="number">11</span></span><br><span class="line">println(numbersMap)</span><br></pre></td></tr></table></figure>
+
+<h3 id="实现类型-1"><a href="#实现类型-1" class="headerlink" title="实现类型"></a>实现类型</h3><ul>
+<li><strong>LinkedHashMap</strong>（默认）：保留插入顺序</li>
+<li><strong>HashMap</strong>：不保证顺序</li>
+</ul>
+<h2 id="七、ArrayDeque"><a href="#七、ArrayDeque" class="headerlink" title="七、ArrayDeque"></a>七、ArrayDeque</h2><p>ArrayDeque 是双端队列实现，可作为 Stack 和 Queue 使用：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> deque = ArrayDeque(listOf(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>))</span><br><span class="line"></span><br><span class="line">deque.addFirst(<span class="number">0</span>)</span><br><span class="line">deque.addLast(<span class="number">4</span>)</span><br><span class="line">println(deque) <span class="comment">// [0, 1, 2, 3, 4]</span></span><br><span class="line"></span><br><span class="line">println(deque.first()) <span class="comment">// 0</span></span><br><span class="line">println(deque.last()) <span class="comment">// 4</span></span><br><span class="line"></span><br><span class="line">deque.removeFirst()</span><br><span class="line">deque.removeLast()</span><br><span class="line">println(deque) <span class="comment">// [1, 2, 3]</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="八、集合操作最佳实践"><a href="#八、集合操作最佳实践" class="headerlink" title="八、集合操作最佳实践"></a>八、集合操作最佳实践</h2><h3 id="1-使用-val-声明可变集合"><a href="#1-使用-val-声明可变集合" class="headerlink" title="1. 使用 val 声明可变集合"></a>1. 使用 val 声明可变集合</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> numbers = mutableListOf(<span class="string">&quot;one&quot;</span>, <span class="string">&quot;two&quot;</span>, <span class="string">&quot;three&quot;</span>)</span><br><span class="line">numbers.add(<span class="string">&quot;four&quot;</span>) <span class="comment">// OK</span></span><br><span class="line"><span class="comment">// numbers = mutableListOf(&quot;five&quot;) // 编译错误</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="2-选择合适的集合类型"><a href="#2-选择合适的集合类型" class="headerlink" title="2. 选择合适的集合类型"></a>2. 选择合适的集合类型</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 需要顺序访问 -&gt; List</span></span><br><span class="line"><span class="keyword">val</span> items = listOf(<span class="string">&quot;a&quot;</span>, <span class="string">&quot;b&quot;</span>, <span class="string">&quot;c&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 需要唯一性 -&gt; Set</span></span><br><span class="line"><span class="keyword">val</span> uniqueIds = setOf(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 需要键值对 -&gt; Map</span></span><br><span class="line"><span class="keyword">val</span> userMap = mapOf(<span class="string">&quot;id&quot;</span> to <span class="number">1</span>, <span class="string">&quot;name&quot;</span> to <span class="string">&quot;Alice&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-使用只读集合提高安全性"><a href="#3-使用只读集合提高安全性" class="headerlink" title="3. 使用只读集合提高安全性"></a>3. 使用只读集合提高安全性</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 公开只读集合</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">DataManager</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> _items = mutableListOf&lt;String&gt;()</span><br><span class="line">    <span class="keyword">val</span> items: List&lt;String&gt; = _items</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">addItem</span><span class="params">(item: <span class="type">String</span>)</span></span> &#123;</span><br><span class="line">        _items.add(item)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-使用-Sequence-处理大数据集"><a href="#4-使用-Sequence-处理大数据集" class="headerlink" title="4. 使用 Sequence 处理大数据集"></a>4. 使用 Sequence 处理大数据集</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 懒加载，节省内存</span></span><br><span class="line"><span class="keyword">val</span> result = (<span class="number">1.</span><span class="number">.1_000_000</span>)</span><br><span class="line">    .asSequence()</span><br><span class="line">    .filter &#123; it % <span class="number">2</span> == <span class="number">0</span> &#125;</span><br><span class="line">    .map &#123; it * <span class="number">2</span> &#125;</span><br><span class="line">    .take(<span class="number">10</span>)</span><br><span class="line">    .toList()</span><br></pre></td></tr></table></figure>
+
+<h2 id="九、常见问题"><a href="#九、常见问题" class="headerlink" title="九、常见问题"></a>九、常见问题</h2><h3 id="问题-1：ConcurrentModificationException"><a href="#问题-1：ConcurrentModificationException" class="headerlink" title="问题 1：ConcurrentModificationException"></a>问题 1：ConcurrentModificationException</h3><p><strong>原因</strong>：遍历时修改集合。</p>
+<p><strong>解决方案</strong>**：使用迭代器的 remove() 或创建新集合。</p>
+<h3 id="问题-2：类型不匹配"><a href="#问题-2：类型不匹配" class="headerlink" title="问题 2：类型不匹配"></a>问题 2：类型不匹配</h3><p><strong>原因</strong>：可变集合不是协变的。</p>
+<p><strong>解决方案</strong>：使用只读集合或显式转换。</p>
+<h3 id="问题-3：性能问题"><a href="#问题-3：性能问题" class="headerlink" title="问题 3：性能问题"></a>问题 3：性能问题</h3><p><strong>原因</strong>：选择不合适的集合类型。</p>
+<p><strong>解决方案</strong>：根据使用场景选择合适的实现。</p>
+<h2 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://kotlinlang.org/docs/collections-overview.html">Collections overview | Kotlin Documentation</a></li>
+<li><a target="_blank" rel="noopener" href="https://juejin.cn/post/7078587415748673543">Kotlin 集合操作详解</a></li>
+</ul>
+<hr>
+<p><em>深入学习中…</em></p>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/Collections/" rel="tag">Collections</a>, <a class="tag-none-link" href="/blog/tags/Kotlin/" rel="tag">Kotlin</a>, <a class="tag-none-link" href="/blog/tags/List/" rel="tag">List</a>, <a class="tag-none-link" href="/blog/tags/Map/" rel="tag">Map</a>, <a class="tag-none-link" href="/blog/tags/Set/" rel="tag">Set</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-03T18:48:57.988Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Android ViewModel深度解析" href="/blog/2026/04/04/Android-ViewModel深度解析/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" Android LiveData深度解析" href="/blog/2026/04/04/Android-LiveData深度解析/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>

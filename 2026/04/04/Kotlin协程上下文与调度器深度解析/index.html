@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>Kotlin协程上下文与调度器深度解析 | Wenyi&#39;s Blog</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/04/Kotlin%E5%8D%8F%E7%A8%8B%E4%B8%8A%E4%B8%8B%E6%96%87%E4%B8%8E%E8%B0%83%E5%BA%A6%E5%99%A8%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="Coroutines, Dispatcher, Kotlin, 协程, 调度器" />
+  
+  <meta name="description" content="前言协程总是在某个上下文中执行，上下文由 CoroutineContext 类型表示。协程上下文是一组元素，主要包括协程的 Job 和调度器（Dispatcher）。本文将深入解析协程上下文和调度器的核心概念。 一、调度器与线程协程调度器决定协程在哪个线程或线程池上执行。可以：  将协程限制在特定线程 分发到线程池 让其无限制运行  调度器类型1234567891011121314151617fu">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kotlin协程上下文与调度器深度解析">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/04/Kotlin%E5%8D%8F%E7%A8%8B%E4%B8%8A%E4%B8%8B%E6%96%87%E4%B8%8E%E8%B0%83%E5%BA%A6%E5%99%A8%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:description" content="前言协程总是在某个上下文中执行，上下文由 CoroutineContext 类型表示。协程上下文是一组元素，主要包括协程的 Job 和调度器（Dispatcher）。本文将深入解析协程上下文和调度器的核心概念。 一、调度器与线程协程调度器决定协程在哪个线程或线程池上执行。可以：  将协程限制在特定线程 分发到线程池 让其无限制运行  调度器类型1234567891011121314151617fu">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-04-04T00:20:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T16:18:56.944Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="Coroutines">
+<meta property="article:tag" content="Dispatcher">
+<meta property="article:tag" content="Kotlin">
+<meta property="article:tag" content="协程">
+<meta property="article:tag" content="调度器">
+<meta name="twitter:card" content="summary">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Kotlin协程上下文与调度器深度解析","description":"前言协程总是在某个上下文中执行，上下文由 CoroutineContext 类型表示。协程上下文是一组元素，主要包括协程的 Job 和调度器（Dispatch...","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-04T00:20:00.000Z","dateModified":"2026-04-03T16:18:56.944Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/04/Kotlin%E5%8D%8F%E7%A8%8B%E4%B8%8A%E4%B8%8B%E6%96%87%E4%B8%8E%E8%B0%83%E5%BA%A6%E5%99%A8%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/04/Kotlin%E5%8D%8F%E7%A8%8B%E4%B8%8A%E4%B8%8B%E6%96%87%E4%B8%8E%E8%B0%83%E5%BA%A6%E5%99%A8%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Kotlin协程上下文与调度器深度解析</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-04T00:20:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-04</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~7.78K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>协程总是在某个上下文中执行，上下文由 CoroutineContext 类型表示。协程上下文是一组元素，主要包括协程的 Job 和调度器（Dispatcher）。本文将深入解析协程上下文和调度器的核心概念。</p>
+<h2 id="一、调度器与线程"><a href="#一、调度器与线程" class="headerlink" title="一、调度器与线程"></a>一、调度器与线程</h2><p>协程调度器决定协程在哪个线程或线程池上执行。可以：</p>
+<ul>
+<li>将协程限制在特定线程</li>
+<li>分发到线程池</li>
+<li>让其无限制运行</li>
+</ul>
+<h3 id="调度器类型"><a href="#调度器类型" class="headerlink" title="调度器类型"></a>调度器类型</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> = runBlocking&lt;<span class="built_in">Unit</span>&gt; &#123;</span><br><span class="line">    launch &#123; <span class="comment">// 继承父协程的上下文</span></span><br><span class="line">        println(<span class="string">&quot;main runBlocking: <span class="subst">$&#123;Thread.currentThread().name&#125;</span>&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    launch(Dispatchers.Unconfined) &#123; <span class="comment">// 不受限</span></span><br><span class="line">        println(<span class="string">&quot;Unconfined: <span class="subst">$&#123;Thread.currentThread().name&#125;</span>&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    launch(Dispatchers.Default) &#123; <span class="comment">// 默认调度器</span></span><br><span class="line">        println(<span class="string">&quot;Default: <span class="subst">$&#123;Thread.currentThread().name&#125;</span>&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    launch(newSingleThreadContext(<span class="string">&quot;MyOwnThread&quot;</span>)) &#123; <span class="comment">// 自定义线程</span></span><br><span class="line">        println(<span class="string">&quot;newSingleThreadContext: <span class="subst">$&#123;Thread.currentThread().name&#125;</span>&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Unconfined: I&#x27;m working in thread main</span><br><span class="line">Default: I&#x27;m working in thread DefaultDispatcher-worker-1</span><br><span class="line">newSingleThreadContext: I&#x27;m working in thread MyOwnThread</span><br><span class="line">main runBlocking: I&#x27;m working in thread main</span><br></pre></td></tr></table></figure>
+
+<h3 id="调度器详解"><a href="#调度器详解" class="headerlink" title="调度器详解"></a>调度器详解</h3><table>
+<thead>
+<tr>
+<th>调度器</th>
+<th>用途</th>
+<th>线程池</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Dispatchers.Default</td>
+<td>CPU 密集型任务</td>
+<td>共享后台线程池</td>
+</tr>
+<tr>
+<td>Dispatchers.IO</td>
+<td>I&#x2F;O 操作</td>
+<td>按需创建线程</td>
+</tr>
+<tr>
+<td>Dispatchers.Main</td>
+<td>UI 操作</td>
+<td>主线程</td>
+</tr>
+<tr>
+<td>Dispatchers.Unconfined</td>
+<td>不限制</td>
+<td>调用者线程</td>
+</tr>
+</tbody></table>
+<h2 id="二、Unconfined-vs-受限调度器"><a href="#二、Unconfined-vs-受限调度器" class="headerlink" title="二、Unconfined vs 受限调度器"></a>二、Unconfined vs 受限调度器</h2><h3 id="Unconfined-行为"><a href="#Unconfined-行为" class="headerlink" title="Unconfined 行为"></a>Unconfined 行为</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">launch(Dispatchers.Unconfined) &#123;</span><br><span class="line">    println(<span class="string">&quot;Unconfined: <span class="subst">$&#123;Thread.currentThread().name&#125;</span>&quot;</span>) <span class="comment">// main</span></span><br><span class="line">    delay(<span class="number">500</span>)</span><br><span class="line">    println(<span class="string">&quot;Unconfined: After delay in <span class="subst">$&#123;Thread.currentThread().name&#125;</span>&quot;</span>) <span class="comment">// DefaultExecutor</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">launch &#123; <span class="comment">// 继承 runBlocking 上下文</span></span><br><span class="line">    println(<span class="string">&quot;main runBlocking: <span class="subst">$&#123;Thread.currentThread().name&#125;</span>&quot;</span>) <span class="comment">// main</span></span><br><span class="line">    delay(<span class="number">1000</span>)</span><br><span class="line">    println(<span class="string">&quot;main runBlocking: After delay in <span class="subst">$&#123;Thread.currentThread().name&#125;</span>&quot;</span>) <span class="comment">// main</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>关键点</strong>：</p>
+<ul>
+<li>Unconfined 在调用者线程启动，直到第一个挂起点</li>
+<li>挂起后，由挂起函数决定恢复线程</li>
+<li>默认继承外部 CoroutineScope 的调度器</li>
+</ul>
+<h2 id="三、调试协程"><a href="#三、调试协程" class="headerlink" title="三、调试协程"></a>三、调试协程</h2><h3 id="使用-IDEA-调试器"><a href="#使用-IDEA-调试器" class="headerlink" title="使用 IDEA 调试器"></a>使用 IDEA 调试器</h3><p>Debug 工具窗口包含 Coroutines 标签，可以：</p>
+<ul>
+<li>查看每个协程的状态</li>
+<li>查看局部和捕获变量的值</li>
+<li>查看完整的协程创建栈和调用栈</li>
+<li>获取协程转储报告</li>
+</ul>
+<h3 id="使用日志调试"><a href="#使用日志调试" class="headerlink" title="使用日志调试"></a>使用日志调试</h3><p>启用调试模式：<code>-Dkotlinx.coroutines.debug</code></p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">log</span><span class="params">(msg: <span class="type">String</span>)</span></span> = println(<span class="string">&quot;[<span class="subst">$&#123;Thread.currentThread().name&#125;</span>] <span class="variable">$msg</span>&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> = runBlocking&lt;<span class="built_in">Unit</span>&gt; &#123;</span><br><span class="line">    <span class="keyword">val</span> a = async &#123;</span><br><span class="line">        log(<span class="string">&quot;I&#x27;m computing a piece of the answer&quot;</span>)</span><br><span class="line">        <span class="number">6</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">val</span> b = async &#123;</span><br><span class="line">        log(<span class="string">&quot;I&#x27;m computing another piece of the answer&quot;</span>)</span><br><span class="line">        <span class="number">7</span></span><br><span class="line">    &#125;</span><br><span class="line">    log(<span class="string">&quot;The answer is <span class="subst">$&#123;a.await() * b.await()&#125;</span>&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[main @coroutine#2] I&#x27;m computing a piece of the answer</span><br><span class="line">[main @coroutine#3] I&#x27;m computing another piece of the answer</span><br><span class="line">[main @coroutine#1] The answer is 42</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、线程间跳转"><a href="#四、线程间跳转" class="headerlink" title="四、线程间跳转"></a>四、线程间跳转</h2><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    newSingleThreadContext(<span class="string">&quot;Ctx1&quot;</span>).use &#123; ctx1 -&gt;</span><br><span class="line">        newSingleThreadContext(<span class="string">&quot;Ctx2&quot;</span>).use &#123; ctx2 -&gt;</span><br><span class="line">            runBlocking(ctx1) &#123;</span><br><span class="line">                log(<span class="string">&quot;Started in ctx1&quot;</span>)</span><br><span class="line">                withContext(ctx2) &#123;</span><br><span class="line">                    log(<span class="string">&quot;Working in ctx2&quot;</span>)</span><br><span class="line">                &#125;</span><br><span class="line">                log(<span class="string">&quot;Back to ctx1&quot;</span>)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[Ctx1 @coroutine#1] Started in ctx1</span><br><span class="line">[Ctx2 @coroutine#1] Working in ctx2</span><br><span class="line">[Ctx1 @coroutine#1] Back to ctx1</span><br></pre></td></tr></table></figure>
+
+<p><strong>withContext</strong> 用于切换上下文，执行完成后返回原调度器。</p>
+<h2 id="五、Job-在上下文中"><a href="#五、Job-在上下文中" class="headerlink" title="五、Job 在上下文中"></a>五、Job 在上下文中</h2><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> = runBlocking&lt;<span class="built_in">Unit</span>&gt; &#123;</span><br><span class="line">    println(<span class="string">&quot;My job is <span class="subst">$&#123;coroutineContext[Job]&#125;</span>&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出（调试模式）：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">My job is &quot;coroutine#1&quot;:BlockingCoroutine&#123;Active&#125;@6d311334</span><br></pre></td></tr></table></figure>
+
+<p><code>isActive</code> 是 <code>coroutineContext[Job]?.isActive == true</code> 的便捷快捷方式。</p>
+<h2 id="六、协程的子级"><a href="#六、协程的子级" class="headerlink" title="六、协程的子级"></a>六、协程的子级</h2><p>当在另一个协程的 CoroutineScope 中启动协程时：</p>
+<ul>
+<li>通过 CoroutineScope.coroutineContext 继承上下文</li>
+<li>新协程的 Job 成为父协程 Job 的子级</li>
+<li>父协程取消时，所有子协程递归取消</li>
+</ul>
+<h3 id="覆盖父子关系"><a href="#覆盖父子关系" class="headerlink" title="覆盖父子关系"></a>覆盖父子关系</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> request = launch &#123;</span><br><span class="line">    launch(Job()) &#123; <span class="comment">// 独立 Job</span></span><br><span class="line">        println(<span class="string">&quot;job1: I run in my own Job&quot;</span>)</span><br><span class="line">        delay(<span class="number">1000</span>)</span><br><span class="line">        println(<span class="string">&quot;job1: I am not affected by cancellation&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    launch &#123; <span class="comment">// 继承父上下文</span></span><br><span class="line">        delay(<span class="number">100</span>)</span><br><span class="line">        println(<span class="string">&quot;job2: I am a child of the request coroutine&quot;</span>)</span><br><span class="line">        delay(<span class="number">1000</span>)</span><br><span class="line">        println(<span class="string">&quot;job2: I will not execute if parent is cancelled&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">delay(<span class="number">500</span>)</span><br><span class="line">request.cancel()</span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">job1: I run in my own Job and execute independently!</span><br><span class="line">job2: I am a child of the request coroutine</span><br><span class="line">main: Who has survived request cancellation?</span><br><span class="line">job1: I am not affected by cancellation of the request</span><br></pre></td></tr></table></figure>
+
+<h2 id="七、父协程的责任"><a href="#七、父协程的责任" class="headerlink" title="七、父协程的责任"></a>七、父协程的责任</h2><p>父协程总是等待所有子协程完成：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> request = launch &#123;</span><br><span class="line">    repeat(<span class="number">3</span>) &#123; i -&gt;</span><br><span class="line">        launch &#123;</span><br><span class="line">            delay((i + <span class="number">1</span>) * <span class="number">200L</span>)</span><br><span class="line">            println(<span class="string">&quot;Coroutine <span class="variable">$i</span> is done&quot;</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    println(<span class="string">&quot;request: I&#x27;m done&quot;</span>)</span><br><span class="line">&#125;</span><br><span class="line">request.join()</span><br><span class="line">println(<span class="string">&quot;Now processing is complete&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">request: I&#x27;m done</span><br><span class="line">Coroutine 0 is done</span><br><span class="line">Coroutine 1 is done</span><br><span class="line">Coroutine 2 is done</span><br><span class="line">Now processing is complete</span><br></pre></td></tr></table></figure>
+
+<h2 id="八、命名协程"><a href="#八、命名协程" class="headerlink" title="八、命名协程"></a>八、命名协程</h2><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> = runBlocking(CoroutineName(<span class="string">&quot;main&quot;</span>)) &#123;</span><br><span class="line">    log(<span class="string">&quot;Started main coroutine&quot;</span>)</span><br><span class="line">    <span class="keyword">val</span> v1 = async(CoroutineName(<span class="string">&quot;v1coroutine&quot;</span>)) &#123;</span><br><span class="line">        delay(<span class="number">500</span>)</span><br><span class="line">        log(<span class="string">&quot;Computing v1&quot;</span>)</span><br><span class="line">        <span class="number">6</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">val</span> v2 = async(CoroutineName(<span class="string">&quot;v2coroutine&quot;</span>)) &#123;</span><br><span class="line">        delay(<span class="number">1000</span>)</span><br><span class="line">        log(<span class="string">&quot;Computing v2&quot;</span>)</span><br><span class="line">        <span class="number">7</span></span><br><span class="line">    &#125;</span><br><span class="line">    log(<span class="string">&quot;The answer for v1 * v2 = <span class="subst">$&#123;v1.await() * v2.await()&#125;</span>&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[main @main#1] Started main coroutine</span><br><span class="line">[main @v1coroutine#2] Computing v1</span><br><span class="line">[main @v2coroutine#3] Computing v2</span><br><span class="line">[main @main#1] The answer for v1 * v2 = 42</span><br></pre></td></tr></table></figure>
+
+<h2 id="九、组合上下文元素"><a href="#九、组合上下文元素" class="headerlink" title="九、组合上下文元素"></a>九、组合上下文元素</h2><p>使用 + 运算符组合多个上下文元素：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">launch(Dispatchers.Default + CoroutineName(<span class="string">&quot;test&quot;</span>)) &#123;</span><br><span class="line">    println(<span class="string">&quot;I&#x27;m working in thread <span class="subst">$&#123;Thread.currentThread().name&#125;</span>&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">I&#x27;m working in thread DefaultDispatcher-worker-1 @test#2</span><br></pre></td></tr></table></figure>
+
+<h2 id="十、协程作用域"><a href="#十、协程作用域" class="headerlink" title="十、协程作用域"></a>十、协程作用域</h2><h3 id="Activity-生命周期管理"><a href="#Activity-生命周期管理" class="headerlink" title="Activity 生命周期管理"></a>Activity 生命周期管理</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Activity</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> mainScope = MainScope()</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">destroy</span><span class="params">()</span></span> &#123;</span><br><span class="line">        mainScope.cancel()</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">doSomething</span><span class="params">()</span></span> &#123;</span><br><span class="line">        repeat(<span class="number">10</span>) &#123; i -&gt;</span><br><span class="line">            mainScope.launch &#123;</span><br><span class="line">                delay((i + <span class="number">1</span>) * <span class="number">200L</span>)</span><br><span class="line">                println(<span class="string">&quot;Coroutine <span class="variable">$i</span> is done&quot;</span>)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> = runBlocking&lt;<span class="built_in">Unit</span>&gt; &#123;</span><br><span class="line">    <span class="keyword">val</span> activity = Activity()</span><br><span class="line">    activity.doSomething()</span><br><span class="line">    println(<span class="string">&quot;Launched coroutines&quot;</span>)</span><br><span class="line">    delay(<span class="number">500L</span>)</span><br><span class="line">    println(<span class="string">&quot;Destroying activity!&quot;</span>)</span><br><span class="line">    activity.destroy()</span><br><span class="line">    delay(<span class="number">1000</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Launched coroutines</span><br><span class="line">Coroutine 0 is done</span><br><span class="line">Coroutine 1 is done</span><br><span class="line">Destroying activity!</span><br></pre></td></tr></table></figure>
+
+<h2 id="十一、线程局部数据"><a href="#十一、线程局部数据" class="headerlink" title="十一、线程局部数据"></a>十一、线程局部数据</h2><p>使用 ThreadLocal.asContextElement() 在协程间传递线程局部数据：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> threadLocal = ThreadLocal&lt;String?&gt;()</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> = runBlocking&lt;<span class="built_in">Unit</span>&gt; &#123;</span><br><span class="line">    threadLocal.<span class="keyword">set</span>(<span class="string">&quot;main&quot;</span>)</span><br><span class="line">    println(<span class="string">&quot;Pre-main, thread local: &#x27;<span class="subst">$&#123;threadLocal.get()&#125;</span>&#x27;&quot;</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">val</span> job = launch(Dispatchers.Default + threadLocal.asContextElement(value = <span class="string">&quot;launch&quot;</span>)) &#123;</span><br><span class="line">        println(<span class="string">&quot;Launch start, thread local: &#x27;<span class="subst">$&#123;threadLocal.get()&#125;</span>&#x27;&quot;</span>)</span><br><span class="line">        yield()</span><br><span class="line">        println(<span class="string">&quot;After yield, thread local: &#x27;<span class="subst">$&#123;threadLocal.get()&#125;</span>&#x27;&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    job.join()</span><br><span class="line">    println(<span class="string">&quot;Post-main, thread local: &#x27;<span class="subst">$&#123;threadLocal.get()&#125;</span>&#x27;&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Pre-main, current thread: Thread[main @coroutine#1,5,main], thread local value: &#x27;main&#x27;</span><br><span class="line">Launch start, current thread: Thread[DefaultDispatcher-worker-1 @coroutine#2,5,main], thread local value: &#x27;launch&#x27;</span><br><span class="line">After yield, current thread: Thread[DefaultDispatcher-worker-2 @coroutine#2,5,main], thread local value: &#x27;launch&#x27;</span><br><span class="line">Post-main, current thread: Thread[main @coroutine#1,5,main], thread local value: &#x27;main&#x27;</span><br></pre></td></tr></table></figure>
+
+<h2 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://kotlinlang.org/docs/coroutine-context-and-dispatchers.html">Coroutine context and dispatchers | Kotlin Documentation</a></li>
+<li><a target="_blank" rel="noopener" href="https://juejin.cn/post/7373505141490794507">彻底搞懂kotlin协程 Dispatcher 与线程池</a></li>
+</ul>
+<hr>
+<p><em>深入学习中…</em></p>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/Coroutines/" rel="tag">Coroutines</a>, <a class="tag-none-link" href="/blog/tags/Dispatcher/" rel="tag">Dispatcher</a>, <a class="tag-none-link" href="/blog/tags/Kotlin/" rel="tag">Kotlin</a>, <a class="tag-none-link" href="/blog/tags/%E5%8D%8F%E7%A8%8B/" rel="tag">协程</a>, <a class="tag-none-link" href="/blog/tags/%E8%B0%83%E5%BA%A6%E5%99%A8/" rel="tag">调度器</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-03T16:18:56.944Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Android Room数据库迁移Migration深度解析" href="/blog/2026/04/04/Android-Room数据库迁移Migration深度解析/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" Android Fragment生命周期深度解析" href="/blog/2026/04/04/Android-Fragment生命周期深度解析/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>

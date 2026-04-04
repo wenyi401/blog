@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>Kotlin 2.0.20新特性深度解析 | Wenyi&#39;s Blog</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/04/Kotlin-2.0.20%E6%96%B0%E7%89%B9%E6%80%A7%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="2.0.20, K2编译器, Kotlin, 新特性" />
+  
+  <meta name="description" content="前言Kotlin 2.0.20 是 Kotlin 2.0.0 的更新版本，包含了性能改进和 bug 修复。本文将深入解析 Kotlin 2.0.20 的重要新特性。 一、语言特性1. data class copy() 函数可见性从 Kotlin 2.0.20 开始，data class 的 copy() 函数将与构造函数具有相同的可见性： 12345678910&#x2F;&#x2F; Kotlin 2.0.20">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kotlin 2.0.20新特性深度解析">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/04/Kotlin-2.0.20%E6%96%B0%E7%89%B9%E6%80%A7%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:description" content="前言Kotlin 2.0.20 是 Kotlin 2.0.0 的更新版本，包含了性能改进和 bug 修复。本文将深入解析 Kotlin 2.0.20 的重要新特性。 一、语言特性1. data class copy() 函数可见性从 Kotlin 2.0.20 开始，data class 的 copy() 函数将与构造函数具有相同的可见性： 12345678910&#x2F;&#x2F; Kotlin 2.0.20">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-04-04T05:20:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T21:18:38.040Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="2.0.20">
+<meta property="article:tag" content="K2编译器">
+<meta property="article:tag" content="Kotlin">
+<meta property="article:tag" content="新特性">
+<meta name="twitter:card" content="summary">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Kotlin 2.0.20新特性深度解析","description":"前言Kotlin 2.0.20 是 Kotlin 2.0.0 的更新版本，包含了性能改进和 bug 修复。本文将深入解析 Kotlin 2.0.20 的重要新...","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-04T05:20:00.000Z","dateModified":"2026-04-03T21:18:38.040Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/04/Kotlin-2.0.20%E6%96%B0%E7%89%B9%E6%80%A7%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/04/Kotlin-2.0.20%E6%96%B0%E7%89%B9%E6%80%A7%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Kotlin 2.0.20新特性深度解析</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-04T05:20:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-04</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~3.79K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Kotlin 2.0.20 是 Kotlin 2.0.0 的更新版本，包含了性能改进和 bug 修复。本文将深入解析 Kotlin 2.0.20 的重要新特性。</p>
+<h2 id="一、语言特性"><a href="#一、语言特性" class="headerlink" title="一、语言特性"></a>一、语言特性</h2><h3 id="1-data-class-copy-函数可见性"><a href="#1-data-class-copy-函数可见性" class="headerlink" title="1. data class copy() 函数可见性"></a>1. data class copy() 函数可见性</h3><p>从 Kotlin 2.0.20 开始，data class 的 copy() 函数将与构造函数具有相同的可见性：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Kotlin 2.0.20 警告</span></span><br><span class="line"><span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">PositiveInteger</span> <span class="keyword">private</span> <span class="keyword">constructor</span>(<span class="keyword">val</span> number: <span class="built_in">Int</span>) &#123;</span><br><span class="line">    <span class="keyword">companion</span> <span class="keyword">object</span> &#123;</span><br><span class="line">        <span class="function"><span class="keyword">fun</span> <span class="title">create</span><span class="params">(number: <span class="type">Int</span>)</span></span>: PositiveInteger? = </span><br><span class="line">            <span class="keyword">if</span> (number &gt; <span class="number">0</span>) PositiveInteger(number) <span class="keyword">else</span> <span class="literal">null</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> positiveNumber = PositiveInteger.create(<span class="number">42</span>)!!</span><br><span class="line"><span class="keyword">val</span> negativeNumber = positiveNumber.copy(number = -<span class="number">1</span>) <span class="comment">// 警告！</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>控制注解</strong>：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 选择新行为</span></span><br><span class="line"><span class="meta">@ConsistentCopyVisibility</span></span><br><span class="line"><span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">User</span> <span class="keyword">private</span> <span class="keyword">constructor</span>(<span class="keyword">val</span> name: String)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 选择旧行为</span></span><br><span class="line"><span class="meta">@ExposedCopyVisibility</span></span><br><span class="line"><span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">LegacyUser</span> <span class="keyword">private</span> <span class="keyword">constructor</span>(<span class="keyword">val</span> name: String)</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-上下文接收器逐步替换"><a href="#2-上下文接收器逐步替换" class="headerlink" title="2. 上下文接收器逐步替换"></a>2. 上下文接收器逐步替换</h3><p>Context receivers 将被 context parameters 替换：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 旧方式（已弃用）</span></span><br><span class="line">context(MyContext)</span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">someFunction</span><span class="params">()</span></span> &#123;</span><br><span class="line">    contextReceiverMember()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 新方式（推荐）</span></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">someFunction</span><span class="params">(explicitContext: <span class="type">MyContext</span>)</span></span> &#123;</span><br><span class="line">    explicitContext.contextReceiverMember()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 或使用扩展函数</span></span><br><span class="line"><span class="function"><span class="keyword">fun</span> MyContext.<span class="title">someFunction</span><span class="params">()</span></span> &#123;</span><br><span class="line">    contextReceiverMember()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="二、Kotlin-Multiplatform"><a href="#二、Kotlin-Multiplatform" class="headerlink" title="二、Kotlin Multiplatform"></a>二、Kotlin Multiplatform</h2><h3 id="1-源集静态访问器"><a href="#1-源集静态访问器" class="headerlink" title="1. 源集静态访问器"></a>1. 源集静态访问器</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">kotlin &#123;</span><br><span class="line">    jvm()</span><br><span class="line">    linuxX64()</span><br><span class="line">    linuxArm64()</span><br><span class="line">    mingwX64()</span><br><span class="line">    </span><br><span class="line">    sourceSets &#123;</span><br><span class="line">        commonMain.languageSettings &#123;</span><br><span class="line">            progressiveMode = <span class="literal">true</span></span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        jvmMain &#123; &#125; <span class="comment">// 静态访问器</span></span><br><span class="line">        linuxX64Main &#123; &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-Gradle-Java-插件兼容性警告"><a href="#2-Gradle-Java-插件兼容性警告" class="headerlink" title="2. Gradle Java 插件兼容性警告"></a>2. Gradle Java 插件兼容性警告</h3><p>与 Java、Java Library、Application 插件的兼容性已被弃用。</p>
+<h2 id="三、Kotlin-Native"><a href="#三、Kotlin-Native" class="headerlink" title="三、Kotlin&#x2F;Native"></a>三、Kotlin&#x2F;Native</h2><h3 id="1-垃圾回收并发标记"><a href="#1-垃圾回收并发标记" class="headerlink" title="1. 垃圾回收并发标记"></a>1. 垃圾回收并发标记</h3><p>启用并发标记以减少 GC 暂停时间：</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">kotlin.native.binary.gc</span>=<span class="string">cms</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="2-从非主线程调用挂起函数"><a href="#2-从非主线程调用挂起函数" class="headerlink" title="2. 从非主线程调用挂起函数"></a>2. 从非主线程调用挂起函数</h3><p>Kotlin&#x2F;Native 现在允许从 Swift&#x2F;Objective-C 的任何线程调用 Kotlin 挂起函数。</p>
+<h3 id="3-Bitcode-嵌入移除"><a href="#3-Bitcode-嵌入移除" class="headerlink" title="3. Bitcode 嵌入移除"></a>3. Bitcode 嵌入移除</h3><p>Xcode 15 移除了 bitcode 支持，Kotlin 2.0.20 相应弃用了相关功能。</p>
+<h2 id="四、Kotlin-Wasm"><a href="#四、Kotlin-Wasm" class="headerlink" title="四、Kotlin&#x2F;Wasm"></a>四、Kotlin&#x2F;Wasm</h2><h3 id="1-默认导出错误"><a href="#1-默认导出错误" class="headerlink" title="1. 默认导出错误"></a>1. 默认导出错误</h3><p>现在使用默认导入会导致错误，必须使用命名导入：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 错误</span></span><br><span class="line"><span class="keyword">import</span> myModule <span class="keyword">from</span> <span class="string">&quot;an-awesome-kotlin-module&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 正确</span></span><br><span class="line"><span class="keyword">import</span> &#123; myFunction &#125; <span class="keyword">from</span> <span class="string">&quot;an-awesome-kotlin-module&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="2-ExperimentalWasmDsl-新位置"><a href="#2-ExperimentalWasmDsl-新位置" class="headerlink" title="2. @ExperimentalWasmDsl 新位置"></a>2. @ExperimentalWasmDsl 新位置</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 新位置</span></span><br><span class="line"><span class="keyword">import</span> org.jetbrains.kotlin.gradle.ExperimentalWasmDsl</span><br><span class="line"></span><br><span class="line"><span class="comment">// 旧位置（已弃用）</span></span><br><span class="line"><span class="keyword">import</span> org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl</span><br></pre></td></tr></table></figure>
+
+<h2 id="五、Kotlin-JS"><a href="#五、Kotlin-JS" class="headerlink" title="五、Kotlin&#x2F;JS"></a>五、Kotlin&#x2F;JS</h2><h3 id="1-JsStatic-注解"><a href="#1-JsStatic-注解" class="headerlink" title="1. @JsStatic 注解"></a>1. @JsStatic 注解</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">C</span> &#123;</span><br><span class="line">    <span class="keyword">companion</span> <span class="keyword">object</span> &#123;</span><br><span class="line">        <span class="meta">@JsStatic</span></span><br><span class="line">        <span class="function"><span class="keyword">fun</span> <span class="title">callStatic</span><span class="params">()</span></span> &#123;&#125;</span><br><span class="line">        <span class="function"><span class="keyword">fun</span> <span class="title">callNonStatic</span><span class="params">()</span></span> &#123;&#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>JavaScript 中：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">C.<span class="title function_">callStatic</span>(); <span class="comment">// 静态方法</span></span><br><span class="line">C.<span class="title function_">callNonStatic</span>(); <span class="comment">// 错误！</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="2-从-JavaScript-创建-Kotlin-集合"><a href="#2-从-JavaScript-创建-Kotlin-集合" class="headerlink" title="2. 从 JavaScript 创建 Kotlin 集合"></a>2. 从 JavaScript 创建 Kotlin 集合</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@JsExport</span></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">consumeMutableMap</span><span class="params">(map: <span class="type">MutableMap</span>&lt;<span class="type">String</span>, <span class="built_in">Int</span>&gt;)</span></span></span><br></pre></td></tr></table></figure>
+
+<p>JavaScript 中：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; <span class="title class_">KtMutableMap</span> &#125; <span class="keyword">from</span> <span class="string">&quot;module/kotlin-kotlin-stdlib&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="title function_">consumeMutableMap</span>(</span><br><span class="line">    <span class="title class_">KtMutableMap</span>.<span class="title function_">fromJsMap</span>(<span class="keyword">new</span> <span class="title class_">Map</span>([[<span class="string">&quot;First&quot;</span>, <span class="number">1</span>], [<span class="string">&quot;Second&quot;</span>, <span class="number">2</span>]]))</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<h2 id="六、Gradle-改进"><a href="#六、Gradle-改进" class="headerlink" title="六、Gradle 改进"></a>六、Gradle 改进</h2><h3 id="1-JVM-构件共享"><a href="#1-JVM-构件共享" class="headerlink" title="1. JVM 构件共享"></a>1. JVM 构件共享</h3><figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">kotlin.jvm.addClassesVariant</span>=<span class="string">true</span></span><br></pre></td></tr></table></figure>
+
+<p>减少 JAR 文件的压缩和解压缩次数。</p>
+<h3 id="2-增量编译改进"><a href="#2-增量编译改进" class="headerlink" title="2. 增量编译改进"></a>2. 增量编译改进</h3><p>旧的基于 JVM 历史文件的增量编译已被弃用。</p>
+<h2 id="七、Compose-编译器"><a href="#七、Compose-编译器" class="headerlink" title="七、Compose 编译器"></a>七、Compose 编译器</h2><h3 id="1-强跳过模式默认启用"><a href="#1-强跳过模式默认启用" class="headerlink" title="1. 强跳过模式默认启用"></a>1. 强跳过模式默认启用</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">composeCompiler &#123;</span><br><span class="line">    featureFlags = setOf(</span><br><span class="line">        ComposeFeatureFlag.StrongSkipping</span><br><span class="line">    )</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-非跳过组优化"><a href="#2-非跳过组优化" class="headerlink" title="2. 非跳过组优化"></a>2. 非跳过组优化</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">composeCompiler &#123;</span><br><span class="line">    featureFlags = setOf(</span><br><span class="line">        ComposeFeatureFlag.OptimizeNonSkippingGroups</span><br><span class="line">    )</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-抽象-Composable-支持默认参数"><a href="#3-抽象-Composable-支持默认参数" class="headerlink" title="3. 抽象 Composable 支持默认参数"></a>3. 抽象 Composable 支持默认参数</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title class_">Composables</span> &#123;</span><br><span class="line">    <span class="meta">@Composable</span></span><br><span class="line">    <span class="keyword">abstract</span> <span class="function"><span class="keyword">fun</span> <span class="title">Composable</span><span class="params">(modifier: <span class="type">Modifier</span> = Modifier)</span></span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="八、标准库"><a href="#八、标准库" class="headerlink" title="八、标准库"></a>八、标准库</h2><h3 id="1-UUID-支持（实验性）"><a href="#1-UUID-支持（实验性）" class="headerlink" title="1. UUID 支持（实验性）"></a>1. UUID 支持（实验性）</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 解析 UUID</span></span><br><span class="line"><span class="keyword">val</span> uuid = Uuid.parse(<span class="string">&quot;550e8400-e29b-41d4-a716-446655440000&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 从字节数组创建</span></span><br><span class="line"><span class="keyword">val</span> uuid = Uuid.fromByteArray(byteArray)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 生成随机 UUID</span></span><br><span class="line"><span class="keyword">val</span> randomUuid = Uuid.random()</span><br><span class="line"></span><br><span class="line"><span class="comment">// 转换为 Java UUID</span></span><br><span class="line"><span class="keyword">val</span> javaUuid = kotlinUuid.toJavaUuid()</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-HexFormat-minLength"><a href="#2-HexFormat-minLength" class="headerlink" title="2. HexFormat minLength"></a>2. HexFormat minLength</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">println(<span class="number">93.</span>toHexString(HexFormat &#123;</span><br><span class="line">    number.minLength = <span class="number">4</span></span><br><span class="line">    number.removeLeadingZeros = <span class="literal">true</span></span><br><span class="line">&#125;))</span><br><span class="line"><span class="comment">// &quot;005d&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="3-Base64-填充配置"><a href="#3-Base64-填充配置" class="headerlink" title="3. Base64 填充配置"></a>3. Base64 填充配置</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> base64 = Base64.UrlSafe.withPadding(Base64.PaddingOption.ABSENT_OPTIONAL)</span><br><span class="line"><span class="keyword">val</span> encoded = base64.encode(<span class="keyword">data</span>)</span><br></pre></td></tr></table></figure>
+
+<h2 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://kotlinlang.org/docs/whatsnew2020.html">What’s new in Kotlin 2.0.20 | Kotlin Documentation</a></li>
+<li><a target="_blank" rel="noopener" href="https://kotlinlang.org/docs/releases.html#release-details">Kotlin 2.0.20 Release Notes</a></li>
+</ul>
+<hr>
+<p><em>深入学习中…</em></p>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/2-0-20/" rel="tag">2.0.20</a>, <a class="tag-none-link" href="/blog/tags/K2%E7%BC%96%E8%AF%91%E5%99%A8/" rel="tag">K2编译器</a>, <a class="tag-none-link" href="/blog/tags/Kotlin/" rel="tag">Kotlin</a>, <a class="tag-none-link" href="/blog/tags/%E6%96%B0%E7%89%B9%E6%80%A7/" rel="tag">新特性</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-03T21:18:38.040Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Android Intent与Intent过滤器深度解析" href="/blog/2026/04/04/Android-Intent与Intent过滤器深度解析/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" Android广播Broadcast深度解析" href="/blog/2026/04/04/Android广播Broadcast深度解析/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>

@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>Kotlin Flow操作符实战-map filter transform | Wenyi&#39;s Blog</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/03/Kotlin-Flow%E6%93%8D%E4%BD%9C%E7%AC%A6%E5%AE%9E%E6%88%98-map-filter-transform/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="Flow, Kotlin, filter, map, transform, 操作符" />
+  
+  <meta name="description" content="前言Kotlin Flow 操作符是处理异步数据流的核心工具。本文将详细介绍常用的转换和过滤操作符，包括 map、filter、transform 等。 一、操作符分类   类别 操作符    转换 map, mapLatest, transform, transformLatest   过滤 filter, filterNot, filterNotNull, take, drop   组合 zi">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kotlin Flow操作符实战-map filter transform">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/03/Kotlin-Flow%E6%93%8D%E4%BD%9C%E7%AC%A6%E5%AE%9E%E6%88%98-map-filter-transform/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:description" content="前言Kotlin Flow 操作符是处理异步数据流的核心工具。本文将详细介绍常用的转换和过滤操作符，包括 map、filter、transform 等。 一、操作符分类   类别 操作符    转换 map, mapLatest, transform, transformLatest   过滤 filter, filterNot, filterNotNull, take, drop   组合 zi">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-04-03T23:42:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T15:43:03.292Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="Flow">
+<meta property="article:tag" content="Kotlin">
+<meta property="article:tag" content="filter">
+<meta property="article:tag" content="map">
+<meta property="article:tag" content="transform">
+<meta property="article:tag" content="操作符">
+<meta name="twitter:card" content="summary">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Kotlin Flow操作符实战-map filter transform","description":"前言Kotlin Flow 操作符是处理异步数据流的核心工具。本文将详细介绍常用的转换和过滤操作符，包括 map、filter、transform 等。","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:42:00.000Z","dateModified":"2026-04-03T15:43:03.292Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Kotlin-Flow%E6%93%8D%E4%BD%9C%E7%AC%A6%E5%AE%9E%E6%88%98-map-filter-transform/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/03/Kotlin-Flow%E6%93%8D%E4%BD%9C%E7%AC%A6%E5%AE%9E%E6%88%98-map-filter-transform/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Kotlin Flow操作符实战-map filter transform</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-03T23:42:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-03</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~4.21K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Kotlin Flow 操作符是处理异步数据流的核心工具。本文将详细介绍常用的转换和过滤操作符，包括 map、filter、transform 等。</p>
+<h2 id="一、操作符分类"><a href="#一、操作符分类" class="headerlink" title="一、操作符分类"></a>一、操作符分类</h2><table>
+<thead>
+<tr>
+<th>类别</th>
+<th>操作符</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>转换</strong></td>
+<td>map, mapLatest, transform, transformLatest</td>
+</tr>
+<tr>
+<td><strong>过滤</strong></td>
+<td>filter, filterNot, filterNotNull, take, drop</td>
+</tr>
+<tr>
+<td><strong>组合</strong></td>
+<td>zip, combine, merge, flattenConcat</td>
+</tr>
+<tr>
+<td><strong>终端</strong></td>
+<td>collect, toList, first, single</td>
+</tr>
+<tr>
+<td><strong>缓冲</strong></td>
+<td>buffer, conflate, flowOn</td>
+</tr>
+</tbody></table>
+<h2 id="二、map-操作符"><a href="#二、map-操作符" class="headerlink" title="二、map 操作符"></a>二、map 操作符</h2><h3 id="基本用法"><a href="#基本用法" class="headerlink" title="基本用法"></a>基本用法</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">flowOf(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>)</span><br><span class="line">    .map &#123; it * <span class="number">2</span> &#125;</span><br><span class="line">    .collect &#123; println(it) &#125;  <span class="comment">// 2, 4, 6</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="类型转换"><a href="#类型转换" class="headerlink" title="类型转换"></a>类型转换</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">flowOf(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>)</span><br><span class="line">    .map &#123; <span class="string">&quot;Number: <span class="variable">$it</span>&quot;</span> &#125;</span><br><span class="line">    .collect &#123; println(it) &#125;</span><br><span class="line"><span class="comment">// Number: 1, Number: 2, Number: 3</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="mapLatest"><a href="#mapLatest" class="headerlink" title="mapLatest"></a>mapLatest</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">flow &#123;</span><br><span class="line">    emit(<span class="number">1</span>)</span><br><span class="line">    delay(<span class="number">100</span>)</span><br><span class="line">    emit(<span class="number">2</span>)</span><br><span class="line">    delay(<span class="number">100</span>)</span><br><span class="line">    emit(<span class="number">3</span>)</span><br><span class="line">&#125;</span><br><span class="line">.mapLatest &#123; value -&gt;</span><br><span class="line">    delay(<span class="number">150</span>)</span><br><span class="line">    <span class="string">&quot;Processed: <span class="variable">$value</span>&quot;</span></span><br><span class="line">&#125;</span><br><span class="line">.collect &#123; println(it) &#125;</span><br><span class="line"><span class="comment">// 只输出 Processed: 3</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="三、filter-操作符"><a href="#三、filter-操作符" class="headerlink" title="三、filter 操作符"></a>三、filter 操作符</h2><h3 id="filter"><a href="#filter" class="headerlink" title="filter"></a>filter</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">flowOf(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>)</span><br><span class="line">    .filter &#123; it % <span class="number">2</span> == <span class="number">0</span> &#125;</span><br><span class="line">    .collect &#123; println(it) &#125;  <span class="comment">// 2, 4</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="filterNot"><a href="#filterNot" class="headerlink" title="filterNot"></a>filterNot</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">flowOf(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>)</span><br><span class="line">    .filterNot &#123; it % <span class="number">2</span> == <span class="number">0</span> &#125;</span><br><span class="line">    .collect &#123; println(it) &#125;  <span class="comment">// 1, 3, 5</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="filterNotNull"><a href="#filterNotNull" class="headerlink" title="filterNotNull"></a>filterNotNull</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">flowOf(<span class="number">1</span>, <span class="literal">null</span>, <span class="number">3</span>, <span class="literal">null</span>, <span class="number">5</span>)</span><br><span class="line">    .filterNotNull()</span><br><span class="line">    .collect &#123; println(it) &#125;  <span class="comment">// 1, 3, 5</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="filterIsInstance"><a href="#filterIsInstance" class="headerlink" title="filterIsInstance"></a>filterIsInstance</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">flowOf(<span class="number">1</span>, <span class="string">&quot;Hello&quot;</span>, <span class="number">3</span>, <span class="string">&quot;World&quot;</span>)</span><br><span class="line">    .filterIsInstance&lt;String&gt;()</span><br><span class="line">    .collect &#123; println(it) &#125;  <span class="comment">// Hello, World</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="四、transform-操作符"><a href="#四、transform-操作符" class="headerlink" title="四、transform 操作符"></a>四、transform 操作符</h2><h3 id="基本用法-1"><a href="#基本用法-1" class="headerlink" title="基本用法"></a>基本用法</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">flowOf(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>)</span><br><span class="line">    .transform &#123; value -&gt;</span><br><span class="line">        emit(<span class="string">&quot;Start: <span class="variable">$value</span>&quot;</span>)</span><br><span class="line">        emit(<span class="string">&quot;End: <span class="variable">$value</span>&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    .collect &#123; println(it) &#125;</span><br><span class="line"><span class="comment">// Start: 1, End: 1, Start: 2, End: 2, Start: 3, End: 3</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="实现-filter-map"><a href="#实现-filter-map" class="headerlink" title="实现 filter + map"></a>实现 filter + map</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">flowOf(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>)</span><br><span class="line">    .transform &#123; value -&gt;</span><br><span class="line">        <span class="keyword">if</span> (value % <span class="number">2</span> == <span class="number">0</span>) &#123;</span><br><span class="line">            emit(value * <span class="number">10</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    .collect &#123; println(it) &#125;  <span class="comment">// 20, 40</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="多次发射"><a href="#多次发射" class="headerlink" title="多次发射"></a>多次发射</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">flowOf(<span class="string">&quot;a&quot;</span>, <span class="string">&quot;b&quot;</span>, <span class="string">&quot;c&quot;</span>)</span><br><span class="line">    .transform &#123; value -&gt;</span><br><span class="line">        emit(value.uppercase())</span><br><span class="line">        emit(value.lowercase())</span><br><span class="line">    &#125;</span><br><span class="line">    .collect &#123; println(it) &#125;</span><br><span class="line"><span class="comment">// A, a, B, b, C, c</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="五、take-操作符"><a href="#五、take-操作符" class="headerlink" title="五、take 操作符"></a>五、take 操作符</h2><h3 id="take"><a href="#take" class="headerlink" title="take"></a>take</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">flowOf(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>)</span><br><span class="line">    .take(<span class="number">3</span>)</span><br><span class="line">    .collect &#123; println(it) &#125;  <span class="comment">// 1, 2, 3</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="takeWhile"><a href="#takeWhile" class="headerlink" title="takeWhile"></a>takeWhile</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">flowOf(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>)</span><br><span class="line">    .takeWhile &#123; it &lt; <span class="number">4</span> &#125;</span><br><span class="line">    .collect &#123; println(it) &#125;  <span class="comment">// 1, 2, 3</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="takeLast"><a href="#takeLast" class="headerlink" title="takeLast"></a>takeLast</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">flowOf(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>)</span><br><span class="line">    .takeLast(<span class="number">2</span>)</span><br><span class="line">    .collect &#123; println(it) &#125;  <span class="comment">// 4, 5</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="六、drop-操作符"><a href="#六、drop-操作符" class="headerlink" title="六、drop 操作符"></a>六、drop 操作符</h2><h3 id="drop"><a href="#drop" class="headerlink" title="drop"></a>drop</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">flowOf(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>)</span><br><span class="line">    .drop(<span class="number">2</span>)</span><br><span class="line">    .collect &#123; println(it) &#125;  <span class="comment">// 3, 4, 5</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="dropWhile"><a href="#dropWhile" class="headerlink" title="dropWhile"></a>dropWhile</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">flowOf(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>)</span><br><span class="line">    .dropWhile &#123; it &lt; <span class="number">3</span> &#125;</span><br><span class="line">    .collect &#123; println(it) &#125;  <span class="comment">// 3, 4, 5</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="七、distinct-操作符"><a href="#七、distinct-操作符" class="headerlink" title="七、distinct 操作符"></a>七、distinct 操作符</h2><h3 id="distinct"><a href="#distinct" class="headerlink" title="distinct"></a>distinct</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">flowOf(<span class="number">1</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">3</span>)</span><br><span class="line">    .distinct()</span><br><span class="line">    .collect &#123; println(it) &#125;  <span class="comment">// 1, 2, 3</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="distinctBy"><a href="#distinctBy" class="headerlink" title="distinctBy"></a>distinctBy</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">User</span>(<span class="keyword">val</span> id: <span class="built_in">Int</span>, <span class="keyword">val</span> name: String)</span><br><span class="line"></span><br><span class="line">flowOf(</span><br><span class="line">    User(<span class="number">1</span>, <span class="string">&quot;Alice&quot;</span>),</span><br><span class="line">    User(<span class="number">2</span>, <span class="string">&quot;Bob&quot;</span>),</span><br><span class="line">    User(<span class="number">1</span>, <span class="string">&quot;Alice2&quot;</span>)</span><br><span class="line">)</span><br><span class="line">.distinctBy &#123; it.id &#125;</span><br><span class="line">.collect &#123; println(it) &#125;</span><br><span class="line"><span class="comment">// User(1, Alice), User(2, Bob)</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="八、实战应用"><a href="#八、实战应用" class="headerlink" title="八、实战应用"></a>八、实战应用</h2><h3 id="网络请求-缓存"><a href="#网络请求-缓存" class="headerlink" title="网络请求 + 缓存"></a>网络请求 + 缓存</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">loadData</span><span class="params">()</span></span>: Flow&lt;Result&lt;Data&gt;&gt; = flow &#123;</span><br><span class="line">    <span class="comment">// 先发射缓存数据</span></span><br><span class="line">    <span class="keyword">val</span> cached = cache.<span class="keyword">get</span>()</span><br><span class="line">    <span class="keyword">if</span> (cached != <span class="literal">null</span>) &#123;</span><br><span class="line">        emit(Result.Loading(cached))</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 发射网络数据</span></span><br><span class="line">    <span class="keyword">val</span> remote = api.fetch()</span><br><span class="line">    emit(Result.Success(remote))</span><br><span class="line">&#125;</span><br><span class="line">.flowOn(Dispatchers.IO)</span><br></pre></td></tr></table></figure>
+
+<h3 id="搜索防抖"><a href="#搜索防抖" class="headerlink" title="搜索防抖"></a>搜索防抖</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">search</span><span class="params">(query: <span class="type">Flow</span>&lt;<span class="type">String</span>&gt;)</span></span>: Flow&lt;List&lt;Item&gt;&gt; = query</span><br><span class="line">    .debounce(<span class="number">300</span>)</span><br><span class="line">    .filter &#123; it.length &gt;= <span class="number">2</span> &#125;</span><br><span class="line">    .distinctUntilChanged()</span><br><span class="line">    .mapLatest &#123; query -&gt;</span><br><span class="line">        repository.search(query)</span><br><span class="line">    &#125;</span><br><span class="line">    .flowOn(Dispatchers.IO)</span><br></pre></td></tr></table></figure>
+
+<h3 id="数据转换流水线"><a href="#数据转换流水线" class="headerlink" title="数据转换流水线"></a>数据转换流水线</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">flowOf(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>)</span><br><span class="line">    .filter &#123; it % <span class="number">2</span> == <span class="number">0</span> &#125;</span><br><span class="line">    .map &#123; it * <span class="number">10</span> &#125;</span><br><span class="line">    .take(<span class="number">2</span>)</span><br><span class="line">    .collect &#123; println(it) &#125;  <span class="comment">// 20, 40</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="九、性能考虑"><a href="#九、性能考虑" class="headerlink" title="九、性能考虑"></a>九、性能考虑</h2><h3 id="操作符选择"><a href="#操作符选择" class="headerlink" title="操作符选择"></a>操作符选择</h3><table>
+<thead>
+<tr>
+<th>操作符</th>
+<th>性能</th>
+<th>场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>map</td>
+<td>高</td>
+<td>简单转换</td>
+</tr>
+<tr>
+<td>transform</td>
+<td>中</td>
+<td>复杂逻辑</td>
+</tr>
+<tr>
+<td>mapLatest</td>
+<td>中</td>
+<td>需要取消前一个</td>
+</tr>
+</tbody></table>
+<h3 id="避免过度操作"><a href="#避免过度操作" class="headerlink" title="避免过度操作"></a>避免过度操作</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ❌ 错误：多次遍历</span></span><br><span class="line">flow.map &#123; ... &#125;.filter &#123; ... &#125;.map &#123; ... &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// ✅ 正确：合并操作</span></span><br><span class="line">flow.transform &#123; value -&gt;</span><br><span class="line">    <span class="keyword">if</span> (condition(value)) &#123;</span><br><span class="line">        emit(transform(value))</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="十、最佳实践"><a href="#十、最佳实践" class="headerlink" title="十、最佳实践"></a>十、最佳实践</h2><ol>
+<li><strong>链式调用</strong>：充分利用操作符组合</li>
+<li><strong>选择合适的操作符</strong>：根据需求选择</li>
+<li><strong>注意线程切换</strong>：使用 flowOn</li>
+<li><strong>异常处理</strong>：使用 catch 操作符</li>
+<li><strong>资源清理</strong>：使用 onCompletion</li>
+</ol>
+<h2 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/transform.html">transform | kotlinx.coroutines</a></li>
+<li><a target="_blank" rel="noopener" href="https://juejin.cn/post/7565813468727361555">玩转 Flow 操作符：数据转换与过滤</a></li>
+<li><a target="_blank" rel="noopener" href="https://medium.com/@shivayogih25/kotlin-flow-operators-complete-guide-with-use-cases-995270effdc9">Kotlin Flow Operators — Complete Guide</a></li>
+</ul>
+<hr>
+<p><em>持续学习中…</em></p>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/Flow/" rel="tag">Flow</a>, <a class="tag-none-link" href="/blog/tags/Kotlin/" rel="tag">Kotlin</a>, <a class="tag-none-link" href="/blog/tags/filter/" rel="tag">filter</a>, <a class="tag-none-link" href="/blog/tags/map/" rel="tag">map</a>, <a class="tag-none-link" href="/blog/tags/transform/" rel="tag">transform</a>, <a class="tag-none-link" href="/blog/tags/%E6%93%8D%E4%BD%9C%E7%AC%A6/" rel="tag">操作符</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-03T15:43:03.292Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Android热修复Tinker学习" href="/blog/2026/04/03/Android热修复Tinker学习/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" Android JNI NDK Native开发学习" href="/blog/2026/04/03/Android-JNI-NDK-Native开发学习/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>

@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>Kotlin Reified实化类型参数学习 | Wenyi&#39;s Blog</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/03/Kotlin-Reified%E5%AE%9E%E5%8C%96%E7%B1%BB%E5%9E%8B%E5%8F%82%E6%95%B0%E5%AD%A6%E4%B9%A0/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="Kotlin, Reified, 内联函数, 泛型, 类型擦除" />
+  
+  <meta name="description" content="前言Kotlin 和 Java 一样，在编译阶段会擦除泛型类型信息。reified 关键字可以让泛型参数在运行时”具体化”，获得其实际类型信息。 一、类型擦除问题什么是类型擦除？在编译阶段，泛型类型信息会被擦除：  List&lt;String&gt; 和 List&lt;Int&gt; 在运行时都只是 List  带来的问题1234&#x2F;&#x2F; ❌ 编译错误：无法访问 T.classfun &lt;T&amp;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kotlin Reified实化类型参数学习">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/03/Kotlin-Reified%E5%AE%9E%E5%8C%96%E7%B1%BB%E5%9E%8B%E5%8F%82%E6%95%B0%E5%AD%A6%E4%B9%A0/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:description" content="前言Kotlin 和 Java 一样，在编译阶段会擦除泛型类型信息。reified 关键字可以让泛型参数在运行时”具体化”，获得其实际类型信息。 一、类型擦除问题什么是类型擦除？在编译阶段，泛型类型信息会被擦除：  List&lt;String&gt; 和 List&lt;Int&gt; 在运行时都只是 List  带来的问题1234&#x2F;&#x2F; ❌ 编译错误：无法访问 T.classfun &lt;T&amp;">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-04-03T23:33:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T15:33:27.224Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="Kotlin">
+<meta property="article:tag" content="Reified">
+<meta property="article:tag" content="内联函数">
+<meta property="article:tag" content="泛型">
+<meta property="article:tag" content="类型擦除">
+<meta name="twitter:card" content="summary">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Kotlin Reified实化类型参数学习","description":"前言Kotlin 和 Java 一样，在编译阶段会擦除泛型类型信息。reified 关键字可以让泛型参数在运行时”具体化”，获得其实际类型信息。\n","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:33:00.000Z","dateModified":"2026-04-03T15:33:27.224Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Kotlin-Reified%E5%AE%9E%E5%8C%96%E7%B1%BB%E5%9E%8B%E5%8F%82%E6%95%B0%E5%AD%A6%E4%B9%A0/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/03/Kotlin-Reified%E5%AE%9E%E5%8C%96%E7%B1%BB%E5%9E%8B%E5%8F%82%E6%95%B0%E5%AD%A6%E4%B9%A0/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Kotlin Reified实化类型参数学习</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-03T23:33:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-03</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~3.56K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Kotlin 和 Java 一样，在编译阶段会擦除泛型类型信息。reified 关键字可以让泛型参数在运行时”具体化”，获得其实际类型信息。</p>
+<h2 id="一、类型擦除问题"><a href="#一、类型擦除问题" class="headerlink" title="一、类型擦除问题"></a>一、类型擦除问题</h2><h3 id="什么是类型擦除？"><a href="#什么是类型擦除？" class="headerlink" title="什么是类型擦除？"></a>什么是类型擦除？</h3><p>在编译阶段，泛型类型信息会被擦除：</p>
+<ul>
+<li><code>List&lt;String&gt;</code> 和 <code>List&lt;Int&gt;</code> 在运行时都只是 <code>List</code></li>
+</ul>
+<h3 id="带来的问题"><a href="#带来的问题" class="headerlink" title="带来的问题"></a>带来的问题</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ❌ 编译错误：无法访问 T.class</span></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="type">&lt;T&gt;</span> <span class="title">readValue</span><span class="params">(<span class="keyword">data</span>: <span class="type">ByteArray</span>)</span></span>: T &#123;</span><br><span class="line">    <span class="keyword">val</span> type = T::<span class="keyword">class</span>.java <span class="comment">// 错误！</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Java-的解决方案"><a href="#Java-的解决方案" class="headerlink" title="Java 的解决方案"></a>Java 的解决方案</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 使用 TypeReference</span></span><br><span class="line">Map&lt;String, String&gt; json = objectMapper.readValue(data,</span><br><span class="line">    <span class="keyword">new</span> <span class="title class_">TypeReference</span>&lt;Map&lt;String, String&gt;&gt;() &#123;&#125;);</span><br></pre></td></tr></table></figure>
+
+<h2 id="二、内联函数"><a href="#二、内联函数" class="headerlink" title="二、内联函数"></a>二、内联函数</h2><h3 id="inline-关键字"><a href="#inline-关键字" class="headerlink" title="inline 关键字"></a>inline 关键字</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">inline</span> <span class="function"><span class="keyword">fun</span> <span class="title">printHello</span><span class="params">()</span></span> &#123;</span><br><span class="line">    print(<span class="string">&quot;Hello &quot;</span>)</span><br><span class="line">    println(<span class="string">&quot;World&quot;</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 编译后，函数体会被内联到调用点</span></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    print(<span class="string">&quot;Hello &quot;</span>)</span><br><span class="line">    println(<span class="string">&quot;World&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="内联的优势"><a href="#内联的优势" class="headerlink" title="内联的优势"></a>内联的优势</h3><ul>
+<li>减少函数调用开销</li>
+<li>在编译时知道调用点的上下文信息</li>
+<li>为 reified 类型参数提供可能</li>
+</ul>
+<h2 id="三、reified-使用"><a href="#三、reified-使用" class="headerlink" title="三、reified 使用"></a>三、reified 使用</h2><h3 id="基本语法"><a href="#基本语法" class="headerlink" title="基本语法"></a>基本语法</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">inline</span> <span class="function"><span class="keyword">fun</span> <span class="type">&lt;<span class="keyword">reified</span> T&gt;</span> ObjectMapper.<span class="title">readValue</span><span class="params">(<span class="keyword">data</span>: <span class="type">ByteArray</span>)</span></span>: T =</span><br><span class="line">    readValue(<span class="keyword">data</span>, <span class="keyword">object</span> : TypeReference&lt;T&gt;() &#123;&#125;)</span><br></pre></td></tr></table></figure>
+
+<h3 id="调用方式"><a href="#调用方式" class="headerlink" title="调用方式"></a>调用方式</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ✅ 简洁调用</span></span><br><span class="line"><span class="keyword">val</span> json = objectMapper.readValue&lt;String&gt;(<span class="keyword">data</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// ✅ 利用类型推导</span></span><br><span class="line"><span class="keyword">val</span> json: String = objectMapper.readValue(<span class="keyword">data</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// ✅ 泛型结构</span></span><br><span class="line"><span class="keyword">val</span> json: Map&lt;String, String&gt; = objectMapper.readValue(<span class="keyword">data</span>)</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、常用场景"><a href="#四、常用场景" class="headerlink" title="四、常用场景"></a>四、常用场景</h2><h3 id="类型检查"><a href="#类型检查" class="headerlink" title="类型检查"></a>类型检查</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">inline</span> <span class="function"><span class="keyword">fun</span> <span class="type">&lt;<span class="keyword">reified</span> T&gt;</span> Any?.<span class="title">isOfType</span><span class="params">()</span></span>: <span class="built_in">Boolean</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span> <span class="keyword">is</span> T</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用</span></span><br><span class="line">println(<span class="string">&quot;hello&quot;</span>.isOfType&lt;String&gt;()) <span class="comment">// true</span></span><br><span class="line">println(<span class="string">&quot;hello&quot;</span>.isOfType&lt;<span class="built_in">Int</span>&gt;())    <span class="comment">// false</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="创建实例"><a href="#创建实例" class="headerlink" title="创建实例"></a>创建实例</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">inline</span> <span class="function"><span class="keyword">fun</span> <span class="type">&lt;<span class="keyword">reified</span> T&gt;</span> <span class="title">create</span><span class="params">()</span></span>: T &#123;</span><br><span class="line">    <span class="keyword">return</span> T::<span class="keyword">class</span>.java.getDeclaredConstructor().newInstance()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用</span></span><br><span class="line"><span class="keyword">val</span> user = create&lt;User&gt;()</span><br></pre></td></tr></table></figure>
+
+<h3 id="泛型数组"><a href="#泛型数组" class="headerlink" title="泛型数组"></a>泛型数组</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">inline</span> <span class="function"><span class="keyword">fun</span> <span class="type">&lt;<span class="keyword">reified</span> T&gt;</span> <span class="title">createArray</span><span class="params">(size: <span class="type">Int</span>)</span></span>: Array&lt;T&gt; &#123;</span><br><span class="line">    <span class="keyword">return</span> Array(size) &#123; create&lt;T&gt;() &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用</span></span><br><span class="line"><span class="keyword">val</span> users = createArray&lt;User&gt;(<span class="number">10</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="JSON-解析"><a href="#JSON-解析" class="headerlink" title="JSON 解析"></a>JSON 解析</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">inline</span> <span class="function"><span class="keyword">fun</span> <span class="type">&lt;<span class="keyword">reified</span> T&gt;</span> <span class="title">fromJson</span><span class="params">(json: <span class="type">String</span>)</span></span>: T &#123;</span><br><span class="line">    <span class="keyword">return</span> Gson().fromJson(json, T::<span class="keyword">class</span>.java)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用</span></span><br><span class="line"><span class="keyword">val</span> user = fromJson&lt;User&gt;(jsonString)</span><br></pre></td></tr></table></figure>
+
+<h3 id="启动-Activity"><a href="#启动-Activity" class="headerlink" title="启动 Activity"></a>启动 Activity</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">inline</span> <span class="function"><span class="keyword">fun</span> <span class="type">&lt;<span class="keyword">reified</span> T : Activity&gt;</span> Context.<span class="title">startActivity</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">val</span> intent = Intent(<span class="keyword">this</span>, T::<span class="keyword">class</span>.java)</span><br><span class="line">    startActivity(intent)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用</span></span><br><span class="line">startActivity&lt;DetailActivity&gt;()</span><br></pre></td></tr></table></figure>
+
+<h2 id="五、原理分析"><a href="#五、原理分析" class="headerlink" title="五、原理分析"></a>五、原理分析</h2><h3 id="字节码层面"><a href="#字节码层面" class="headerlink" title="字节码层面"></a>字节码层面</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> json: Map&lt;String, String&gt; = objectMapper.readValue(<span class="keyword">data</span>)</span><br></pre></td></tr></table></figure>
+
+<p>等价于 Java 代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;String, String&gt; json = objectMapper.readValue(data,</span><br><span class="line">    <span class="keyword">new</span> <span class="title class_">TypeReference</span>&lt;Map&lt;String, String&gt;&gt;() &#123;&#125;);</span><br></pre></td></tr></table></figure>
+
+<h3 id="编译器魔法"><a href="#编译器魔法" class="headerlink" title="编译器魔法"></a>编译器魔法</h3><ul>
+<li>内联时保留泛型类型信息</li>
+<li>生成 TypeReference 匿名子类</li>
+<li>自动进行类型转换</li>
+</ul>
+<h2 id="六、限制"><a href="#六、限制" class="headerlink" title="六、限制"></a>六、限制</h2><h3 id="只能用于内联函数"><a href="#只能用于内联函数" class="headerlink" title="只能用于内联函数"></a>只能用于内联函数</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ❌ 错误：reified 只能用于内联函数</span></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="type">&lt;<span class="keyword">reified</span> T&gt;</span> <span class="title">wrong</span><span class="params">()</span></span> &#123; &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// ✅ 正确</span></span><br><span class="line"><span class="keyword">inline</span> <span class="function"><span class="keyword">fun</span> <span class="type">&lt;<span class="keyword">reified</span> T&gt;</span> <span class="title">correct</span><span class="params">()</span></span> &#123; &#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="不能用于类"><a href="#不能用于类" class="headerlink" title="不能用于类"></a>不能用于类</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ❌ 错误：不能用于类</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Container</span>&lt;<span class="type">reified T</span>&gt; &#123; &#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="不能用于非内联函数参数"><a href="#不能用于非内联函数参数" class="headerlink" title="不能用于非内联函数参数"></a>不能用于非内联函数参数</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ❌ 错误</span></span><br><span class="line"><span class="keyword">inline</span> <span class="function"><span class="keyword">fun</span> <span class="type">&lt;<span class="keyword">reified</span> T&gt;</span> <span class="title">foo</span><span class="params">(block: (<span class="type">T</span>) -&gt; <span class="type">Unit</span>)</span></span> &#123;</span><br><span class="line">    <span class="comment">// 不能在非内联 lambda 中使用 T</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="七、最佳实践"><a href="#七、最佳实践" class="headerlink" title="七、最佳实践"></a>七、最佳实践</h2><h3 id="1-结合扩展函数"><a href="#1-结合扩展函数" class="headerlink" title="1. 结合扩展函数"></a>1. 结合扩展函数</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">inline</span> <span class="function"><span class="keyword">fun</span> <span class="type">&lt;<span class="keyword">reified</span> T&gt;</span> String.<span class="title">parseJson</span><span class="params">()</span></span>: T &#123;</span><br><span class="line">    <span class="keyword">return</span> Gson().fromJson(<span class="keyword">this</span>, T::<span class="keyword">class</span>.java)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-工厂方法"><a href="#2-工厂方法" class="headerlink" title="2. 工厂方法"></a>2. 工厂方法</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">inline</span> <span class="function"><span class="keyword">fun</span> <span class="type">&lt;<span class="keyword">reified</span> T : ViewModel&gt;</span> <span class="title">viewModelFactory</span><span class="params">()</span></span>: ViewModelProvider.Factory &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">object</span> : ViewModelProvider.Factory &#123;</span><br><span class="line">        <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="type">&lt;VM : ViewModel&gt;</span> <span class="title">create</span><span class="params">(modelClass: <span class="type">Class</span>&lt;<span class="type">VM</span>&gt;)</span></span>: VM &#123;</span><br><span class="line">            <span class="meta">@Suppress(<span class="string">&quot;UNCHECKED_CAST&quot;</span>)</span></span><br><span class="line">            <span class="keyword">return</span> create&lt;T&gt;() <span class="keyword">as</span> VM</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-反射简化"><a href="#3-反射简化" class="headerlink" title="3. 反射简化"></a>3. 反射简化</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">inline</span> <span class="function"><span class="keyword">fun</span> <span class="type">&lt;<span class="keyword">reified</span> T&gt;</span> KClass<span class="type">&lt;T&gt;</span>.<span class="title">createInstance</span><span class="params">()</span></span>: T &#123;</span><br><span class="line">    <span class="keyword">return</span> java.getDeclaredConstructor().newInstance()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="八、reified-vs-Java-泛型"><a href="#八、reified-vs-Java-泛型" class="headerlink" title="八、reified vs Java 泛型"></a>八、reified vs Java 泛型</h2><table>
+<thead>
+<tr>
+<th>特性</th>
+<th>Java</th>
+<th>Kotlin reified</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>运行时类型</strong></td>
+<td>擦除</td>
+<td>保留</td>
+</tr>
+<tr>
+<td><strong>类型检查</strong></td>
+<td>不支持</td>
+<td>支持 <code>is T</code></td>
+</tr>
+<tr>
+<td><strong>类字面量</strong></td>
+<td>不支持 <code>T.class</code></td>
+<td>支持 <code>T::class</code></td>
+</tr>
+<tr>
+<td><strong>简洁性</strong></td>
+<td>需要 TypeReference</td>
+<td>直接使用</td>
+</tr>
+</tbody></table>
+<h2 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://www.baeldung-cn.com/kotlin/reified-functions">Kotlin 中的 reified 函数详解</a></li>
+<li><a target="_blank" rel="noopener" href="https://juejin.cn/post/7597416716542640134">告别”类型擦除”：深入解析 Kotlin 中的 Inline 与 Reified 黑魔法</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/gitblog_00385/article/details/152391529">Kotlin泛型数组创建终极指南</a></li>
+</ul>
+<hr>
+<p><em>持续学习中…</em></p>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/Kotlin/" rel="tag">Kotlin</a>, <a class="tag-none-link" href="/blog/tags/Reified/" rel="tag">Reified</a>, <a class="tag-none-link" href="/blog/tags/%E5%86%85%E8%81%94%E5%87%BD%E6%95%B0/" rel="tag">内联函数</a>, <a class="tag-none-link" href="/blog/tags/%E6%B3%9B%E5%9E%8B/" rel="tag">泛型</a>, <a class="tag-none-link" href="/blog/tags/%E7%B1%BB%E5%9E%8B%E6%93%A6%E9%99%A4/" rel="tag">类型擦除</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-03T15:33:27.224Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Android ANR问题分析与解决" href="/blog/2026/04/03/Android-ANR问题分析与解决/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" Android应用启动优化学习" href="/blog/2026/04/03/Android应用启动优化学习/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>

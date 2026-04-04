@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>Android Jetpack组件学习-DataStore数据存储 | Wenyi&#39;s Blog</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/03/Android-Jetpack%E7%BB%84%E4%BB%B6%E5%AD%A6%E4%B9%A0-DataStore%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="Android, DataStore, Jetpack, Kotlin, SharedPreferences" />
+  
+  <meta name="description" content="前言Jetpack DataStore 是一种数据存储解决方案，是 SharedPreferences 的现代替代方案。它使用 Kotlin 协程和 Flow 以异步、一致的事务方式存储数据。 DataStore 概述优势 异步 API：使用协程和 Flow 类型安全：支持类型化对象存储 事务性：数据更新是一致的 错误处理：提供完善的错误处理机制  两种实现   类型 描述 适用场景    Pre">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android Jetpack组件学习-DataStore数据存储">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/03/Android-Jetpack%E7%BB%84%E4%BB%B6%E5%AD%A6%E4%B9%A0-DataStore%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:description" content="前言Jetpack DataStore 是一种数据存储解决方案，是 SharedPreferences 的现代替代方案。它使用 Kotlin 协程和 Flow 以异步、一致的事务方式存储数据。 DataStore 概述优势 异步 API：使用协程和 Flow 类型安全：支持类型化对象存储 事务性：数据更新是一致的 错误处理：提供完善的错误处理机制  两种实现   类型 描述 适用场景    Pre">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-04-03T18:06:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T10:06:40.876Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="DataStore">
+<meta property="article:tag" content="Jetpack">
+<meta property="article:tag" content="Kotlin">
+<meta property="article:tag" content="SharedPreferences">
+<meta name="twitter:card" content="summary">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Android Jetpack组件学习-DataStore数据存储","description":"前言Jetpack DataStore 是一种数据存储解决方案，是 SharedPreferences 的现代替代方案。它使用 Kotlin 协程和 Flow...","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T18:06:00.000Z","dateModified":"2026-04-03T10:06:40.876Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Android-Jetpack%E7%BB%84%E4%BB%B6%E5%AD%A6%E4%B9%A0-DataStore%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/03/Android-Jetpack%E7%BB%84%E4%BB%B6%E5%AD%A6%E4%B9%A0-DataStore%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Android Jetpack组件学习-DataStore数据存储</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-03T18:06:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-03</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~3.52K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Jetpack DataStore 是一种数据存储解决方案，是 SharedPreferences 的现代替代方案。它使用 Kotlin 协程和 Flow 以异步、一致的事务方式存储数据。</p>
+<h2 id="DataStore-概述"><a href="#DataStore-概述" class="headerlink" title="DataStore 概述"></a>DataStore 概述</h2><h3 id="优势"><a href="#优势" class="headerlink" title="优势"></a>优势</h3><ul>
+<li><strong>异步 API</strong>：使用协程和 Flow</li>
+<li><strong>类型安全</strong>：支持类型化对象存储</li>
+<li><strong>事务性</strong>：数据更新是一致的</li>
+<li><strong>错误处理</strong>：提供完善的错误处理机制</li>
+</ul>
+<h3 id="两种实现"><a href="#两种实现" class="headerlink" title="两种实现"></a>两种实现</h3><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>描述</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Preferences DataStore</strong></td>
+<td>类似 SharedPreferences，不需要预定义架构</td>
+<td>简单键值对存储</td>
+</tr>
+<tr>
+<td><strong>Proto DataStore</strong></td>
+<td>存储类型化对象，需要预定义架构</td>
+<td>复杂数据结构</td>
+</tr>
+</tbody></table>
+<h2 id="设置依赖"><a href="#设置依赖" class="headerlink" title="设置依赖"></a>设置依赖</h2><h3 id="Preferences-DataStore"><a href="#Preferences-DataStore" class="headerlink" title="Preferences DataStore"></a>Preferences DataStore</h3><figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">dependencies</span> &#123;</span><br><span class="line">    implementation(<span class="string">&quot;androidx.datastore:datastore-preferences:1.2.1&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Proto-DataStore"><a href="#Proto-DataStore" class="headerlink" title="Proto DataStore"></a>Proto DataStore</h3><figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">dependencies</span> &#123;</span><br><span class="line">    implementation(<span class="string">&quot;androidx.datastore:datastore:1.2.1&quot;</span>)</span><br><span class="line">    implementation(<span class="string">&quot;com.google.protobuf:protobuf-kotlin-lite:4.32.1&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Preferences-DataStore-使用"><a href="#Preferences-DataStore-使用" class="headerlink" title="Preferences DataStore 使用"></a>Preferences DataStore 使用</h2><h3 id="创建-DataStore"><a href="#创建-DataStore" class="headerlink" title="创建 DataStore"></a>创建 DataStore</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">val</span> Context.dataStore: DataStore&lt;Preferences&gt; <span class="keyword">by</span> preferencesDataStore(name = <span class="string">&quot;settings&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="定义键"><a href="#定义键" class="headerlink" title="定义键"></a>定义键</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> EXAMPLE_COUNTER = intPreferencesKey(<span class="string">&quot;example_counter&quot;</span>)</span><br><span class="line"><span class="keyword">val</span> USER_NAME = stringPreferencesKey(<span class="string">&quot;user_name&quot;</span>)</span><br><span class="line"><span class="keyword">val</span> IS_LOGGED_IN = booleanPreferencesKey(<span class="string">&quot;is_logged_in&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="读取数据"><a href="#读取数据" class="headerlink" title="读取数据"></a>读取数据</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> flow: Flow&lt;<span class="built_in">Int</span>&gt; = context.dataStore.<span class="keyword">data</span></span><br><span class="line">    .map &#123; preferences -&gt;</span><br><span class="line">        preferences[EXAMPLE_COUNTER] ?: <span class="number">0</span></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="写入数据"><a href="#写入数据" class="headerlink" title="写入数据"></a>写入数据</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">suspend</span> <span class="function"><span class="keyword">fun</span> <span class="title">incrementCounter</span><span class="params">()</span></span> &#123;</span><br><span class="line">    context.dataStore.edit &#123; preferences -&gt;</span><br><span class="line">        <span class="keyword">val</span> currentCounter = preferences[EXAMPLE_COUNTER] ?: <span class="number">0</span></span><br><span class="line">        preferences[EXAMPLE_COUNTER] = currentCounter + <span class="number">1</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Proto-DataStore-使用"><a href="#Proto-DataStore-使用" class="headerlink" title="Proto DataStore 使用"></a>Proto DataStore 使用</h2><h3 id="定义-Proto-文件"><a href="#定义-Proto-文件" class="headerlink" title="定义 Proto 文件"></a>定义 Proto 文件</h3><figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">syntax = <span class="string">&quot;proto3&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">option</span> java_package = <span class="string">&quot;com.example.datastore&quot;</span>;</span><br><span class="line"><span class="keyword">option</span> java_multiple_files = <span class="literal">true</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">message </span><span class="title class_">Settings</span> &#123;</span><br><span class="line">  <span class="type">int32</span> example_counter = <span class="number">1</span>;</span><br><span class="line">  <span class="type">string</span> user_name = <span class="number">2</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="定义序列化器"><a href="#定义序列化器" class="headerlink" title="定义序列化器"></a>定义序列化器</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">object</span> SettingsSerializer : Serializer&lt;Settings&gt; &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="keyword">val</span> defaultValue: Settings = Settings.getDefaultInstance()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">override</span> <span class="keyword">suspend</span> <span class="function"><span class="keyword">fun</span> <span class="title">readFrom</span><span class="params">(input: <span class="type">InputStream</span>)</span></span>: Settings &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> Settings.parseFrom(input)</span><br><span class="line">        &#125; <span class="keyword">catch</span> (exception: InvalidProtocolBufferException) &#123;</span><br><span class="line">            <span class="keyword">throw</span> CorruptionException(<span class="string">&quot;Cannot read proto.&quot;</span>, exception)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">override</span> <span class="keyword">suspend</span> <span class="function"><span class="keyword">fun</span> <span class="title">writeTo</span><span class="params">(t: <span class="type">Settings</span>, output: <span class="type">OutputStream</span>)</span></span> &#123;</span><br><span class="line">        t.writeTo(output)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="创建-DataStore-1"><a href="#创建-DataStore-1" class="headerlink" title="创建 DataStore"></a>创建 DataStore</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">val</span> Context.settingsDataStore: DataStore&lt;Settings&gt; <span class="keyword">by</span> dataStore(</span><br><span class="line">    fileName = <span class="string">&quot;settings.pb&quot;</span>,</span><br><span class="line">    serializer = SettingsSerializer</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<h3 id="读取数据-1"><a href="#读取数据-1" class="headerlink" title="读取数据"></a>读取数据</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> flow: Flow&lt;Settings&gt; = context.settingsDataStore.<span class="keyword">data</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="写入数据-1"><a href="#写入数据-1" class="headerlink" title="写入数据"></a>写入数据</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">suspend</span> <span class="function"><span class="keyword">fun</span> <span class="title">updateSettings</span><span class="params">(newCounter: <span class="type">Int</span>)</span></span> &#123;</span><br><span class="line">    context.settingsDataStore.updateData &#123; currentSettings -&gt;</span><br><span class="line">        currentSettings.toBuilder()</span><br><span class="line">            .setExampleCounter(newCounter)</span><br><span class="line">            .build()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="使用规则"><a href="#使用规则" class="headerlink" title="使用规则"></a>使用规则</h2><ol>
+<li><strong>不要创建多个实例</strong>：同一进程中为给定文件只创建一个 DataStore 实例</li>
+<li><strong>类型必须不可变</strong>：DataStore 的泛型类型必须不可变</li>
+<li><strong>不要混用</strong>：不要对同一个文件混用 SingleProcessDataStore 和 MultiProcessDataStore</li>
+</ol>
+<h2 id="从-SharedPreferences-迁移"><a href="#从-SharedPreferences-迁移" class="headerlink" title="从 SharedPreferences 迁移"></a>从 SharedPreferences 迁移</h2><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> dataStore: DataStore&lt;Preferences&gt; = context.dataStore</span><br><span class="line"></span><br><span class="line"><span class="comment">// 迁移 SharedPreferences</span></span><br><span class="line">dataStore.edit &#123; preferences -&gt;</span><br><span class="line">    <span class="keyword">val</span> sharedPrefs = context.getSharedPreferences(<span class="string">&quot;old_prefs&quot;</span>, Context.MODE_PRIVATE)</span><br><span class="line">    sharedPrefs.all.forEach &#123; (key, value) -&gt;</span><br><span class="line">        <span class="keyword">when</span> (value) &#123;</span><br><span class="line">            <span class="keyword">is</span> <span class="built_in">Int</span> -&gt; preferences[intPreferencesKey(key)] = value</span><br><span class="line">            <span class="keyword">is</span> String -&gt; preferences[stringPreferencesKey(key)] = value</span><br><span class="line">            <span class="keyword">is</span> <span class="built_in">Boolean</span> -&gt; preferences[booleanPreferencesKey(key)] = value</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://developer.android.google.cn/topic/libraries/architecture/datastore?hl=zh-cn">DataStore 官方文档</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.zhifeiya.cn/post/2026/4/1/5438f624">DataStore迁移指南</a></li>
+<li><a target="_blank" rel="noopener" href="https://juejin.cn/post/7535135041821212723">DataStore vs SharedPreferences</a></li>
+</ul>
+<h2 id="下一步"><a href="#下一步" class="headerlink" title="下一步"></a>下一步</h2><ul>
+<li>学习 WorkManager（后台任务）</li>
+<li>学习 Hilt（依赖注入）</li>
+<li>学习 Paging 3（分页加载）</li>
+</ul>
+<hr>
+<p><em>持续学习中…</em></p>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/Android/" rel="tag">Android</a>, <a class="tag-none-link" href="/blog/tags/DataStore/" rel="tag">DataStore</a>, <a class="tag-none-link" href="/blog/tags/Jetpack/" rel="tag">Jetpack</a>, <a class="tag-none-link" href="/blog/tags/Kotlin/" rel="tag">Kotlin</a>, <a class="tag-none-link" href="/blog/tags/SharedPreferences/" rel="tag">SharedPreferences</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-03T10:06:40.876Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Android Jetpack组件学习-Navigation导航" href="/blog/2026/04/03/Android-Jetpack组件学习-Navigation导航/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" Android Jetpack组件学习-WorkManager后台任务" href="/blog/2026/04/03/Android-Jetpack组件学习-WorkManager后台任务/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>

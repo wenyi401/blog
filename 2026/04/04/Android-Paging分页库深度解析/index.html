@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>Android Paging分页库深度解析 | Wenyi&#39;s Blog</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/04/Android-Paging%E5%88%86%E9%A1%B5%E5%BA%93%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="Android, Paging, RecyclerView, 分页" />
+  
+  <meta name="description" content="前言Paging 库帮助您一次加载和显示多个小的数据块。按需载入部分数据会减少网络带宽和系统资源的使用量。 一、添加依赖1234567891011dependencies &#123;    val paging_version &#x3D; &quot;3.2.0&quot;        implementation(&quot;androidx.paging:paging-runtime:$pagin">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android Paging分页库深度解析">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/04/Android-Paging%E5%88%86%E9%A1%B5%E5%BA%93%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:description" content="前言Paging 库帮助您一次加载和显示多个小的数据块。按需载入部分数据会减少网络带宽和系统资源的使用量。 一、添加依赖1234567891011dependencies &#123;    val paging_version &#x3D; &quot;3.2.0&quot;        implementation(&quot;androidx.paging:paging-runtime:$pagin">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-04-04T03:50:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T19:48:39.688Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="Paging">
+<meta property="article:tag" content="RecyclerView">
+<meta property="article:tag" content="分页">
+<meta name="twitter:card" content="summary">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Android Paging分页库深度解析","description":"前言Paging 库帮助您一次加载和显示多个小的数据块。按需载入部分数据会减少网络带宽和系统资源的使用量。\n","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-04T03:50:00.000Z","dateModified":"2026-04-03T19:48:39.688Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/04/Android-Paging%E5%88%86%E9%A1%B5%E5%BA%93%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/04/Android-Paging%E5%88%86%E9%A1%B5%E5%BA%93%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Android Paging分页库深度解析</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-04T03:50:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-04</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~5.41K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Paging 库帮助您一次加载和显示多个小的数据块。按需载入部分数据会减少网络带宽和系统资源的使用量。</p>
+<h2 id="一、添加依赖"><a href="#一、添加依赖" class="headerlink" title="一、添加依赖"></a>一、添加依赖</h2><figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">dependencies</span> &#123;</span><br><span class="line">    val paging_version = <span class="string">&quot;3.2.0&quot;</span></span><br><span class="line">    </span><br><span class="line">    implementation(<span class="string">&quot;androidx.paging:paging-runtime:$paging_version&quot;</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 可选 - RxJava 支持</span></span><br><span class="line">    implementation(<span class="string">&quot;androidx.paging:paging-rxjava2:$paging_version&quot;</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 可选 - Compose 支持</span></span><br><span class="line">    implementation(<span class="string">&quot;androidx.paging:paging-compose:$paging_version&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="二、核心组件"><a href="#二、核心组件" class="headerlink" title="二、核心组件"></a>二、核心组件</h2><h3 id="1-PagedList"><a href="#1-PagedList" class="headerlink" title="1. PagedList"></a>1. PagedList</h3><p>PagedList 类用于加载应用数据块（页面）。随着所需数据的增多，系统会将其分页到现有的 PagedList 对象中。</p>
+<h3 id="2-DataSource"><a href="#2-DataSource" class="headerlink" title="2. DataSource"></a>2. DataSource</h3><p>每个 PagedList 实例从对应的 DataSource 对象加载应用数据的最新快照。</p>
+<h3 id="3-PagedListAdapter"><a href="#3-PagedListAdapter" class="headerlink" title="3. PagedListAdapter"></a>3. PagedListAdapter</h3><p>PagedList 使用 PagedListAdapter 将项加载到 RecyclerView。</p>
+<h2 id="三、基本使用"><a href="#三、基本使用" class="headerlink" title="三、基本使用"></a>三、基本使用</h2><h3 id="1-定义-DataSource"><a href="#1-定义-DataSource" class="headerlink" title="1. 定义 DataSource"></a>1. 定义 DataSource</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Dao</span></span><br><span class="line"><span class="keyword">interface</span> <span class="title class_">ConcertDao</span> &#123;</span><br><span class="line">    <span class="meta">@Query(<span class="string">&quot;SELECT * FROM concerts ORDER BY date DESC&quot;</span>)</span></span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">concertsByDate</span><span class="params">()</span></span>: DataSource.Factory&lt;<span class="built_in">Int</span>, Concert&gt;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-创建-ViewModel"><a href="#2-创建-ViewModel" class="headerlink" title="2. 创建 ViewModel"></a>2. 创建 ViewModel</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">ConcertViewModel</span>(concertDao: ConcertDao) : ViewModel() &#123;</span><br><span class="line">    <span class="keyword">val</span> concertList: LiveData&lt;PagedList&lt;Concert&gt;&gt; =</span><br><span class="line">        concertDao.concertsByDate().toLiveData(pageSize = <span class="number">50</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-创建-Adapter"><a href="#3-创建-Adapter" class="headerlink" title="3. 创建 Adapter"></a>3. 创建 Adapter</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">ConcertAdapter</span> : <span class="type">PagedListAdapter</span>&lt;<span class="type">Concert, ConcertViewHolder</span>&gt;(DIFF_CALLBACK) &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onBindViewHolder</span><span class="params">(holder: <span class="type">ConcertViewHolder</span>, position: <span class="type">Int</span>)</span></span> &#123;</span><br><span class="line">        <span class="keyword">val</span> concert: Concert? = getItem(position)</span><br><span class="line">        holder.bindTo(concert)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">companion</span> <span class="keyword">object</span> &#123;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">val</span> DIFF_CALLBACK = <span class="keyword">object</span> : DiffUtil.ItemCallback&lt;Concert&gt;() &#123;</span><br><span class="line">            <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">areItemsTheSame</span><span class="params">(oldConcert: <span class="type">Concert</span>, newConcert: <span class="type">Concert</span>)</span></span> =</span><br><span class="line">                oldConcert.id == newConcert.id</span><br><span class="line">            </span><br><span class="line">            <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">areContentsTheSame</span><span class="params">(oldConcert: <span class="type">Concert</span>, newConcert: <span class="type">Concert</span>)</span></span> =</span><br><span class="line">                oldConcert == newConcert</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-观察-PagedList"><a href="#4-观察-PagedList" class="headerlink" title="4. 观察 PagedList"></a>4. 观察 PagedList</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">ConcertActivity</span> : <span class="type">AppCompatActivity</span>() &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> viewModel: ConcertViewModel <span class="keyword">by</span> viewModels()</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onCreate</span><span class="params">(savedInstanceState: <span class="type">Bundle</span>?)</span></span> &#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState)</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">val</span> adapter = ConcertAdapter()</span><br><span class="line">        viewModel.concertList.observe(<span class="keyword">this</span>, adapter::submitList)</span><br><span class="line">        recyclerView.adapter = adapter</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、支持的数据架构"><a href="#四、支持的数据架构" class="headerlink" title="四、支持的数据架构"></a>四、支持的数据架构</h2><h3 id="1-仅限网络"><a href="#1-仅限网络" class="headerlink" title="1. 仅限网络"></a>1. 仅限网络</h3><p>使用同步版本的 Retrofit API，将信息加载到自定义 DataSource 对象中。</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">NetworkDataSource</span>(</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> api: ConcertApi</span><br><span class="line">) : PageKeyedDataSource&lt;<span class="built_in">Int</span>, Concert&gt;() &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">loadInitial</span><span class="params">(params: <span class="type">LoadInitialParams</span>&lt;<span class="type">Int</span>&gt;, callback: <span class="type">LoadInitialCallback</span>&lt;<span class="type">Int</span>, Concert&gt;)</span></span> &#123;</span><br><span class="line">        <span class="keyword">val</span> response = api.getConcerts(page = <span class="number">1</span>, pageSize = params.requestedLoadSize)</span><br><span class="line">        callback.onResult(response.items, <span class="literal">null</span>, <span class="number">2</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">loadAfter</span><span class="params">(params: <span class="type">LoadParams</span>&lt;<span class="type">Int</span>&gt;, callback: <span class="type">LoadCallback</span>&lt;<span class="type">Int</span>, Concert&gt;)</span></span> &#123;</span><br><span class="line">        <span class="keyword">val</span> response = api.getConcerts(page = params.key, pageSize = params.requestedLoadSize)</span><br><span class="line">        callback.onResult(response.items, params.key + <span class="number">1</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-仅限数据库"><a href="#2-仅限数据库" class="headerlink" title="2. 仅限数据库"></a>2. 仅限数据库</h3><p>使用 Room 持久性库，数据变更自动反映在 RecyclerView 中。</p>
+<h3 id="3-网络和数据库"><a href="#3-网络和数据库" class="headerlink" title="3. 网络和数据库"></a>3. 网络和数据库</h3><p>使用 PagedList.BoundaryCallback 监听数据库中的数据何时耗尽：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">ConcertBoundaryCallback</span>(</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> repository: ConcertRepository</span><br><span class="line">) : PagedList.BoundaryCallback&lt;Concert&gt;() &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onZeroItemsLoaded</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="comment">// 数据库为空，从网络加载</span></span><br><span class="line">        repository.fetchAndSaveConcerts()</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onItemAtEndLoaded</span><span class="params">(itemAtEnd: <span class="type">Concert</span>)</span></span> &#123;</span><br><span class="line">        <span class="comment">// 到达数据库末尾，从网络加载更多</span></span><br><span class="line">        repository.fetchAndSaveConcerts(itemAtEnd.id)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="五、处理网络连接错误"><a href="#五、处理网络连接错误" class="headerlink" title="五、处理网络连接错误"></a>五、处理网络连接错误</h2><p>网络连接可能断断续续：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">ConcertViewModel</span> : <span class="type">ViewModel</span>() &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> _networkState = MutableLiveData&lt;NetworkState&gt;()</span><br><span class="line">    <span class="keyword">val</span> networkState: LiveData&lt;NetworkState&gt; = _networkState</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">retry</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="comment">// 重试失败的请求</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 在 Adapter 中显示重试按钮</span></span><br><span class="line"><span class="keyword">when</span> (state) &#123;</span><br><span class="line">    <span class="keyword">is</span> NetworkState.Error -&gt; &#123;</span><br><span class="line">        holder.retryButton.visibility = View.VISIBLE</span><br><span class="line">        holder.retryButton.setOnClickListener &#123; retry() &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="六、RxJava-支持"><a href="#六、RxJava-支持" class="headerlink" title="六、RxJava 支持"></a>六、RxJava 支持</h2><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">ConcertViewModel</span>(concertDao: ConcertDao) : ViewModel() &#123;</span><br><span class="line">    <span class="keyword">val</span> concertList: Observable&lt;PagedList&lt;Concert&gt;&gt; =</span><br><span class="line">        concertDao.concertsByDate().toObservable(pageSize = <span class="number">50</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ConcertActivity</span> : <span class="type">AppCompatActivity</span>() &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> disposable = CompositeDisposable()</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onStart</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="keyword">super</span>.onStart()</span><br><span class="line">        disposable.add(viewModel.concertList.subscribe(adapter::submitList))</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onStop</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="keyword">super</span>.onStop()</span><br><span class="line">        disposable.clear()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="七、最佳实践"><a href="#七、最佳实践" class="headerlink" title="七、最佳实践"></a>七、最佳实践</h2><h3 id="1-选择合适的页面大小"><a href="#1-选择合适的页面大小" class="headerlink" title="1. 选择合适的页面大小"></a>1. 选择合适的页面大小</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 根据列表项大小和设备屏幕选择合适的页面大小</span></span><br><span class="line"><span class="keyword">val</span> pageSize = <span class="keyword">if</span> (isLargeScreen) <span class="number">30</span> <span class="keyword">else</span> <span class="number">20</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="2-使用占位符"><a href="#2-使用占位符" class="headerlink" title="2. 使用占位符"></a>2. 使用占位符</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 在 PagedListAdapter 中处理 null</span></span><br><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onBindViewHolder</span><span class="params">(holder: <span class="type">ConcertViewHolder</span>, position: <span class="type">Int</span>)</span></span> &#123;</span><br><span class="line">    <span class="keyword">val</span> concert: Concert? = getItem(position)</span><br><span class="line">    <span class="keyword">if</span> (concert != <span class="literal">null</span>) &#123;</span><br><span class="line">        holder.bindTo(concert)</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        holder.showPlaceholder()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-预取距离"><a href="#3-预取距离" class="headerlink" title="3. 预取距离"></a>3. 预取距离</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 设置预取距离</span></span><br><span class="line"><span class="keyword">val</span> config = PagedList.Config.Builder()</span><br><span class="line">    .setPageSize(<span class="number">50</span>)</span><br><span class="line">    .setPrefetchDistance(<span class="number">100</span>) <span class="comment">// 距离末尾 100 项时开始加载</span></span><br><span class="line">    .build()</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> concertList = concertDao.concertsByDate().toLiveData(config)</span><br></pre></td></tr></table></figure>
+
+<h2 id="八、常见问题"><a href="#八、常见问题" class="headerlink" title="八、常见问题"></a>八、常见问题</h2><h3 id="问题-1：列表滚动卡顿"><a href="#问题-1：列表滚动卡顿" class="headerlink" title="问题 1：列表滚动卡顿"></a>问题 1：列表滚动卡顿</h3><p><strong>原因</strong>：主线程执行耗时操作。</p>
+<p><strong>解决方案</strong>：使用异步数据源，避免在 onBindViewHolder 中执行耗时操作。</p>
+<h3 id="问题-2：数据重复"><a href="#问题-2：数据重复" class="headerlink" title="问题 2：数据重复"></a>问题 2：数据重复</h3><p><strong>原因</strong>：DataSource 键不正确。</p>
+<p><strong>解决方案</strong>：确保 DataSource 正确处理分页键。</p>
+<h3 id="问题-3：内存泄漏"><a href="#问题-3：内存泄漏" class="headerlink" title="问题 3：内存泄漏"></a>问题 3：内存泄漏</h3><p><strong>原因</strong>：未正确取消订阅。</p>
+<p><strong>解决方案</strong>：在 onStop 或 onDestroy 中取消订阅。</p>
+<h2 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://developer.android.google.cn/topic/libraries/architecture/paging?hl=zh-cn">Paging 库概览 | Android Developers</a></li>
+<li><a target="_blank" rel="noopener" href="https://codelabs.developers.google.cn/codelabs/android-paging/">Android Paging Codelab</a></li>
+</ul>
+<hr>
+<p><em>深入学习中…</em></p>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/Android/" rel="tag">Android</a>, <a class="tag-none-link" href="/blog/tags/Paging/" rel="tag">Paging</a>, <a class="tag-none-link" href="/blog/tags/RecyclerView/" rel="tag">RecyclerView</a>, <a class="tag-none-link" href="/blog/tags/%E5%88%86%E9%A1%B5/" rel="tag">分页</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-03T19:48:39.688Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Kotlin对象声明与表达式深度解析" href="/blog/2026/04/04/Kotlin对象声明与表达式深度解析/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" Kotlin内联函数Inline Functions深度解析" href="/blog/2026/04/04/Kotlin内联函数Inline-Functions深度解析/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>

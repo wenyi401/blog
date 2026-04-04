@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>Android传感器开发-加速度计与陀螺仪 | Wenyi&#39;s Blog</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/03/Android%E4%BC%A0%E6%84%9F%E5%99%A8%E5%BC%80%E5%8F%91-%E5%8A%A0%E9%80%9F%E5%BA%A6%E8%AE%A1%E4%B8%8E%E9%99%80%E8%9E%BA%E4%BB%AA/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="Android, Sensor, 传感器, 加速度, 陀螺仪" />
+  
+  <meta name="description" content="前言Android 平台提供了多种传感器，可让您监控设备的运动。加速度计和陀螺仪是最常用的运动传感器，分别用于检测设备的加速度和角速度。 一、传感器类型运动传感器   传感器 描述    TYPE_ACCELEROMETER 加速度计   TYPE_GYROSCOPE 陀螺仪   TYPE_GRAVITY 重力传感器   TYPE_LINEAR_ACCELERATION 线性加速度   TYPE_">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android传感器开发-加速度计与陀螺仪">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/03/Android%E4%BC%A0%E6%84%9F%E5%99%A8%E5%BC%80%E5%8F%91-%E5%8A%A0%E9%80%9F%E5%BA%A6%E8%AE%A1%E4%B8%8E%E9%99%80%E8%9E%BA%E4%BB%AA/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:description" content="前言Android 平台提供了多种传感器，可让您监控设备的运动。加速度计和陀螺仪是最常用的运动传感器，分别用于检测设备的加速度和角速度。 一、传感器类型运动传感器   传感器 描述    TYPE_ACCELEROMETER 加速度计   TYPE_GYROSCOPE 陀螺仪   TYPE_GRAVITY 重力传感器   TYPE_LINEAR_ACCELERATION 线性加速度   TYPE_">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-04-03T23:52:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T15:55:45.304Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="Sensor">
+<meta property="article:tag" content="传感器">
+<meta property="article:tag" content="加速度">
+<meta property="article:tag" content="陀螺仪">
+<meta name="twitter:card" content="summary">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Android传感器开发-加速度计与陀螺仪","description":"前言Android 平台提供了多种传感器，可让您监控设备的运动。加速度计和陀螺仪是最常用的运动传感器，分别用于检测设备的加速度和角速度。\n","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:52:00.000Z","dateModified":"2026-04-03T15:55:45.304Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Android%E4%BC%A0%E6%84%9F%E5%99%A8%E5%BC%80%E5%8F%91-%E5%8A%A0%E9%80%9F%E5%BA%A6%E8%AE%A1%E4%B8%8E%E9%99%80%E8%9E%BA%E4%BB%AA/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/03/Android%E4%BC%A0%E6%84%9F%E5%99%A8%E5%BC%80%E5%8F%91-%E5%8A%A0%E9%80%9F%E5%BA%A6%E8%AE%A1%E4%B8%8E%E9%99%80%E8%9E%BA%E4%BB%AA/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Android传感器开发-加速度计与陀螺仪</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-03T23:52:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-03</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~4.08K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Android 平台提供了多种传感器，可让您监控设备的运动。加速度计和陀螺仪是最常用的运动传感器，分别用于检测设备的加速度和角速度。</p>
+<h2 id="一、传感器类型"><a href="#一、传感器类型" class="headerlink" title="一、传感器类型"></a>一、传感器类型</h2><h3 id="运动传感器"><a href="#运动传感器" class="headerlink" title="运动传感器"></a>运动传感器</h3><table>
+<thead>
+<tr>
+<th>传感器</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>TYPE_ACCELEROMETER</td>
+<td>加速度计</td>
+</tr>
+<tr>
+<td>TYPE_GYROSCOPE</td>
+<td>陀螺仪</td>
+</tr>
+<tr>
+<td>TYPE_GRAVITY</td>
+<td>重力传感器</td>
+</tr>
+<tr>
+<td>TYPE_LINEAR_ACCELERATION</td>
+<td>线性加速度</td>
+</tr>
+<tr>
+<td>TYPE_ROTATION_VECTOR</td>
+<td>旋转矢量</td>
+</tr>
+</tbody></table>
+<h3 id="位置传感器"><a href="#位置传感器" class="headerlink" title="位置传感器"></a>位置传感器</h3><table>
+<thead>
+<tr>
+<th>传感器</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>TYPE_MAGNETIC_FIELD</td>
+<td>磁场传感器</td>
+</tr>
+<tr>
+<td>TYPE_PROXIMITY</td>
+<td>距离传感器</td>
+</tr>
+</tbody></table>
+<h2 id="二、获取-SensorManager"><a href="#二、获取-SensorManager" class="headerlink" title="二、获取 SensorManager"></a>二、获取 SensorManager</h2><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">val</span> sensorManager <span class="keyword">by</span> lazy &#123;</span><br><span class="line">    getSystemService(Context.SENSOR_SERVICE) <span class="keyword">as</span> SensorManager</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="三、加速度计"><a href="#三、加速度计" class="headerlink" title="三、加速度计"></a>三、加速度计</h2><h3 id="注册监听器"><a href="#注册监听器" class="headerlink" title="注册监听器"></a>注册监听器</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">var</span> accelerometer: Sensor? = <span class="literal">null</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">var</span> sensorListener: SensorEventListener? = <span class="literal">null</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onCreate</span><span class="params">(savedInstanceState: <span class="type">Bundle</span>?)</span></span> &#123;</span><br><span class="line">    <span class="keyword">super</span>.onCreate(savedInstanceState)</span><br><span class="line">    </span><br><span class="line">    accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)</span><br><span class="line">    </span><br><span class="line">    sensorListener = <span class="keyword">object</span> : SensorEventListener &#123;</span><br><span class="line">        <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onSensorChanged</span><span class="params">(event: <span class="type">SensorEvent</span>)</span></span> &#123;</span><br><span class="line">            <span class="keyword">val</span> x = event.values[<span class="number">0</span>]  <span class="comment">// X 轴加速度</span></span><br><span class="line">            <span class="keyword">val</span> y = event.values[<span class="number">1</span>]  <span class="comment">// Y 轴加速度</span></span><br><span class="line">            <span class="keyword">val</span> z = event.values[<span class="number">2</span>]  <span class="comment">// Z 轴加速度</span></span><br><span class="line">            </span><br><span class="line">            Log.d(TAG, <span class="string">&quot;Accelerometer: x=<span class="variable">$x</span>, y=<span class="variable">$y</span>, z=<span class="variable">$z</span>&quot;</span>)</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onAccuracyChanged</span><span class="params">(sensor: <span class="type">Sensor</span>, accuracy: <span class="type">Int</span>)</span></span> &#123;</span><br><span class="line">            Log.d(TAG, <span class="string">&quot;Accuracy changed: <span class="variable">$accuracy</span>&quot;</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onResume</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">super</span>.onResume()</span><br><span class="line">    accelerometer?.also &#123; sensor -&gt;</span><br><span class="line">        sensorManager.registerListener(sensorListener, sensor, SensorManager.SENSOR_DELAY_NORMAL)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onPause</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">super</span>.onPause()</span><br><span class="line">    sensorManager.unregisterListener(sensorListener)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="数据解读"><a href="#数据解读" class="headerlink" title="数据解读"></a>数据解读</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">设备平放屏幕朝上：</span><br><span class="line">- x: 0</span><br><span class="line">- y: 0</span><br><span class="line">- z: 9.81 (重力加速度)</span><br><span class="line"></span><br><span class="line">设备直立：</span><br><span class="line">- x: 0</span><br><span class="line">- y: 9.81</span><br><span class="line">- z: 0</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、陀螺仪"><a href="#四、陀螺仪" class="headerlink" title="四、陀螺仪"></a>四、陀螺仪</h2><h3 id="注册监听器-1"><a href="#注册监听器-1" class="headerlink" title="注册监听器"></a>注册监听器</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">var</span> gyroscope: Sensor? = <span class="literal">null</span></span><br><span class="line"></span><br><span class="line">gyroscope = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE)</span><br><span class="line"></span><br><span class="line">sensorListener = <span class="keyword">object</span> : SensorEventListener &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onSensorChanged</span><span class="params">(event: <span class="type">SensorEvent</span>)</span></span> &#123;</span><br><span class="line">        <span class="keyword">val</span> x = event.values[<span class="number">0</span>]  <span class="comment">// X 轴角速度 (rad/s)</span></span><br><span class="line">        <span class="keyword">val</span> y = event.values[<span class="number">1</span>]  <span class="comment">// Y 轴角速度</span></span><br><span class="line">        <span class="keyword">val</span> z = event.values[<span class="number">2</span>]  <span class="comment">// Z 轴角速度</span></span><br><span class="line">        </span><br><span class="line">        Log.d(TAG, <span class="string">&quot;Gyroscope: x=<span class="variable">$x</span>, y=<span class="variable">$y</span>, z=<span class="variable">$z</span>&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onAccuracyChanged</span><span class="params">(sensor: <span class="type">Sensor</span>, accuracy: <span class="type">Int</span>)</span></span> &#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="计算旋转角度"><a href="#计算旋转角度" class="headerlink" title="计算旋转角度"></a>计算旋转角度</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">var</span> lastTimestamp = <span class="number">0L</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">var</span> angleX = <span class="number">0f</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">var</span> angleY = <span class="number">0f</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">var</span> angleZ = <span class="number">0f</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onSensorChanged</span><span class="params">(event: <span class="type">SensorEvent</span>)</span></span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (lastTimestamp != <span class="number">0L</span>) &#123;</span><br><span class="line">        <span class="keyword">val</span> dt = (event.timestamp - lastTimestamp) * <span class="number">1e-9f</span>  <span class="comment">// 转换为秒</span></span><br><span class="line">        </span><br><span class="line">        angleX += event.values[<span class="number">0</span>] * dt * <span class="number">180</span> / Math.PI</span><br><span class="line">        angleY += event.values[<span class="number">1</span>] * dt * <span class="number">180</span> / Math.PI</span><br><span class="line">        angleZ += event.values[<span class="number">2</span>] * dt * <span class="number">180</span> / Math.PI</span><br><span class="line">        </span><br><span class="line">        Log.d(TAG, <span class="string">&quot;Angle: x=<span class="variable">$angleX</span>°, y=<span class="variable">$angleY</span>°, z=<span class="variable">$angleZ</span>°&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    lastTimestamp = event.timestamp</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="五、传感器融合"><a href="#五、传感器融合" class="headerlink" title="五、传感器融合"></a>五、传感器融合</h2><h3 id="互补滤波器"><a href="#互补滤波器" class="headerlink" title="互补滤波器"></a>互补滤波器</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">SensorFusion</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">var</span> pitch = <span class="number">0f</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">var</span> roll = <span class="number">0f</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> ALPHA = <span class="number">0.98f</span></span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">update</span><span class="params">(acc: <span class="type">FloatArray</span>, gyro: <span class="type">FloatArray</span>, dt: <span class="type">Float</span>)</span></span> &#123;</span><br><span class="line">        <span class="comment">// 加速度计计算角度</span></span><br><span class="line">        <span class="keyword">val</span> accPitch = atan2(acc[<span class="number">1</span>].toDouble(), acc[<span class="number">2</span>].toDouble()).toFloat()</span><br><span class="line">        <span class="keyword">val</span> accRoll = atan2(-acc[<span class="number">0</span>].toDouble(), sqrt(acc[<span class="number">1</span>] * acc[<span class="number">1</span>] + acc[<span class="number">2</span>] * acc[<span class="number">2</span>]).toDouble()).toFloat()</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 陀螺仪积分</span></span><br><span class="line">        pitch += gyro[<span class="number">0</span>] * dt</span><br><span class="line">        roll += gyro[<span class="number">1</span>] * dt</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 互补滤波</span></span><br><span class="line">        pitch = ALPHA * pitch + (<span class="number">1</span> - ALPHA) * accPitch</span><br><span class="line">        roll = ALPHA * roll + (<span class="number">1</span> - ALPHA) * accRoll</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="六、计步器"><a href="#六、计步器" class="headerlink" title="六、计步器"></a>六、计步器</h2><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> stepCounter = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)</span><br><span class="line"></span><br><span class="line">sensorListener = <span class="keyword">object</span> : SensorEventListener &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onSensorChanged</span><span class="params">(event: <span class="type">SensorEvent</span>)</span></span> &#123;</span><br><span class="line">        <span class="keyword">val</span> steps = event.values[<span class="number">0</span>].toLong()</span><br><span class="line">        Log.d(TAG, <span class="string">&quot;Total steps: <span class="variable">$steps</span>&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onAccuracyChanged</span><span class="params">(sensor: <span class="type">Sensor</span>, accuracy: <span class="type">Int</span>)</span></span> &#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="七、最佳实践"><a href="#七、最佳实践" class="headerlink" title="七、最佳实践"></a>七、最佳实践</h2><ol>
+<li><strong>及时注销</strong>：避免耗电</li>
+<li><strong>选择合适采样率</strong>：SENSOR_DELAY_NORMAL &#x2F; UI &#x2F; GAME &#x2F; FASTEST</li>
+<li><strong>低通滤波</strong>：减少噪声</li>
+<li><strong>坐标系理解</strong>：设备坐标系 vs 世界坐标系</li>
+<li><strong>传感器融合</strong>：结合多个传感器提高精度</li>
+</ol>
+<h2 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://developer.android.google.cn/develop/sensors-and-location/sensors/sensors_motion?hl=zh-cn">移动传感器 | Android Developers</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_29190651/article/details/159679524">Android传感器融合开发</a></li>
+<li><a target="_blank" rel="noopener" href="https://yingjuxia.com/archives/3651">传感器专题——加速度&#x2F;陀螺仪传感器</a></li>
+</ul>
+<hr>
+<p><em>持续学习中…</em></p>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/Android/" rel="tag">Android</a>, <a class="tag-none-link" href="/blog/tags/Sensor/" rel="tag">Sensor</a>, <a class="tag-none-link" href="/blog/tags/%E4%BC%A0%E6%84%9F%E5%99%A8/" rel="tag">传感器</a>, <a class="tag-none-link" href="/blog/tags/%E5%8A%A0%E9%80%9F%E5%BA%A6/" rel="tag">加速度</a>, <a class="tag-none-link" href="/blog/tags/%E9%99%80%E8%9E%BA%E4%BB%AA/" rel="tag">陀螺仪</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-03T15:55:45.304Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Android位置服务GPS定位开发实战" href="/blog/2026/04/03/Android位置服务GPS定位开发实战/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" Android ViewModel协程作用域viewModelScope详解" href="/blog/2026/04/03/Android-ViewModel协程作用域viewModelScope详解/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>

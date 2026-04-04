@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>Kotlin Serialization-JSON序列化学习 | Wenyi&#39;s Blog</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/03/Kotlin-Serialization-JSON%E5%BA%8F%E5%88%97%E5%8C%96%E5%AD%A6%E4%B9%A0/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="JSON, Kotlin, Serialization, 数据序列化" />
+  
+  <meta name="description" content="前言序列化是将应用程序使用的数据转换为可以通过网络传输或存储在数据库或文件中的格式的过程。反序列化则是相反的过程，即从外部源读取数据并将其转换为运行时对象。Kotlin 提供了 kotlinx.serialization 库来处理数据序列化。 kotlinx.serialization 概述组成部分kotlinx.serialization 由以下几个部分组成：  org.jetbrains.ko">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kotlin Serialization-JSON序列化学习">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/03/Kotlin-Serialization-JSON%E5%BA%8F%E5%88%97%E5%8C%96%E5%AD%A6%E4%B9%A0/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:description" content="前言序列化是将应用程序使用的数据转换为可以通过网络传输或存储在数据库或文件中的格式的过程。反序列化则是相反的过程，即从外部源读取数据并将其转换为运行时对象。Kotlin 提供了 kotlinx.serialization 库来处理数据序列化。 kotlinx.serialization 概述组成部分kotlinx.serialization 由以下几个部分组成：  org.jetbrains.ko">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-04-03T23:07:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T15:07:07.668Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="JSON">
+<meta property="article:tag" content="Kotlin">
+<meta property="article:tag" content="Serialization">
+<meta property="article:tag" content="数据序列化">
+<meta name="twitter:card" content="summary">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Kotlin Serialization-JSON序列化学习","description":"前言序列化是将应用程序使用的数据转换为可以通过网络传输或存储在数据库或文件中的格式的过程。反序列化则是相反的过程，即从外部源读取数据并将其转换为运行时对象。K...","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:07:00.000Z","dateModified":"2026-04-03T15:07:07.668Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Kotlin-Serialization-JSON%E5%BA%8F%E5%88%97%E5%8C%96%E5%AD%A6%E4%B9%A0/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/03/Kotlin-Serialization-JSON%E5%BA%8F%E5%88%97%E5%8C%96%E5%AD%A6%E4%B9%A0/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Kotlin Serialization-JSON序列化学习</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-03T23:07:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-03</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~3.31K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>序列化是将应用程序使用的数据转换为可以通过网络传输或存储在数据库或文件中的格式的过程。反序列化则是相反的过程，即从外部源读取数据并将其转换为运行时对象。Kotlin 提供了 kotlinx.serialization 库来处理数据序列化。</p>
+<h2 id="kotlinx-serialization-概述"><a href="#kotlinx-serialization-概述" class="headerlink" title="kotlinx.serialization 概述"></a>kotlinx.serialization 概述</h2><h3 id="组成部分"><a href="#组成部分" class="headerlink" title="组成部分"></a>组成部分</h3><p>kotlinx.serialization 由以下几个部分组成：</p>
+<ol>
+<li><strong>org.jetbrains.kotlin.plugin.serialization</strong> - Gradle 插件</li>
+<li><strong>运行时库</strong> - 核心序列化 API</li>
+<li><strong>编译器插件</strong> - 生成可序列化类的访问者代码</li>
+</ol>
+<h3 id="支持的平台"><a href="#支持的平台" class="headerlink" title="支持的平台"></a>支持的平台</h3><ul>
+<li>JVM</li>
+<li>JavaScript</li>
+<li>Native</li>
+<li>Multiplatform</li>
+</ul>
+<hr>
+<h2 id="一、添加依赖"><a href="#一、添加依赖" class="headerlink" title="一、添加依赖"></a>一、添加依赖</h2><h3 id="Gradle-插件"><a href="#Gradle-插件" class="headerlink" title="Gradle 插件"></a>Gradle 插件</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">plugins &#123;</span><br><span class="line">    kotlin(<span class="string">&quot;jvm&quot;</span>) version <span class="string">&quot;2.3.20&quot;</span></span><br><span class="line">    kotlin(<span class="string">&quot;plugin.serialization&quot;</span>) version <span class="string">&quot;2.3.20&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="添加-JSON-序列化库"><a href="#添加-JSON-序列化库" class="headerlink" title="添加 JSON 序列化库"></a>添加 JSON 序列化库</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">dependencies &#123;</span><br><span class="line">    implementation(<span class="string">&quot;org.jetbrains.kotlinx:kotlinx-serialization-json:1.10.0&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="二、支持的序列化格式"><a href="#二、支持的序列化格式" class="headerlink" title="二、支持的序列化格式"></a>二、支持的序列化格式</h2><table>
+<thead>
+<tr>
+<th>格式</th>
+<th>库</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>JSON</strong></td>
+<td>kotlinx-serialization-json</td>
+</tr>
+<tr>
+<td><strong>Protocol Buffers</strong></td>
+<td>kotlinx-serialization-protobuf</td>
+</tr>
+<tr>
+<td><strong>CBOR</strong></td>
+<td>kotlinx-serialization-cbor</td>
+</tr>
+<tr>
+<td><strong>Properties</strong></td>
+<td>kotlinx-serialization-properties</td>
+</tr>
+<tr>
+<td><strong>HOCON</strong></td>
+<td>kotlinx-serialization-hocon（仅 JVM）</td>
+</tr>
+</tbody></table>
+<p><strong>注意：</strong> 除了 JSON 序列化外，其他格式都是实验性的。</p>
+<hr>
+<h2 id="三、JSON-序列化示例"><a href="#三、JSON-序列化示例" class="headerlink" title="三、JSON 序列化示例"></a>三、JSON 序列化示例</h2><h3 id="定义可序列化类"><a href="#定义可序列化类" class="headerlink" title="定义可序列化类"></a>定义可序列化类</h3><p>使用 <code>@Serializable</code> 注解标记类：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> kotlinx.serialization.Serializable</span><br><span class="line"></span><br><span class="line"><span class="meta">@Serializable</span></span><br><span class="line"><span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">Data</span>(<span class="keyword">val</span> a: <span class="built_in">Int</span>, <span class="keyword">val</span> b: String)</span><br></pre></td></tr></table></figure>
+
+<h3 id="序列化对象"><a href="#序列化对象" class="headerlink" title="序列化对象"></a>序列化对象</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> kotlinx.serialization.encodeToString</span><br><span class="line"><span class="keyword">import</span> kotlinx.serialization.json.Json</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">val</span> <span class="keyword">data</span> = Data(<span class="number">42</span>, <span class="string">&quot;Hello&quot;</span>)</span><br><span class="line">    <span class="keyword">val</span> jsonString = Json.encodeToString(<span class="keyword">data</span>)</span><br><span class="line">    println(jsonString) <span class="comment">// &#123;&quot;a&quot;:42,&quot;b&quot;:&quot;Hello&quot;&#125;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="反序列化对象"><a href="#反序列化对象" class="headerlink" title="反序列化对象"></a>反序列化对象</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> kotlinx.serialization.decodeFromString</span><br><span class="line"><span class="keyword">import</span> kotlinx.serialization.json.Json</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">val</span> jsonString = <span class="string">&quot;&quot;&quot;&#123;&quot;a&quot;:42,&quot;b&quot;:&quot;Hello&quot;&#125;&quot;&quot;&quot;</span></span><br><span class="line">    <span class="keyword">val</span> <span class="keyword">data</span> = Json.decodeFromString&lt;Data&gt;(jsonString)</span><br><span class="line">    println(<span class="keyword">data</span>) <span class="comment">// Data(a=42, b=Hello)</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="四、高级特性"><a href="#四、高级特性" class="headerlink" title="四、高级特性"></a>四、高级特性</h2><h3 id="可选字段"><a href="#可选字段" class="headerlink" title="可选字段"></a>可选字段</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Serializable</span></span><br><span class="line"><span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">User</span>(</span><br><span class="line">    <span class="keyword">val</span> id: <span class="built_in">Int</span>,</span><br><span class="line">    <span class="keyword">val</span> name: String,</span><br><span class="line">    <span class="keyword">val</span> email: String? = <span class="literal">null</span>  <span class="comment">// 可选字段</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<h3 id="默认值"><a href="#默认值" class="headerlink" title="默认值"></a>默认值</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Serializable</span></span><br><span class="line"><span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">Config</span>(</span><br><span class="line">    <span class="keyword">val</span> debug: <span class="built_in">Boolean</span> = <span class="literal">false</span>,</span><br><span class="line">    <span class="keyword">val</span> timeout: <span class="built_in">Int</span> = <span class="number">30000</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<h3 id="自定义字段名"><a href="#自定义字段名" class="headerlink" title="自定义字段名"></a>自定义字段名</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> kotlinx.serialization.SerialName</span><br><span class="line"></span><br><span class="line"><span class="meta">@Serializable</span></span><br><span class="line"><span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">User</span>(</span><br><span class="line">    <span class="meta">@SerialName(<span class="string">&quot;user_id&quot;</span>)</span></span><br><span class="line">    <span class="keyword">val</span> id: <span class="built_in">Int</span>,</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@SerialName(<span class="string">&quot;user_name&quot;</span>)</span></span><br><span class="line">    <span class="keyword">val</span> name: String</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<h3 id="嵌套对象"><a href="#嵌套对象" class="headerlink" title="嵌套对象"></a>嵌套对象</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Serializable</span></span><br><span class="line"><span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">Address</span>(</span><br><span class="line">    <span class="keyword">val</span> city: String,</span><br><span class="line">    <span class="keyword">val</span> street: String</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="meta">@Serializable</span></span><br><span class="line"><span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">Person</span>(</span><br><span class="line">    <span class="keyword">val</span> name: String,</span><br><span class="line">    <span class="keyword">val</span> address: Address</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<h3 id="列表序列化"><a href="#列表序列化" class="headerlink" title="列表序列化"></a>列表序列化</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Serializable</span></span><br><span class="line"><span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">Response</span>(</span><br><span class="line">    <span class="keyword">val</span> users: List&lt;User&gt;</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 序列化列表</span></span><br><span class="line"><span class="keyword">val</span> users = listOf(User(<span class="number">1</span>, <span class="string">&quot;Alice&quot;</span>), User(<span class="number">2</span>, <span class="string">&quot;Bob&quot;</span>))</span><br><span class="line"><span class="keyword">val</span> jsonString = Json.encodeToString(users)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 反序列化列表</span></span><br><span class="line"><span class="keyword">val</span> userList = Json.decodeFromString&lt;List&lt;User&gt;&gt;(jsonString)</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="五、Json-配置"><a href="#五、Json-配置" class="headerlink" title="五、Json 配置"></a>五、Json 配置</h2><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> json = Json &#123;</span><br><span class="line">    ignoreUnknownKeys = <span class="literal">true</span>        <span class="comment">// 忽略未知字段</span></span><br><span class="line">    isLenient = <span class="literal">true</span>                <span class="comment">// 宽松模式</span></span><br><span class="line">    encodeDefaults = <span class="literal">true</span>           <span class="comment">// 编码默认值</span></span><br><span class="line">    prettyPrint = <span class="literal">true</span>              <span class="comment">// 美化输出</span></span><br><span class="line">    coerceInputValues = <span class="literal">true</span>        <span class="comment">// 强制输入值</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> <span class="keyword">data</span> = json.decodeFromString&lt;Data&gt;(jsonString)</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="六、与-Gson-的对比"><a href="#六、与-Gson-的对比" class="headerlink" title="六、与 Gson 的对比"></a>六、与 Gson 的对比</h2><table>
+<thead>
+<tr>
+<th>特性</th>
+<th>Gson</th>
+<th>kotlinx.serialization</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>类型安全</strong></td>
+<td>运行时检查</td>
+<td>编译时检查</td>
+</tr>
+<tr>
+<td><strong>Kotlin 支持</strong></td>
+<td>需要额外配置</td>
+<td>原生支持</td>
+</tr>
+<tr>
+<td><strong>空安全</strong></td>
+<td>可能导致 NPE</td>
+<td>编译时验证</td>
+</tr>
+<tr>
+<td><strong>默认值</strong></td>
+<td>不支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td><strong>性能</strong></td>
+<td>较慢</td>
+<td>更快</td>
+</tr>
+<tr>
+<td><strong>多平台</strong></td>
+<td>仅 JVM</td>
+<td>JVM&#x2F;JS&#x2F;Native</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="七、最佳实践"><a href="#七、最佳实践" class="headerlink" title="七、最佳实践"></a>七、最佳实践</h2><ol>
+<li><strong>使用 data class</strong> - 自动生成 equals、hashCode、toString</li>
+<li><strong>使用 @SerialName</strong> - 自定义 JSON 字段名</li>
+<li><strong>处理可空字段</strong> - 使用 <code>?</code> 标记可选字段</li>
+<li><strong>配置 Json 实例</strong> - 根据需求调整配置</li>
+<li><strong>测试序列化&#x2F;反序列化</strong> - 确保数据完整性</li>
+</ol>
+<hr>
+<h2 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://kotlinlang.org/docs/serialization.html">Serialization | Kotlin Documentation</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/Kotlin/kotlinx.serialization">kotlinx.serialization - GitHub</a></li>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/671728767">高效的 Json 解析框架 kotlinx.serialization</a></li>
+</ul>
+<hr>
+<p><em>持续学习中…</em></p>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/JSON/" rel="tag">JSON</a>, <a class="tag-none-link" href="/blog/tags/Kotlin/" rel="tag">Kotlin</a>, <a class="tag-none-link" href="/blog/tags/Serialization/" rel="tag">Serialization</a>, <a class="tag-none-link" href="/blog/tags/%E6%95%B0%E6%8D%AE%E5%BA%8F%E5%88%97%E5%8C%96/" rel="tag">数据序列化</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-03T15:07:07.668Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Jetpack Compose动画学习-自定义动画" href="/blog/2026/04/03/Jetpack-Compose动画学习-自定义动画/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" Android Room数据库进阶-迁移策略" href="/blog/2026/04/03/Android-Room数据库进阶-迁移策略/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>

@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>Kotlin密封类与密封接口学习 | Wenyi&#39;s Blog</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/03/Kotlin%E5%AF%86%E5%B0%81%E7%B1%BB%E4%B8%8E%E5%AF%86%E5%B0%81%E6%8E%A5%E5%8F%A3%E5%AD%A6%E4%B9%A0/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="Kotlin, Sealed Class, 密封接口, 密封类, 模式匹配" />
+  
+  <meta name="description" content="前言密封类和密封接口提供受控的类层次结构继承。密封类的所有直接子类在编译时已知，不允许在定义密封类的模块和包之外出现其他子类。结合 when 表达式，可以覆盖所有可能的子类行为。 一、声明密封类或接口基本语法123456789101112&#x2F;&#x2F; 创建密封接口sealed interface Error&#x2F;&#x2F; 创建实现密封接口的密封类sealed class IOError(): Error&#x2F;&#x2F; 定义扩">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kotlin密封类与密封接口学习">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/03/Kotlin%E5%AF%86%E5%B0%81%E7%B1%BB%E4%B8%8E%E5%AF%86%E5%B0%81%E6%8E%A5%E5%8F%A3%E5%AD%A6%E4%B9%A0/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:description" content="前言密封类和密封接口提供受控的类层次结构继承。密封类的所有直接子类在编译时已知，不允许在定义密封类的模块和包之外出现其他子类。结合 when 表达式，可以覆盖所有可能的子类行为。 一、声明密封类或接口基本语法123456789101112&#x2F;&#x2F; 创建密封接口sealed interface Error&#x2F;&#x2F; 创建实现密封接口的密封类sealed class IOError(): Error&#x2F;&#x2F; 定义扩">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-04-03T23:25:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T15:26:00.044Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="Kotlin">
+<meta property="article:tag" content="Sealed Class">
+<meta property="article:tag" content="密封接口">
+<meta property="article:tag" content="密封类">
+<meta property="article:tag" content="模式匹配">
+<meta name="twitter:card" content="summary">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Kotlin密封类与密封接口学习","description":"前言密封类和密封接口提供受控的类层次结构继承。密封类的所有直接子类在编译时已知，不允许在定义密封类的模块和包之外出现其他子类。结合 when 表达式，可以覆盖...","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:25:00.000Z","dateModified":"2026-04-03T15:26:00.044Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Kotlin%E5%AF%86%E5%B0%81%E7%B1%BB%E4%B8%8E%E5%AF%86%E5%B0%81%E6%8E%A5%E5%8F%A3%E5%AD%A6%E4%B9%A0/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/03/Kotlin%E5%AF%86%E5%B0%81%E7%B1%BB%E4%B8%8E%E5%AF%86%E5%B0%81%E6%8E%A5%E5%8F%A3%E5%AD%A6%E4%B9%A0/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Kotlin密封类与密封接口学习</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-03T23:25:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-03</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~5.30K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>密封类和密封接口提供受控的类层次结构继承。密封类的所有直接子类在编译时已知，不允许在定义密封类的模块和包之外出现其他子类。结合 when 表达式，可以覆盖所有可能的子类行为。</p>
+<h2 id="一、声明密封类或接口"><a href="#一、声明密封类或接口" class="headerlink" title="一、声明密封类或接口"></a>一、声明密封类或接口</h2><h3 id="基本语法"><a href="#基本语法" class="headerlink" title="基本语法"></a>基本语法</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 创建密封接口</span></span><br><span class="line"><span class="keyword">sealed</span> <span class="keyword">interface</span> <span class="title class_">Error</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 创建实现密封接口的密封类</span></span><br><span class="line"><span class="keyword">sealed</span> <span class="keyword">class</span> <span class="title class_">IOError</span>(): Error</span><br><span class="line"></span><br><span class="line"><span class="comment">// 定义扩展密封类的子类</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">FileReadError</span>(<span class="keyword">val</span> file: File): IOError()</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">DatabaseError</span>(<span class="keyword">val</span> source: DataSource): IOError()</span><br><span class="line"></span><br><span class="line"><span class="comment">// 创建实现密封接口的单例对象</span></span><br><span class="line"><span class="keyword">object</span> RuntimeError : Error</span><br></pre></td></tr></table></figure>
+
+<h3 id="类层次结构"><a href="#类层次结构" class="headerlink" title="类层次结构"></a>类层次结构</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Error (sealed interface)</span><br><span class="line">├── IOError (sealed class)</span><br><span class="line">│   ├── FileReadError</span><br><span class="line">│   └── DatabaseError</span><br><span class="line">└── RuntimeError (object)</span><br></pre></td></tr></table></figure>
+
+<h2 id="二、密封类的应用场景"><a href="#二、密封类的应用场景" class="headerlink" title="二、密封类的应用场景"></a>二、密封类的应用场景</h2><h3 id="适用场景"><a href="#适用场景" class="headerlink" title="适用场景"></a>适用场景</h3><table>
+<thead>
+<tr>
+<th>场景</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>有限的类继承</strong></td>
+<td>预定义的、有限的子类集合</td>
+</tr>
+<tr>
+<td><strong>类型安全设计</strong></td>
+<td>状态管理或复杂条件逻辑</td>
+</tr>
+<tr>
+<td><strong>封闭 API</strong></td>
+<td>库的健壮且可维护的公共 API</td>
+</tr>
+</tbody></table>
+<h3 id="示例：错误处理"><a href="#示例：错误处理" class="headerlink" title="示例：错误处理"></a>示例：错误处理</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">sealed</span> <span class="keyword">class</span> <span class="title class_">Error</span>(<span class="keyword">val</span> message: String) &#123;</span><br><span class="line">    <span class="keyword">class</span> <span class="title class_">NetworkError</span> : <span class="type">Error</span>(<span class="string">&quot;Network failure&quot;</span>)</span><br><span class="line">    <span class="keyword">class</span> <span class="title class_">DatabaseError</span> : <span class="type">Error</span>(<span class="string">&quot;Database cannot be reached&quot;</span>)</span><br><span class="line">    <span class="keyword">class</span> <span class="title class_">UnknownError</span> : <span class="type">Error</span>(<span class="string">&quot;An unknown error has occurred&quot;</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">val</span> errors = listOf(Error.NetworkError(), Error.DatabaseError(), Error.UnknownError())</span><br><span class="line">    errors.forEach &#123; println(it.message) &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="三、构造函数"><a href="#三、构造函数" class="headerlink" title="三、构造函数"></a>三、构造函数</h2><h3 id="可见性"><a href="#可见性" class="headerlink" title="可见性"></a>可见性</h3><p>密封类的构造函数可以具有以下可见性：</p>
+<ul>
+<li><code>protected</code>（默认）</li>
+<li><code>private</code></li>
+</ul>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">sealed</span> <span class="keyword">class</span> <span class="title class_">IOError</span> &#123;</span><br><span class="line">    <span class="comment">// 默认 protected</span></span><br><span class="line">    <span class="keyword">constructor</span>() &#123; <span class="comment">/*...*/</span> &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// private 构造函数</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">constructor</span>(description: String): <span class="keyword">this</span>() &#123; <span class="comment">/*...*/</span> &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// ❌ 不允许 public 或 internal</span></span><br><span class="line">    <span class="comment">// public constructor(code: Int): this() &#123;&#125;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="结合枚举"><a href="#结合枚举" class="headerlink" title="结合枚举"></a>结合枚举</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">enum</span> <span class="keyword">class</span> <span class="title class_">ErrorSeverity</span> &#123; MINOR, MAJOR, CRITICAL &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">sealed</span> <span class="keyword">class</span> <span class="title class_">Error</span>(<span class="keyword">val</span> severity: ErrorSeverity) &#123;</span><br><span class="line">    <span class="keyword">class</span> <span class="title class_">FileReadError</span>(<span class="keyword">val</span> file: File): Error(ErrorSeverity.MAJOR)</span><br><span class="line">    <span class="keyword">class</span> <span class="title class_">DatabaseError</span>(<span class="keyword">val</span> source: DataSource): Error(ErrorSeverity.CRITICAL)</span><br><span class="line">    <span class="keyword">object</span> RuntimeError : Error(ErrorSeverity.CRITICAL)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、继承规则"><a href="#四、继承规则" class="headerlink" title="四、继承规则"></a>四、继承规则</h2><h3 id="包内声明"><a href="#包内声明" class="headerlink" title="包内声明"></a>包内声明</h3><p>直接子类必须在同一个包中声明：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 同一文件或同一包内</span></span><br><span class="line"><span class="keyword">sealed</span> <span class="keyword">class</span> <span class="title class_">UIState</span> &#123;</span><br><span class="line">    <span class="keyword">object</span> Loading : UIState()</span><br><span class="line">    <span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">Success</span>(<span class="keyword">val</span> <span class="keyword">data</span>: String) : UIState()</span><br><span class="line">    <span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">Error</span>(<span class="keyword">val</span> message: String) : UIState()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="子类类型"><a href="#子类类型" class="headerlink" title="子类类型"></a>子类类型</h3><p>子类可以是：</p>
+<ul>
+<li>数据类</li>
+<li>普通类</li>
+<li>对象</li>
+<li>另一个密封类</li>
+</ul>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">sealed</span> <span class="keyword">class</span> <span class="title class_">Expr</span> &#123;</span><br><span class="line">    <span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">Const</span>(<span class="keyword">val</span> number: <span class="built_in">Double</span>) : Expr()</span><br><span class="line">    <span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">Sum</span>(<span class="keyword">val</span> e1: Expr, <span class="keyword">val</span> e2: Expr) : Expr()</span><br><span class="line">    <span class="keyword">object</span> NotANumber : Expr()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="五、when-表达式"><a href="#五、when-表达式" class="headerlink" title="五、when 表达式"></a>五、when 表达式</h2><h3 id="完整覆盖"><a href="#完整覆盖" class="headerlink" title="完整覆盖"></a>完整覆盖</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">evaluate</span><span class="params">(expr: <span class="type">Expr</span>)</span></span>: <span class="built_in">Double</span> = <span class="keyword">when</span> (expr) &#123;</span><br><span class="line">    <span class="keyword">is</span> Expr.Const -&gt; expr.number</span><br><span class="line">    <span class="keyword">is</span> Expr.Sum -&gt; evaluate(expr.e1) + evaluate(expr.e2)</span><br><span class="line">    Expr.NotANumber -&gt; <span class="built_in">Double</span>.NaN</span><br><span class="line">    <span class="comment">// 不需要 else 分支，所有情况已覆盖</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="智能类型转换"><a href="#智能类型转换" class="headerlink" title="智能类型转换"></a>智能类型转换</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">handleState</span><span class="params">(state: <span class="type">UIState</span>)</span></span> &#123;</span><br><span class="line">    <span class="keyword">when</span> (state) &#123;</span><br><span class="line">        <span class="keyword">is</span> UIState.Loading -&gt; showLoading()</span><br><span class="line">        <span class="keyword">is</span> UIState.Success -&gt; showData(state.<span class="keyword">data</span>) <span class="comment">// 智能转换</span></span><br><span class="line">        <span class="keyword">is</span> UIState.Error -&gt; showError(state.message)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="六、密封接口"><a href="#六、密封接口" class="headerlink" title="六、密封接口"></a>六、密封接口</h2><h3 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">sealed</span> <span class="keyword">interface</span> <span class="title class_">Drawable</span> &#123;</span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">draw</span><span class="params">()</span></span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Circle</span>(<span class="keyword">val</span> radius: <span class="built_in">Double</span>) : Drawable &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">draw</span><span class="params">()</span></span> &#123; <span class="comment">/*...*/</span> &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Rectangle</span>(<span class="keyword">val</span> width: <span class="built_in">Double</span>, <span class="keyword">val</span> height: <span class="built_in">Double</span>) : Drawable &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">draw</span><span class="params">()</span></span> &#123; <span class="comment">/*...*/</span> &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="多继承"><a href="#多继承" class="headerlink" title="多继承"></a>多继承</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">sealed</span> <span class="keyword">interface</span> <span class="title class_">A</span></span><br><span class="line"><span class="keyword">sealed</span> <span class="keyword">interface</span> <span class="title class_">B</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">C</span> : <span class="type">A</span>, <span class="type">B</span>  // 可以实现多个密封接口</span><br></pre></td></tr></table></figure>
+
+<h2 id="七、实际应用"><a href="#七、实际应用" class="headerlink" title="七、实际应用"></a>七、实际应用</h2><h3 id="网络请求状态"><a href="#网络请求状态" class="headerlink" title="网络请求状态"></a>网络请求状态</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">sealed</span> <span class="keyword">class</span> <span class="title class_">NetworkResult</span>&lt;<span class="type">out T</span>&gt; &#123;</span><br><span class="line">    <span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">Success</span>&lt;<span class="type">T</span>&gt;(<span class="keyword">val</span> <span class="keyword">data</span>: T) : NetworkResult&lt;T&gt;()</span><br><span class="line">    <span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">Error</span>(<span class="keyword">val</span> exception: Throwable) : NetworkResult&lt;<span class="built_in">Nothing</span>&gt;()</span><br><span class="line">    <span class="keyword">object</span> Loading : NetworkResult&lt;<span class="built_in">Nothing</span>&gt;()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="type">&lt;T&gt;</span> <span class="title">handleResult</span><span class="params">(result: <span class="type">NetworkResult</span>&lt;<span class="type">T</span>&gt;)</span></span> &#123;</span><br><span class="line">    <span class="keyword">when</span> (result) &#123;</span><br><span class="line">        <span class="keyword">is</span> NetworkResult.Success -&gt; &#123;</span><br><span class="line">            <span class="comment">// 处理成功</span></span><br><span class="line">            showData(result.<span class="keyword">data</span>)</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">is</span> NetworkResult.Error -&gt; &#123;</span><br><span class="line">            <span class="comment">// 处理错误</span></span><br><span class="line">            showError(result.exception.message)</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">is</span> NetworkResult.Loading -&gt; &#123;</span><br><span class="line">            <span class="comment">// 显示加载中</span></span><br><span class="line">            showLoading()</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="RecyclerView-适配器"><a href="#RecyclerView-适配器" class="headerlink" title="RecyclerView 适配器"></a>RecyclerView 适配器</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">sealed</span> <span class="keyword">class</span> <span class="title class_">ListItem</span> &#123;</span><br><span class="line">    <span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">Header</span>(<span class="keyword">val</span> title: String) : ListItem()</span><br><span class="line">    <span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">Content</span>(<span class="keyword">val</span> id: <span class="built_in">Int</span>, <span class="keyword">val</span> text: String) : ListItem()</span><br><span class="line">    <span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">Footer</span>(<span class="keyword">val</span> page: <span class="built_in">Int</span>) : ListItem()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyAdapter</span> : <span class="type">RecyclerView.Adapter</span>&lt;<span class="type">RecyclerView.ViewHolder</span>&gt;() &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">getItemViewType</span><span class="params">(position: <span class="type">Int</span>)</span></span>: <span class="built_in">Int</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">when</span> (items[position]) &#123;</span><br><span class="line">            <span class="keyword">is</span> ListItem.Header -&gt; TYPE_HEADER</span><br><span class="line">            <span class="keyword">is</span> ListItem.Content -&gt; TYPE_CONTENT</span><br><span class="line">            <span class="keyword">is</span> ListItem.Footer -&gt; TYPE_FOOTER</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="导航路由"><a href="#导航路由" class="headerlink" title="导航路由"></a>导航路由</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">sealed</span> <span class="keyword">class</span> <span class="title class_">Screen</span> &#123;</span><br><span class="line">    <span class="keyword">object</span> Home : Screen()</span><br><span class="line">    <span class="keyword">object</span> Settings : Screen()</span><br><span class="line">    <span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">Detail</span>(<span class="keyword">val</span> id: String) : Screen()</span><br><span class="line">    <span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">Profile</span>(<span class="keyword">val</span> userId: <span class="built_in">Int</span>) : Screen()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">navigate</span><span class="params">(screen: <span class="type">Screen</span>)</span></span> &#123;</span><br><span class="line">    <span class="keyword">when</span> (screen) &#123;</span><br><span class="line">        Screen.Home -&gt; navController.navigate(<span class="string">&quot;home&quot;</span>)</span><br><span class="line">        Screen.Settings -&gt; navController.navigate(<span class="string">&quot;settings&quot;</span>)</span><br><span class="line">        <span class="keyword">is</span> Screen.Detail -&gt; navController.navigate(<span class="string">&quot;detail/<span class="subst">$&#123;screen.id&#125;</span>&quot;</span>)</span><br><span class="line">        <span class="keyword">is</span> Screen.Profile -&gt; navController.navigate(<span class="string">&quot;profile/<span class="subst">$&#123;screen.userId&#125;</span>&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="八、密封类-vs-枚举"><a href="#八、密封类-vs-枚举" class="headerlink" title="八、密封类 vs 枚举"></a>八、密封类 vs 枚举</h2><table>
+<thead>
+<tr>
+<th>特性</th>
+<th>密封类</th>
+<th>枚举</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>实例数量</strong></td>
+<td>可以有多个实例</td>
+<td>每个常量只有一个实例</td>
+</tr>
+<tr>
+<td><strong>状态</strong></td>
+<td>可以持有状态</td>
+<td>只能是单例</td>
+</tr>
+<tr>
+<td><strong>继承</strong></td>
+<td>可以扩展</td>
+<td>不能继承</td>
+</tr>
+<tr>
+<td><strong>类型检查</strong></td>
+<td>编译时完整覆盖</td>
+<td>需要手动覆盖</td>
+</tr>
+<tr>
+<td><strong>使用场景</strong></td>
+<td>复杂状态</td>
+<td>简单常量</td>
+</tr>
+</tbody></table>
+<h2 id="九、最佳实践"><a href="#九、最佳实践" class="headerlink" title="九、最佳实践"></a>九、最佳实践</h2><ol>
+<li><strong>有限状态管理</strong>：使用密封类表示有限的 UI 状态</li>
+<li><strong>完整 when 覆盖</strong>：利用编译器检查所有情况</li>
+<li><strong>避免 else 分支</strong>：让编译器帮助检查完整性</li>
+<li><strong>结合数据类</strong>：携带丰富的状态信息</li>
+<li><strong>单一职责</strong>：每个子类只表示一种状态</li>
+</ol>
+<h2 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://kotlinlang.org/docs/sealed-classes.html">Sealed classes and interfaces | Kotlin Documentation</a></li>
+<li><a target="_blank" rel="noopener" href="https://book.kotlincn.net/text/sealed-classes.html">密封类与密封接口 · Kotlin 官方文档 中文版</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/wangsen927/article/details/159516130">Kotlin中 Sealed Class密封类</a></li>
+</ul>
+<hr>
+<p><em>持续学习中…</em></p>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/Kotlin/" rel="tag">Kotlin</a>, <a class="tag-none-link" href="/blog/tags/Sealed-Class/" rel="tag">Sealed Class</a>, <a class="tag-none-link" href="/blog/tags/%E5%AF%86%E5%B0%81%E6%8E%A5%E5%8F%A3/" rel="tag">密封接口</a>, <a class="tag-none-link" href="/blog/tags/%E5%AF%86%E5%B0%81%E7%B1%BB/" rel="tag">密封类</a>, <a class="tag-none-link" href="/blog/tags/%E6%A8%A1%E5%BC%8F%E5%8C%B9%E9%85%8D/" rel="tag">模式匹配</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-03T15:26:00.044Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Android Handler消息机制学习" href="/blog/2026/04/03/Android-Handler消息机制学习/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" Android View绘制流程学习-Measure Layout Draw" href="/blog/2026/04/03/Android-View绘制流程学习-Measure-Layout-Draw/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>

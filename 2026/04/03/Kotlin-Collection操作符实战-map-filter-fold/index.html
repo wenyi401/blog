@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>Kotlin Collection操作符实战-map filter fold | Wenyi&#39;s Blog</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/03/Kotlin-Collection%E6%93%8D%E4%BD%9C%E7%AC%A6%E5%AE%9E%E6%88%98-map-filter-fold/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="Collection, Kotlin, filter, fold, map, reduce" />
+  
+  <meta name="description" content="前言Kotlin 集合操作符是函数式编程的核心工具，通过链式调用实现数据转换、过滤和聚合。本文将详细介绍 map、filter、fold 等常用操作符。 一、操作符分类   类别 操作符    转换 map, flatMap, groupBy, associate   过滤 filter, filterNot, filterNotNull, take, drop   聚合 fold, reduce">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kotlin Collection操作符实战-map filter fold">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/03/Kotlin-Collection%E6%93%8D%E4%BD%9C%E7%AC%A6%E5%AE%9E%E6%88%98-map-filter-fold/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:description" content="前言Kotlin 集合操作符是函数式编程的核心工具，通过链式调用实现数据转换、过滤和聚合。本文将详细介绍 map、filter、fold 等常用操作符。 一、操作符分类   类别 操作符    转换 map, flatMap, groupBy, associate   过滤 filter, filterNot, filterNotNull, take, drop   聚合 fold, reduce">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-04-03T23:44:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T15:46:33.532Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="Collection">
+<meta property="article:tag" content="Kotlin">
+<meta property="article:tag" content="filter">
+<meta property="article:tag" content="fold">
+<meta property="article:tag" content="map">
+<meta property="article:tag" content="reduce">
+<meta name="twitter:card" content="summary">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Kotlin Collection操作符实战-map filter fold","description":"前言Kotlin 集合操作符是函数式编程的核心工具，通过链式调用实现数据转换、过滤和聚合。本文将详细介绍 map、filter、fold 等常用操作符。","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:44:00.000Z","dateModified":"2026-04-03T15:46:33.532Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Kotlin-Collection%E6%93%8D%E4%BD%9C%E7%AC%A6%E5%AE%9E%E6%88%98-map-filter-fold/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/03/Kotlin-Collection%E6%93%8D%E4%BD%9C%E7%AC%A6%E5%AE%9E%E6%88%98-map-filter-fold/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Kotlin Collection操作符实战-map filter fold</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-03T23:44:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-03</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~5.66K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Kotlin 集合操作符是函数式编程的核心工具，通过链式调用实现数据转换、过滤和聚合。本文将详细介绍 map、filter、fold 等常用操作符。</p>
+<h2 id="一、操作符分类"><a href="#一、操作符分类" class="headerlink" title="一、操作符分类"></a>一、操作符分类</h2><table>
+<thead>
+<tr>
+<th>类别</th>
+<th>操作符</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>转换</strong></td>
+<td>map, flatMap, groupBy, associate</td>
+</tr>
+<tr>
+<td><strong>过滤</strong></td>
+<td>filter, filterNot, filterNotNull, take, drop</td>
+</tr>
+<tr>
+<td><strong>聚合</strong></td>
+<td>fold, reduce, sum, average</td>
+</tr>
+<tr>
+<td><strong>排序</strong></td>
+<td>sortedBy, sortedWith, reversed</td>
+</tr>
+<tr>
+<td><strong>查找</strong></td>
+<td>find, first, last, any, all, none</td>
+</tr>
+</tbody></table>
+<h2 id="二、map-操作符"><a href="#二、map-操作符" class="headerlink" title="二、map 操作符"></a>二、map 操作符</h2><h3 id="基本用法"><a href="#基本用法" class="headerlink" title="基本用法"></a>基本用法</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> numbers = listOf(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>)</span><br><span class="line"><span class="keyword">val</span> doubled = numbers.map &#123; it * <span class="number">2</span> &#125;</span><br><span class="line">println(doubled)  <span class="comment">// [2, 4, 6, 8, 10]</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="类型转换"><a href="#类型转换" class="headerlink" title="类型转换"></a>类型转换</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> numbers = listOf(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>)</span><br><span class="line"><span class="keyword">val</span> strings = numbers.map &#123; <span class="string">&quot;Number: <span class="variable">$it</span>&quot;</span> &#125;</span><br><span class="line">println(strings)  <span class="comment">// [Number: 1, Number: 2, Number: 3]</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="mapNotNull"><a href="#mapNotNull" class="headerlink" title="mapNotNull"></a>mapNotNull</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> strings = listOf(<span class="string">&quot;1&quot;</span>, <span class="string">&quot;2&quot;</span>, <span class="string">&quot;a&quot;</span>, <span class="string">&quot;3&quot;</span>)</span><br><span class="line"><span class="keyword">val</span> numbers = strings.mapNotNull &#123; it.toIntOrNull() &#125;</span><br><span class="line">println(numbers)  <span class="comment">// [1, 2, 3]</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="flatMap"><a href="#flatMap" class="headerlink" title="flatMap"></a>flatMap</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> lists = listOf(listOf(<span class="number">1</span>, <span class="number">2</span>), listOf(<span class="number">3</span>, <span class="number">4</span>))</span><br><span class="line"><span class="keyword">val</span> flattened = lists.flatMap &#123; it &#125;</span><br><span class="line">println(flattened)  <span class="comment">// [1, 2, 3, 4]</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="三、filter-操作符"><a href="#三、filter-操作符" class="headerlink" title="三、filter 操作符"></a>三、filter 操作符</h2><h3 id="基本用法-1"><a href="#基本用法-1" class="headerlink" title="基本用法"></a>基本用法</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> numbers = listOf(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>)</span><br><span class="line"><span class="keyword">val</span> evens = numbers.filter &#123; it % <span class="number">2</span> == <span class="number">0</span> &#125;</span><br><span class="line">println(evens)  <span class="comment">// [2, 4]</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="filterNot"><a href="#filterNot" class="headerlink" title="filterNot"></a>filterNot</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> numbers = listOf(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>)</span><br><span class="line"><span class="keyword">val</span> odds = numbers.filterNot &#123; it % <span class="number">2</span> == <span class="number">0</span> &#125;</span><br><span class="line">println(odds)  <span class="comment">// [1, 3, 5]</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="filterNotNull"><a href="#filterNotNull" class="headerlink" title="filterNotNull"></a>filterNotNull</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> values = listOf(<span class="number">1</span>, <span class="literal">null</span>, <span class="number">3</span>, <span class="literal">null</span>, <span class="number">5</span>)</span><br><span class="line"><span class="keyword">val</span> nonNull = values.filterNotNull()</span><br><span class="line">println(nonNull)  <span class="comment">// [1, 3, 5]</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="filterIsInstance"><a href="#filterIsInstance" class="headerlink" title="filterIsInstance"></a>filterIsInstance</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> items = listOf(<span class="number">1</span>, <span class="string">&quot;Hello&quot;</span>, <span class="number">2</span>, <span class="string">&quot;World&quot;</span>)</span><br><span class="line"><span class="keyword">val</span> strings = items.filterIsInstance&lt;String&gt;()</span><br><span class="line">println(strings)  <span class="comment">// [Hello, World]</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="四、fold-操作符"><a href="#四、fold-操作符" class="headerlink" title="四、fold 操作符"></a>四、fold 操作符</h2><h3 id="基本用法-2"><a href="#基本用法-2" class="headerlink" title="基本用法"></a>基本用法</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> numbers = listOf(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>)</span><br><span class="line"><span class="keyword">val</span> sum = numbers.fold(<span class="number">0</span>) &#123; acc, num -&gt; acc + num &#125;</span><br><span class="line">println(sum)  <span class="comment">// 15</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="字符串拼接"><a href="#字符串拼接" class="headerlink" title="字符串拼接"></a>字符串拼接</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> words = listOf(<span class="string">&quot;Hello&quot;</span>, <span class="string">&quot;World&quot;</span>)</span><br><span class="line"><span class="keyword">val</span> result = words.fold(<span class="string">&quot;&quot;</span>) &#123; acc, word -&gt; </span><br><span class="line">    <span class="keyword">if</span> (acc.isEmpty()) word <span class="keyword">else</span> <span class="string">&quot;<span class="variable">$acc</span> <span class="variable">$word</span>&quot;</span> </span><br><span class="line">&#125;</span><br><span class="line">println(result)  <span class="comment">// &quot;Hello World&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="复杂对象聚合"><a href="#复杂对象聚合" class="headerlink" title="复杂对象聚合"></a>复杂对象聚合</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">Order</span>(<span class="keyword">val</span> item: String, <span class="keyword">val</span> price: <span class="built_in">Double</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> orders = listOf(</span><br><span class="line">    Order(<span class="string">&quot;Book&quot;</span>, <span class="number">20.0</span>),</span><br><span class="line">    Order(<span class="string">&quot;Pen&quot;</span>, <span class="number">5.0</span>),</span><br><span class="line">    Order(<span class="string">&quot;Notebook&quot;</span>, <span class="number">10.0</span>)</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> total = orders.fold(<span class="number">0.0</span>) &#123; acc, order -&gt; acc + order.price &#125;</span><br><span class="line">println(total)  <span class="comment">// 35.0</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="五、reduce-操作符"><a href="#五、reduce-操作符" class="headerlink" title="五、reduce 操作符"></a>五、reduce 操作符</h2><h3 id="基本用法-3"><a href="#基本用法-3" class="headerlink" title="基本用法"></a>基本用法</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> numbers = listOf(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>)</span><br><span class="line"><span class="keyword">val</span> sum = numbers.reduce &#123; acc, num -&gt; acc + num &#125;</span><br><span class="line">println(sum)  <span class="comment">// 15</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="与-fold-区别"><a href="#与-fold-区别" class="headerlink" title="与 fold 区别"></a>与 fold 区别</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// fold：有初始值</span></span><br><span class="line"><span class="keyword">val</span> sum1 = emptyList&lt;<span class="built_in">Int</span>&gt;().fold(<span class="number">0</span>) &#123; acc, num -&gt; acc + num &#125;</span><br><span class="line">println(sum1)  <span class="comment">// 0</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// reduce：无初始值，空集合会抛异常</span></span><br><span class="line"><span class="keyword">val</span> sum2 = emptyList&lt;<span class="built_in">Int</span>&gt;().reduce &#123; acc, num -&gt; acc + num &#125;</span><br><span class="line"><span class="comment">// NoSuchElementException</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="六、groupBy-操作符"><a href="#六、groupBy-操作符" class="headerlink" title="六、groupBy 操作符"></a>六、groupBy 操作符</h2><h3 id="基本用法-4"><a href="#基本用法-4" class="headerlink" title="基本用法"></a>基本用法</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">Person</span>(<span class="keyword">val</span> name: String, <span class="keyword">val</span> city: String)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> people = listOf(</span><br><span class="line">    Person(<span class="string">&quot;Alice&quot;</span>, <span class="string">&quot;Beijing&quot;</span>),</span><br><span class="line">    Person(<span class="string">&quot;Bob&quot;</span>, <span class="string">&quot;Shanghai&quot;</span>),</span><br><span class="line">    Person(<span class="string">&quot;Charlie&quot;</span>, <span class="string">&quot;Beijing&quot;</span>)</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> grouped = people.groupBy &#123; it.city &#125;</span><br><span class="line">println(grouped)</span><br><span class="line"><span class="comment">// &#123;Beijing=[Alice, Charlie], Shanghai=[Bob]&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="分组统计"><a href="#分组统计" class="headerlink" title="分组统计"></a>分组统计</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> words = listOf(<span class="string">&quot;apple&quot;</span>, <span class="string">&quot;banana&quot;</span>, <span class="string">&quot;cherry&quot;</span>, <span class="string">&quot;date&quot;</span>)</span><br><span class="line"><span class="keyword">val</span> grouped = words.groupBy &#123; it.first() &#125;</span><br><span class="line">println(grouped)</span><br><span class="line"><span class="comment">// &#123;a=[apple], b=[banana], c=[cherry], d=[date]&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="七、associate-操作符"><a href="#七、associate-操作符" class="headerlink" title="七、associate 操作符"></a>七、associate 操作符</h2><h3 id="associate"><a href="#associate" class="headerlink" title="associate"></a>associate</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">User</span>(<span class="keyword">val</span> id: <span class="built_in">Int</span>, <span class="keyword">val</span> name: String)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> users = listOf(User(<span class="number">1</span>, <span class="string">&quot;Alice&quot;</span>), User(<span class="number">2</span>, <span class="string">&quot;Bob&quot;</span>))</span><br><span class="line"><span class="keyword">val</span> map = users.associate &#123; it.id to it.name &#125;</span><br><span class="line">println(map)  <span class="comment">// &#123;1=Alice, 2=Bob&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="associateBy"><a href="#associateBy" class="headerlink" title="associateBy"></a>associateBy</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> users = listOf(User(<span class="number">1</span>, <span class="string">&quot;Alice&quot;</span>), User(<span class="number">2</span>, <span class="string">&quot;Bob&quot;</span>))</span><br><span class="line"><span class="keyword">val</span> map = users.associateBy &#123; it.id &#125;</span><br><span class="line">println(map)  <span class="comment">// &#123;1=User(1, Alice), 2=User(2, Bob)&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="八、实战应用"><a href="#八、实战应用" class="headerlink" title="八、实战应用"></a>八、实战应用</h2><h3 id="1-数据处理流水线"><a href="#1-数据处理流水线" class="headerlink" title="1. 数据处理流水线"></a>1. 数据处理流水线</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">Product</span>(<span class="keyword">val</span> name: String, <span class="keyword">val</span> price: <span class="built_in">Double</span>, <span class="keyword">val</span> category: String)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> products = listOf(</span><br><span class="line">    Product(<span class="string">&quot;Book&quot;</span>, <span class="number">20.0</span>, <span class="string">&quot;Education&quot;</span>),</span><br><span class="line">    Product(<span class="string">&quot;Pen&quot;</span>, <span class="number">5.0</span>, <span class="string">&quot;Office&quot;</span>),</span><br><span class="line">    Product(<span class="string">&quot;Laptop&quot;</span>, <span class="number">1000.0</span>, <span class="string">&quot;Electronics&quot;</span>),</span><br><span class="line">    Product(<span class="string">&quot;Notebook&quot;</span>, <span class="number">10.0</span>, <span class="string">&quot;Education&quot;</span>)</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> expensiveEducationProducts = products</span><br><span class="line">    .filter &#123; it.category == <span class="string">&quot;Education&quot;</span> &#125;</span><br><span class="line">    .filter &#123; it.price &gt; <span class="number">10</span> &#125;</span><br><span class="line">    .map &#123; it.name &#125;</span><br><span class="line">    .sorted()</span><br><span class="line"></span><br><span class="line">println(expensiveEducationProducts)  <span class="comment">// [Book]</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="2-分组统计"><a href="#2-分组统计" class="headerlink" title="2. 分组统计"></a>2. 分组统计</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> products = listOf(</span><br><span class="line">    Product(<span class="string">&quot;Book&quot;</span>, <span class="number">20.0</span>, <span class="string">&quot;Education&quot;</span>),</span><br><span class="line">    Product(<span class="string">&quot;Pen&quot;</span>, <span class="number">5.0</span>, <span class="string">&quot;Office&quot;</span>),</span><br><span class="line">    Product(<span class="string">&quot;Laptop&quot;</span>, <span class="number">1000.0</span>, <span class="string">&quot;Electronics&quot;</span>)</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> categoryTotal = products</span><br><span class="line">    .groupBy &#123; it.category &#125;</span><br><span class="line">    .mapValues &#123; (_, items) -&gt; items.sumOf &#123; it.price &#125; &#125;</span><br><span class="line"></span><br><span class="line">println(categoryTotal)</span><br><span class="line"><span class="comment">// &#123;Education=20.0, Office=5.0, Electronics=1000.0&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="3-数据转换"><a href="#3-数据转换" class="headerlink" title="3. 数据转换"></a>3. 数据转换</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">User</span>(<span class="keyword">val</span> id: <span class="built_in">Int</span>, <span class="keyword">val</span> name: String)</span><br><span class="line"><span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">UserDTO</span>(<span class="keyword">val</span> id: String, <span class="keyword">val</span> displayName: String)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> users = listOf(User(<span class="number">1</span>, <span class="string">&quot;Alice&quot;</span>), User(<span class="number">2</span>, <span class="string">&quot;Bob&quot;</span>))</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> dtos = users.map &#123; user -&gt;</span><br><span class="line">    UserDTO(</span><br><span class="line">        id = user.id.toString(),</span><br><span class="line">        displayName = user.name.uppercase()</span><br><span class="line">    )</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">println(dtos)</span><br><span class="line"><span class="comment">// [UserDTO(id=1, displayName=ALICE), UserDTO(id=2, displayName=BOB)]</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="九、性能考虑"><a href="#九、性能考虑" class="headerlink" title="九、性能考虑"></a>九、性能考虑</h2><h3 id="惰性序列"><a href="#惰性序列" class="headerlink" title="惰性序列"></a>惰性序列</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 普通链式调用：创建中间集合</span></span><br><span class="line"><span class="keyword">val</span> result = numbers</span><br><span class="line">    .filter &#123; it &gt; <span class="number">2</span> &#125;</span><br><span class="line">    .map &#123; it * <span class="number">2</span> &#125;</span><br><span class="line">    .take(<span class="number">3</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用 Sequence：惰性求值</span></span><br><span class="line"><span class="keyword">val</span> result = numbers.asSequence()</span><br><span class="line">    .filter &#123; it &gt; <span class="number">2</span> &#125;</span><br><span class="line">    .map &#123; it * <span class="number">2</span> &#125;</span><br><span class="line">    .take(<span class="number">3</span>)</span><br><span class="line">    .toList()</span><br></pre></td></tr></table></figure>
+
+<h3 id="何时使用-Sequence"><a href="#何时使用-Sequence" class="headerlink" title="何时使用 Sequence"></a>何时使用 Sequence</h3><ul>
+<li>✅ 大数据集</li>
+<li>✅ 多步操作</li>
+<li>✅ 只需要部分结果</li>
+</ul>
+<h3 id="何时使用普通集合"><a href="#何时使用普通集合" class="headerlink" title="何时使用普通集合"></a>何时使用普通集合</h3><ul>
+<li>✅ 小数据集</li>
+<li>✅ 需要多次遍历</li>
+<li>✅ 简单操作</li>
+</ul>
+<h2 id="十、最佳实践"><a href="#十、最佳实践" class="headerlink" title="十、最佳实践"></a>十、最佳实践</h2><ol>
+<li><strong>链式调用</strong>：充分利用操作符组合</li>
+<li><strong>命名参数</strong>：提高可读性</li>
+<li><strong>避免过度嵌套</strong>：保持简洁</li>
+<li><strong>合理使用 Sequence</strong>：大数据集优化</li>
+<li><strong>注意空集合</strong>：reduce 需要非空集合</li>
+</ol>
+<h2 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://kotlinlang.org/docs/collection-filtering.html">Filtering collections | Kotlin Documentation</a></li>
+<li><a target="_blank" rel="noopener" href="https://medium.com/@sivavishnu0705/supercharge-your-kotlin-code-6-collection-functions-you-cant-ignore-map-filter-more-297ca90f9334">Kotlin Collection Mastery: Map, Filter, Fold</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.slingacademy.com/article/kotlin-using-lambdas-with-collections-map-filter-and-reduce/">Kotlin - Using Lambdas with Collections</a></li>
+</ul>
+<hr>
+<p><em>持续学习中…</em></p>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/Collection/" rel="tag">Collection</a>, <a class="tag-none-link" href="/blog/tags/Kotlin/" rel="tag">Kotlin</a>, <a class="tag-none-link" href="/blog/tags/filter/" rel="tag">filter</a>, <a class="tag-none-link" href="/blog/tags/fold/" rel="tag">fold</a>, <a class="tag-none-link" href="/blog/tags/map/" rel="tag">map</a>, <a class="tag-none-link" href="/blog/tags/reduce/" rel="tag">reduce</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-03T15:46:33.532Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Android RxJava响应式编程学习" href="/blog/2026/04/03/Android-RxJava响应式编程学习/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" Android依赖注入框架对比-Hilt vs Koin" href="/blog/2026/04/03/Android依赖注入框架对比-Hilt-vs-Koin/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>

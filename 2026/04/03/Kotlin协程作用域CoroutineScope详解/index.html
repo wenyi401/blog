@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>Kotlin协程作用域CoroutineScope详解 | Wenyi&#39;s Blog</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/03/Kotlin%E5%8D%8F%E7%A8%8B%E4%BD%9C%E7%94%A8%E5%9F%9FCoroutineScope%E8%AF%A6%E8%A7%A3/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="CoroutineScope, Coroutines, Kotlin, 作用域" />
+  
+  <meta name="description" content="前言CoroutineScope 是 Kotlin 协程结构化并发的基础，本质是一个包含 CoroutineContext 的接口。其核心作用为管理协程生命周期，确保父作用域取消时所有子协程自动终止。 一、CoroutineScope 定义123public interface CoroutineScope &#123;    public val coroutineContext: Corout">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kotlin协程作用域CoroutineScope详解">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/03/Kotlin%E5%8D%8F%E7%A8%8B%E4%BD%9C%E7%94%A8%E5%9F%9FCoroutineScope%E8%AF%A6%E8%A7%A3/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:description" content="前言CoroutineScope 是 Kotlin 协程结构化并发的基础，本质是一个包含 CoroutineContext 的接口。其核心作用为管理协程生命周期，确保父作用域取消时所有子协程自动终止。 一、CoroutineScope 定义123public interface CoroutineScope &#123;    public val coroutineContext: Corout">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-04-03T23:52:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T15:54:57.636Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="CoroutineScope">
+<meta property="article:tag" content="Coroutines">
+<meta property="article:tag" content="Kotlin">
+<meta property="article:tag" content="作用域">
+<meta name="twitter:card" content="summary">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Kotlin协程作用域CoroutineScope详解","description":"前言CoroutineScope 是 Kotlin 协程结构化并发的基础，本质是一个包含 CoroutineContext 的接口。其核心作用为管理协程生命周...","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:52:00.000Z","dateModified":"2026-04-03T15:54:57.636Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Kotlin%E5%8D%8F%E7%A8%8B%E4%BD%9C%E7%94%A8%E5%9F%9FCoroutineScope%E8%AF%A6%E8%A7%A3/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/03/Kotlin%E5%8D%8F%E7%A8%8B%E4%BD%9C%E7%94%A8%E5%9F%9FCoroutineScope%E8%AF%A6%E8%A7%A3/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Kotlin协程作用域CoroutineScope详解</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-03T23:52:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-03</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~3.21K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>CoroutineScope 是 Kotlin 协程结构化并发的基础，本质是一个包含 CoroutineContext 的接口。其核心作用为管理协程生命周期，确保父作用域取消时所有子协程自动终止。</p>
+<h2 id="一、CoroutineScope-定义"><a href="#一、CoroutineScope-定义" class="headerlink" title="一、CoroutineScope 定义"></a>一、CoroutineScope 定义</h2><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">CoroutineScope</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">val</span> coroutineContext: CoroutineContext</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>CoroutineScope 只有一个属性 coroutineContext，它是一个 CoroutineContext 类型，包含了协程的配置信息。</p>
+<h2 id="二、CoroutineContext-组成"><a href="#二、CoroutineContext-组成" class="headerlink" title="二、CoroutineContext 组成"></a>二、CoroutineContext 组成</h2><table>
+<thead>
+<tr>
+<th>元素</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Job</strong></td>
+<td>控制协程生命周期</td>
+</tr>
+<tr>
+<td><strong>Dispatcher</strong></td>
+<td>决定协程执行的线程</td>
+</tr>
+<tr>
+<td><strong>CoroutineName</strong></td>
+<td>协程名称，用于调试</td>
+</tr>
+<tr>
+<td><strong>CoroutineExceptionHandler</strong></td>
+<td>处理未捕获异常</td>
+</tr>
+</tbody></table>
+<h2 id="三、作用域创建"><a href="#三、作用域创建" class="headerlink" title="三、作用域创建"></a>三、作用域创建</h2><h3 id="CoroutineScope"><a href="#CoroutineScope" class="headerlink" title="CoroutineScope()"></a>CoroutineScope()</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> scope = CoroutineScope(Dispatchers.Default)</span><br></pre></td></tr></table></figure>
+
+<h3 id="MainScope"><a href="#MainScope" class="headerlink" title="MainScope()"></a>MainScope()</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> scope = MainScope()  <span class="comment">// 使用 Dispatchers.Main</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="lifecycleScope"><a href="#lifecycleScope" class="headerlink" title="lifecycleScope"></a>lifecycleScope</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">lifecycleScope.launch &#123;</span><br><span class="line">    <span class="comment">// 在 Activity/Fragment 中使用</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="viewModelScope"><a href="#viewModelScope" class="headerlink" title="viewModelScope"></a>viewModelScope</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">viewModelScope.launch &#123;</span><br><span class="line">    <span class="comment">// 在 ViewModel 中使用</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="GlobalScope"><a href="#GlobalScope" class="headerlink" title="GlobalScope"></a>GlobalScope</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">GlobalScope.launch &#123;</span><br><span class="line">    <span class="comment">// 不推荐使用，生命周期跟随应用</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、作用域函数"><a href="#四、作用域函数" class="headerlink" title="四、作用域函数"></a>四、作用域函数</h2><h3 id="coroutineScope"><a href="#coroutineScope" class="headerlink" title="coroutineScope"></a>coroutineScope</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">suspend</span> <span class="function"><span class="keyword">fun</span> <span class="title">loadData</span><span class="params">()</span></span> = coroutineScope &#123;</span><br><span class="line">    launch &#123;</span><br><span class="line">        <span class="comment">// 子协程 1</span></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    launch &#123;</span><br><span class="line">        <span class="comment">// 子协程 2</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="supervisorScope"><a href="#supervisorScope" class="headerlink" title="supervisorScope"></a>supervisorScope</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">suspend</span> <span class="function"><span class="keyword">fun</span> <span class="title">loadData</span><span class="params">()</span></span> = supervisorScope &#123;</span><br><span class="line">    launch &#123;</span><br><span class="line">        <span class="comment">// 子协程 1，失败不影响其他子协程</span></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    launch &#123;</span><br><span class="line">        <span class="comment">// 子协程 2</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="withContext"><a href="#withContext" class="headerlink" title="withContext"></a>withContext</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">suspend</span> <span class="function"><span class="keyword">fun</span> <span class="title">loadData</span><span class="params">()</span></span> = withContext(Dispatchers.IO) &#123;</span><br><span class="line">    <span class="comment">// 切换到 IO 线程执行</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="五、取消作用域"><a href="#五、取消作用域" class="headerlink" title="五、取消作用域"></a>五、取消作用域</h2><h3 id="cancel"><a href="#cancel" class="headerlink" title="cancel()"></a>cancel()</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> scope = CoroutineScope(Dispatchers.Default)</span><br><span class="line"></span><br><span class="line">scope.launch &#123;</span><br><span class="line">    delay(<span class="number">1000</span>)</span><br><span class="line">    println(<span class="string">&quot;Completed&quot;</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">scope.cancel()  <span class="comment">// 取消作用域内所有协程</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="取消检查"><a href="#取消检查" class="headerlink" title="取消检查"></a>取消检查</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">scope.launch &#123;</span><br><span class="line">    <span class="keyword">for</span> (i <span class="keyword">in</span> <span class="number">0.</span><span class="number">.1000</span>) &#123;</span><br><span class="line">        ensureActive()  <span class="comment">// 检查是否取消</span></span><br><span class="line">        processData(i)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="六、异常处理"><a href="#六、异常处理" class="headerlink" title="六、异常处理"></a>六、异常处理</h2><h3 id="CoroutineExceptionHandler"><a href="#CoroutineExceptionHandler" class="headerlink" title="CoroutineExceptionHandler"></a>CoroutineExceptionHandler</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> handler = CoroutineExceptionHandler &#123; _, exception -&gt;</span><br><span class="line">    println(<span class="string">&quot;Caught <span class="variable">$exception</span>&quot;</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> scope = CoroutineScope(Dispatchers.Main + handler)</span><br><span class="line"></span><br><span class="line">scope.launch &#123;</span><br><span class="line">    <span class="keyword">throw</span> RuntimeException(<span class="string">&quot;Error&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="SupervisorJob"><a href="#SupervisorJob" class="headerlink" title="SupervisorJob"></a>SupervisorJob</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)</span><br><span class="line"></span><br><span class="line">scope.launch &#123;</span><br><span class="line">    <span class="keyword">throw</span> RuntimeException(<span class="string">&quot;Error&quot;</span>)</span><br><span class="line">    <span class="comment">// 不会影响其他子协程</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">scope.launch &#123;</span><br><span class="line">    <span class="comment">// 仍然会执行</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="七、最佳实践"><a href="#七、最佳实践" class="headerlink" title="七、最佳实践"></a>七、最佳实践</h2><h3 id="1-结构化并发"><a href="#1-结构化并发" class="headerlink" title="1. 结构化并发"></a>1. 结构化并发</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">suspend</span> <span class="function"><span class="keyword">fun</span> <span class="title">loadData</span><span class="params">()</span></span> = coroutineScope &#123;</span><br><span class="line">    <span class="keyword">val</span> data1 = async &#123; fetchFromApi1() &#125;</span><br><span class="line">    <span class="keyword">val</span> data2 = async &#123; fetchFromApi2() &#125;</span><br><span class="line">    </span><br><span class="line">    combine(data1.await(), data2.await())</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-避免使用-GlobalScope"><a href="#2-避免使用-GlobalScope" class="headerlink" title="2. 避免使用 GlobalScope"></a>2. 避免使用 GlobalScope</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ❌ 错误</span></span><br><span class="line">GlobalScope.launch &#123;</span><br><span class="line">    <span class="comment">// 无法控制生命周期</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// ✅ 正确</span></span><br><span class="line">lifecycleScope.launch &#123;</span><br><span class="line">    <span class="comment">// 生命周期感知</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-合理使用-Dispatcher"><a href="#3-合理使用-Dispatcher" class="headerlink" title="3. 合理使用 Dispatcher"></a>3. 合理使用 Dispatcher</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 网络请求</span></span><br><span class="line">withContext(Dispatchers.IO) &#123;</span><br><span class="line">    fetchData()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// CPU 密集型</span></span><br><span class="line">withContext(Dispatchers.Default) &#123;</span><br><span class="line">    processData()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// UI 操作</span></span><br><span class="line">withContext(Dispatchers.Main) &#123;</span><br><span class="line">    updateUI()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-异常隔离"><a href="#4-异常隔离" class="headerlink" title="4. 异常隔离"></a>4. 异常隔离</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">supervisorScope &#123;</span><br><span class="line">    launch &#123;</span><br><span class="line">        <span class="comment">// 可能失败的任务</span></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    launch &#123;</span><br><span class="line">        <span class="comment">// 独立任务</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="八、常见问题"><a href="#八、常见问题" class="headerlink" title="八、常见问题"></a>八、常见问题</h2><h3 id="Q-coroutineScope-vs-supervisorScope"><a href="#Q-coroutineScope-vs-supervisorScope" class="headerlink" title="Q: coroutineScope vs supervisorScope"></a>Q: coroutineScope vs supervisorScope</h3><table>
+<thead>
+<tr>
+<th>特性</th>
+<th>coroutineScope</th>
+<th>supervisorScope</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>子协程失败</td>
+<td>取消所有子协程</td>
+<td>不影响其他子协程</td>
+</tr>
+<tr>
+<td>异常传播</td>
+<td>向上传播</td>
+<td>隔离异常</td>
+</tr>
+<tr>
+<td>使用场景</td>
+<td>任务相关性强</td>
+<td>任务独立性高</td>
+</tr>
+</tbody></table>
+<h3 id="Q-何时创建自定义作用域？"><a href="#Q-何时创建自定义作用域？" class="headerlink" title="Q: 何时创建自定义作用域？"></a>Q: 何时创建自定义作用域？</h3><ul>
+<li>需要自定义生命周期管理时</li>
+<li>需要特定配置时</li>
+<li>单元测试中</li>
+</ul>
+<h2 id="九、调试技巧"><a href="#九、调试技巧" class="headerlink" title="九、调试技巧"></a>九、调试技巧</h2><h3 id="协程命名"><a href="#协程命名" class="headerlink" title="协程命名"></a>协程命名</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">launch(CoroutineName(<span class="string">&quot;DataLoader&quot;</span>)) &#123;</span><br><span class="line">    <span class="comment">// 调试时可以看到协程名称</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="协程调试器"><a href="#协程调试器" class="headerlink" title="协程调试器"></a>协程调试器</h3><p>在 Android Studio 中使用 Kotlin 协程调试器查看协程状态。</p>
+<h2 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://kotlinlang.org/docs/coroutine-context-and-dispatchers.html">Coroutine context and dispatchers | Kotlin Documentation</a></li>
+<li><a target="_blank" rel="noopener" href="https://developer.android.google.cn/kotlin/coroutines/coroutines-best-practices?hl=zh-cn">在 Android 中使用协程的最佳实践</a></li>
+<li><a target="_blank" rel="noopener" href="https://juejin.cn/post/7502329326097432585">Kotlin CoroutineScope 详解</a></li>
+</ul>
+<hr>
+<p><em>持续学习中…</em></p>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/CoroutineScope/" rel="tag">CoroutineScope</a>, <a class="tag-none-link" href="/blog/tags/Coroutines/" rel="tag">Coroutines</a>, <a class="tag-none-link" href="/blog/tags/Kotlin/" rel="tag">Kotlin</a>, <a class="tag-none-link" href="/blog/tags/%E4%BD%9C%E7%94%A8%E5%9F%9F/" rel="tag">作用域</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-03T15:54:57.636Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Kotlin延迟初始化-lazy与lateinit" href="/blog/2026/04/03/Kotlin延迟初始化-lazy与lateinit/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" Kotlin协程Dispatcher线程调度器详解" href="/blog/2026/04/03/Kotlin协程Dispatcher线程调度器详解/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>

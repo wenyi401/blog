@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>Android CameraX相机开发实战 | Wenyi&#39;s Blog</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/03/Android-CameraX%E7%9B%B8%E6%9C%BA%E5%BC%80%E5%8F%91%E5%AE%9E%E6%88%98/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="Android, CameraX, 拍照, 相机" />
+  
+  <meta name="description" content="前言CameraX 是一个 Jetpack 库，旨在帮助您更轻松地开发相机应用。它提供了一个一致且易于使用的 API，该 API 适用于绝大多数 Android 设备，并向后兼容 Android 5.0（API 级别 21）。 一、添加依赖1234567dependencies &#123;    val camerax_version &#x3D; &quot;1.4.1&quot;    impleme">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android CameraX相机开发实战">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/03/Android-CameraX%E7%9B%B8%E6%9C%BA%E5%BC%80%E5%8F%91%E5%AE%9E%E6%88%98/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:description" content="前言CameraX 是一个 Jetpack 库，旨在帮助您更轻松地开发相机应用。它提供了一个一致且易于使用的 API，该 API 适用于绝大多数 Android 设备，并向后兼容 Android 5.0（API 级别 21）。 一、添加依赖1234567dependencies &#123;    val camerax_version &#x3D; &quot;1.4.1&quot;    impleme">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-04-03T23:52:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T15:54:57.636Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="CameraX">
+<meta property="article:tag" content="拍照">
+<meta property="article:tag" content="相机">
+<meta name="twitter:card" content="summary">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Android CameraX相机开发实战","description":"前言CameraX 是一个 Jetpack 库，旨在帮助您更轻松地开发相机应用。它提供了一个一致且易于使用的 API，该 API 适用于绝大多数 Androi...","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:52:00.000Z","dateModified":"2026-04-03T15:54:57.636Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Android-CameraX%E7%9B%B8%E6%9C%BA%E5%BC%80%E5%8F%91%E5%AE%9E%E6%88%98/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/03/Android-CameraX%E7%9B%B8%E6%9C%BA%E5%BC%80%E5%8F%91%E5%AE%9E%E6%88%98/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Android CameraX相机开发实战</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-03T23:52:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-03</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~5.55K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>CameraX 是一个 Jetpack 库，旨在帮助您更轻松地开发相机应用。它提供了一个一致且易于使用的 API，该 API 适用于绝大多数 Android 设备，并向后兼容 Android 5.0（API 级别 21）。</p>
+<h2 id="一、添加依赖"><a href="#一、添加依赖" class="headerlink" title="一、添加依赖"></a>一、添加依赖</h2><figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">dependencies</span> &#123;</span><br><span class="line">    val camerax_version = <span class="string">&quot;1.4.1&quot;</span></span><br><span class="line">    implementation(<span class="string">&quot;androidx.camera:camera-core:$&#123;camerax_version&#125;&quot;</span>)</span><br><span class="line">    implementation(<span class="string">&quot;androidx.camera:camera-camera2:$&#123;camerax_version&#125;&quot;</span>)</span><br><span class="line">    implementation(<span class="string">&quot;androidx.camera:camera-lifecycle:$&#123;camerax_version&#125;&quot;</span>)</span><br><span class="line">    implementation(<span class="string">&quot;androidx.camera:camera-view:$&#123;camerax_version&#125;&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="二、添加权限"><a href="#二、添加权限" class="headerlink" title="二、添加权限"></a>二、添加权限</h2><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">uses-feature</span> <span class="attr">android:name</span>=<span class="string">&quot;android.hardware.camera.any&quot;</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">&quot;android.permission.CAMERA&quot;</span> /&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="三、初始化相机"><a href="#三、初始化相机" class="headerlink" title="三、初始化相机"></a>三、初始化相机</h2><h3 id="获取-ProcessCameraProvider"><a href="#获取-ProcessCameraProvider" class="headerlink" title="获取 ProcessCameraProvider"></a>获取 ProcessCameraProvider</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">lateinit</span> <span class="keyword">var</span> cameraProvider: ProcessCameraProvider</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">startCamera</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">val</span> cameraProviderFuture = ProcessCameraProvider.getInstance(<span class="keyword">this</span>)</span><br><span class="line">    </span><br><span class="line">    cameraProviderFuture.addListener(&#123;</span><br><span class="line">        cameraProvider = cameraProviderFuture.<span class="keyword">get</span>()</span><br><span class="line">        bindCameraUseCases()</span><br><span class="line">    &#125;, ContextCompat.getMainExecutor(<span class="keyword">this</span>))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、绑定用例"><a href="#四、绑定用例" class="headerlink" title="四、绑定用例"></a>四、绑定用例</h2><h3 id="预览用例"><a href="#预览用例" class="headerlink" title="预览用例"></a>预览用例</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">var</span> preview: Preview? = <span class="literal">null</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">var</span> camera: Camera? = <span class="literal">null</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">bindCameraUseCases</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">val</span> cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA</span><br><span class="line">    </span><br><span class="line">    preview = Preview.Builder()</span><br><span class="line">        .build()</span><br><span class="line">        .also &#123;</span><br><span class="line">            it.setSurfaceProvider(viewFinder.surfaceProvider)</span><br><span class="line">        &#125;</span><br><span class="line">    </span><br><span class="line">    cameraProvider.unbindAll()</span><br><span class="line">    camera = cameraProvider.bindToLifecycle(</span><br><span class="line">        <span class="keyword">this</span>, cameraSelector, preview</span><br><span class="line">    )</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="拍照用例"><a href="#拍照用例" class="headerlink" title="拍照用例"></a>拍照用例</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">var</span> imageCapture: ImageCapture? = <span class="literal">null</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">bindCameraUseCases</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">val</span> cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA</span><br><span class="line">    </span><br><span class="line">    preview = Preview.Builder().build()</span><br><span class="line">    </span><br><span class="line">    imageCapture = ImageCapture.Builder()</span><br><span class="line">        .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)</span><br><span class="line">        .build()</span><br><span class="line">    </span><br><span class="line">    cameraProvider.unbindAll()</span><br><span class="line">    camera = cameraProvider.bindToLifecycle(</span><br><span class="line">        <span class="keyword">this</span>, cameraSelector, preview, imageCapture</span><br><span class="line">    )</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="拍照"><a href="#拍照" class="headerlink" title="拍照"></a>拍照</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">takePhoto</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">val</span> imageCapture = imageCapture ?: <span class="keyword">return</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">val</span> photoFile = File(</span><br><span class="line">        outputDirectory,</span><br><span class="line">        SimpleDateFormat(FILENAME_FORMAT, Locale.US)</span><br><span class="line">            .format(System.currentTimeMillis()) + <span class="string">&quot;.jpg&quot;</span></span><br><span class="line">    )</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">val</span> outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()</span><br><span class="line">    </span><br><span class="line">    imageCapture.takePicture(</span><br><span class="line">        outputOptions,</span><br><span class="line">        ContextCompat.getMainExecutor(<span class="keyword">this</span>),</span><br><span class="line">        <span class="keyword">object</span> : ImageCapture.OnImageSavedCallback &#123;</span><br><span class="line">            <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onError</span><span class="params">(exc: <span class="type">ImageCaptureException</span>)</span></span> &#123;</span><br><span class="line">                Log.e(TAG, <span class="string">&quot;Photo capture failed: <span class="subst">$&#123;exc.message&#125;</span>&quot;</span>)</span><br><span class="line">            &#125;</span><br><span class="line">            </span><br><span class="line">            <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onImageSaved</span><span class="params">(output: <span class="type">ImageCapture</span>.<span class="type">OutputFileResults</span>)</span></span> &#123;</span><br><span class="line">                <span class="keyword">val</span> savedUri = Uri.fromFile(photoFile)</span><br><span class="line">                Log.d(TAG, <span class="string">&quot;Photo capture succeeded: <span class="variable">$savedUri</span>&quot;</span>)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    )</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="五、切换摄像头"><a href="#五、切换摄像头" class="headerlink" title="五、切换摄像头"></a>五、切换摄像头</h2><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">var</span> lensFacing = CameraSelector.LENS_FACING_BACK</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">switchCamera</span><span class="params">()</span></span> &#123;</span><br><span class="line">    lensFacing = <span class="keyword">if</span> (lensFacing == CameraSelector.LENS_FACING_BACK) &#123;</span><br><span class="line">        CameraSelector.LENS_FACING_FRONT</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        CameraSelector.LENS_FACING_BACK</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    bindCameraUseCases()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="六、闪光灯控制"><a href="#六、闪光灯控制" class="headerlink" title="六、闪光灯控制"></a>六、闪光灯控制</h2><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">enableFlash</span><span class="params">(enabled: <span class="type">Boolean</span>)</span></span> &#123;</span><br><span class="line">    camera?.cameraControl?.enableTorch(enabled)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="七、缩放控制"><a href="#七、缩放控制" class="headerlink" title="七、缩放控制"></a>七、缩放控制</h2><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">setZoom</span><span class="params">(ratio: <span class="type">Float</span>)</span></span> &#123;</span><br><span class="line">    camera?.cameraControl?.setLinearZoom(ratio)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="八、对焦控制"><a href="#八、对焦控制" class="headerlink" title="八、对焦控制"></a>八、对焦控制</h2><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">focusOnPoint</span><span class="params">(x: <span class="type">Float</span>, y: <span class="type">Float</span>)</span></span> &#123;</span><br><span class="line">    <span class="keyword">val</span> point = MeteringPointFactory.createPoint(x, y)</span><br><span class="line">    <span class="keyword">val</span> action = FocusMeteringAction.Builder(point).build()</span><br><span class="line">    camera?.cameraControl?.startFocusAndMetering(action)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="九、视频录制"><a href="#九、视频录制" class="headerlink" title="九、视频录制"></a>九、视频录制</h2><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">var</span> videoCapture: VideoCapture&lt;Recorder&gt;? = <span class="literal">null</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">bindVideoCapture</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">val</span> recorder = Recorder.Builder()</span><br><span class="line">        .setQualitySelector(QualitySelector.from(Quality.HIGHEST))</span><br><span class="line">        .build()</span><br><span class="line">    </span><br><span class="line">    videoCapture = VideoCapture.withOutput(recorder)</span><br><span class="line">    </span><br><span class="line">    cameraProvider.bindToLifecycle(</span><br><span class="line">        <span class="keyword">this</span>, cameraSelector, preview, videoCapture</span><br><span class="line">    )</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">startRecording</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">val</span> mediaStoreOutput = MediaStoreOutputOptions</span><br><span class="line">        .Builder(contentResolver, MediaStore.Video.Media.EXTERNAL_CONTENT_URI)</span><br><span class="line">        .setContentValues(ContentValues().apply &#123;</span><br><span class="line">            put(MediaStore.Video.Media.DISPLAY_NAME, <span class="string">&quot;video_<span class="subst">$&#123;System.currentTimeMillis()&#125;</span>&quot;</span>)</span><br><span class="line">            put(MediaStore.Video.Media.MIME_TYPE, <span class="string">&quot;video/mp4&quot;</span>)</span><br><span class="line">        &#125;)</span><br><span class="line">        .build()</span><br><span class="line">    </span><br><span class="line">    currentRecording = videoCapture?.output</span><br><span class="line">        ?.prepareRecording(<span class="keyword">this</span>, mediaStoreOutput)</span><br><span class="line">        ?.start(ContextCompat.getMainExecutor(<span class="keyword">this</span>)) &#123; recordEvent -&gt;</span><br><span class="line">            <span class="keyword">when</span> (recordEvent) &#123;</span><br><span class="line">                <span class="keyword">is</span> VideoRecordEvent.Start -&gt; &#123;</span><br><span class="line">                    Log.d(TAG, <span class="string">&quot;Recording started&quot;</span>)</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">is</span> VideoRecordEvent.Finalize -&gt; &#123;</span><br><span class="line">                    <span class="keyword">if</span> (!recordEvent.hasError()) &#123;</span><br><span class="line">                        Log.d(TAG, <span class="string">&quot;Recording saved: <span class="subst">$&#123;recordEvent.outputResults.outputUri&#125;</span>&quot;</span>)</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="十、最佳实践"><a href="#十、最佳实践" class="headerlink" title="十、最佳实践"></a>十、最佳实践</h2><ol>
+<li><strong>生命周期感知</strong>：绑定到生命周期</li>
+<li><strong>权限检查</strong>：运行时权限请求</li>
+<li><strong>异常处理</strong>：处理相机不可用情况</li>
+<li><strong>资源释放</strong>：及时释放相机资源</li>
+<li><strong>内存管理</strong>：避免内存泄漏</li>
+</ol>
+<h2 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://developer.android.google.cn/media/camera/camerax?hl=zh-cn">CameraX 概览 | Android Developers</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.zhifeiya.cn/post/2026/3/12/363c91a6">Android Jetpack CameraX实战</a></li>
+<li><a target="_blank" rel="noopener" href="https://proandroiddev.com/compose-native-camerax-in-2026-the-complete-guide-bf36c76a78e9">Compose-Native CameraX in 2026</a></li>
+</ul>
+<hr>
+<p><em>持续学习中…</em></p>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/Android/" rel="tag">Android</a>, <a class="tag-none-link" href="/blog/tags/CameraX/" rel="tag">CameraX</a>, <a class="tag-none-link" href="/blog/tags/%E6%8B%8D%E7%85%A7/" rel="tag">拍照</a>, <a class="tag-none-link" href="/blog/tags/%E7%9B%B8%E6%9C%BA/" rel="tag">相机</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-03T15:54:57.636Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Android ContentProvider内容提供者实战" href="/blog/2026/04/03/Android-ContentProvider内容提供者实战/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" Android Room数据库迁移Migration深度解析" href="/blog/2026/04/04/Android-Room数据库迁移Migration深度解析/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>

@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>Android组件化架构学习-ARouter路由框架 | Wenyi&#39;s Blog</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/03/Android%E7%BB%84%E4%BB%B6%E5%8C%96%E6%9E%B6%E6%9E%84%E5%AD%A6%E4%B9%A0-ARouter%E8%B7%AF%E7%94%B1%E6%A1%86%E6%9E%B6/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="ARouter, Android, 模块化, 组件化, 路由" />
+  
+  <meta name="description" content="前言ARouter 是阿里巴巴开源的 Android 组件化路由框架，通过解耦模块依赖，实现跨模块跳转与服务调用。 一、为什么需要 ARouter？组件化的问题 模块间无法直接引用 Intent 跳转耦合严重 服务调用困难  ARouter 解决方案 路由跳转 参数自动注入 服务发现 拦截器机制  二、添加依赖1234567891011121314android &#123;    default">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android组件化架构学习-ARouter路由框架">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/03/Android%E7%BB%84%E4%BB%B6%E5%8C%96%E6%9E%B6%E6%9E%84%E5%AD%A6%E4%B9%A0-ARouter%E8%B7%AF%E7%94%B1%E6%A1%86%E6%9E%B6/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:description" content="前言ARouter 是阿里巴巴开源的 Android 组件化路由框架，通过解耦模块依赖，实现跨模块跳转与服务调用。 一、为什么需要 ARouter？组件化的问题 模块间无法直接引用 Intent 跳转耦合严重 服务调用困难  ARouter 解决方案 路由跳转 参数自动注入 服务发现 拦截器机制  二、添加依赖1234567891011121314android &#123;    default">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-04-03T23:39:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T15:38:52.464Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="ARouter">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="模块化">
+<meta property="article:tag" content="组件化">
+<meta property="article:tag" content="路由">
+<meta name="twitter:card" content="summary">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Android组件化架构学习-ARouter路由框架","description":"前言ARouter 是阿里巴巴开源的 Android 组件化路由框架，通过解耦模块依赖，实现跨模块跳转与服务调用。\n","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:39:00.000Z","dateModified":"2026-04-03T15:38:52.464Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Android%E7%BB%84%E4%BB%B6%E5%8C%96%E6%9E%B6%E6%9E%84%E5%AD%A6%E4%B9%A0-ARouter%E8%B7%AF%E7%94%B1%E6%A1%86%E6%9E%B6/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/03/Android%E7%BB%84%E4%BB%B6%E5%8C%96%E6%9E%B6%E6%9E%84%E5%AD%A6%E4%B9%A0-ARouter%E8%B7%AF%E7%94%B1%E6%A1%86%E6%9E%B6/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Android组件化架构学习-ARouter路由框架</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-03T23:39:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-03</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~3.63K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>ARouter 是阿里巴巴开源的 Android 组件化路由框架，通过解耦模块依赖，实现跨模块跳转与服务调用。</p>
+<h2 id="一、为什么需要-ARouter？"><a href="#一、为什么需要-ARouter？" class="headerlink" title="一、为什么需要 ARouter？"></a>一、为什么需要 ARouter？</h2><h3 id="组件化的问题"><a href="#组件化的问题" class="headerlink" title="组件化的问题"></a>组件化的问题</h3><ul>
+<li>模块间无法直接引用</li>
+<li>Intent 跳转耦合严重</li>
+<li>服务调用困难</li>
+</ul>
+<h3 id="ARouter-解决方案"><a href="#ARouter-解决方案" class="headerlink" title="ARouter 解决方案"></a>ARouter 解决方案</h3><ul>
+<li>路由跳转</li>
+<li>参数自动注入</li>
+<li>服务发现</li>
+<li>拦截器机制</li>
+</ul>
+<h2 id="二、添加依赖"><a href="#二、添加依赖" class="headerlink" title="二、添加依赖"></a>二、添加依赖</h2><figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">android &#123;</span><br><span class="line">    defaultConfig &#123;</span><br><span class="line">        javaCompileOptions &#123;</span><br><span class="line">            annotationProcessorOptions &#123;</span><br><span class="line">                arguments = [AROUTER_MODULE_NAME: <span class="keyword">project</span>.getName()]</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">dependencies</span> &#123;</span><br><span class="line">    implementation <span class="string">&#x27;com.alibaba:arouter-api:1.5.2&#x27;</span></span><br><span class="line">    kapt <span class="string">&#x27;com.alibaba:arouter-compiler:1.5.2&#x27;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="三、基本使用"><a href="#三、基本使用" class="headerlink" title="三、基本使用"></a>三、基本使用</h2><h3 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MyApplication</span> : <span class="type">Application</span>() &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onCreate</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate()</span><br><span class="line">        ARouter.<span class="keyword">init</span>(<span class="keyword">this</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="定义路由"><a href="#定义路由" class="headerlink" title="定义路由"></a>定义路由</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Route(path = <span class="string">&quot;/user/profile&quot;</span>)</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ProfileActivity</span> : <span class="type">AppCompatActivity</span>() &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onCreate</span><span class="params">(savedInstanceState: <span class="type">Bundle</span>?)</span></span> &#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState)</span><br><span class="line">        setContentView(R.layout.activity_profile)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="路由跳转"><a href="#路由跳转" class="headerlink" title="路由跳转"></a>路由跳转</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 简单跳转</span></span><br><span class="line">ARouter.getInstance()</span><br><span class="line">    .build(<span class="string">&quot;/user/profile&quot;</span>)</span><br><span class="line">    .navigation()</span><br><span class="line"></span><br><span class="line"><span class="comment">// 带参数跳转</span></span><br><span class="line">ARouter.getInstance()</span><br><span class="line">    .build(<span class="string">&quot;/user/profile&quot;</span>)</span><br><span class="line">    .withString(<span class="string">&quot;userId&quot;</span>, <span class="string">&quot;123&quot;</span>)</span><br><span class="line">    .withInt(<span class="string">&quot;age&quot;</span>, <span class="number">25</span>)</span><br><span class="line">    .navigation()</span><br><span class="line"></span><br><span class="line"><span class="comment">// 获取跳转结果</span></span><br><span class="line">ARouter.getInstance()</span><br><span class="line">    .build(<span class="string">&quot;/user/profile&quot;</span>)</span><br><span class="line">    .navigation(<span class="keyword">this</span>, <span class="keyword">object</span> : NavigationCallback &#123;</span><br><span class="line">        <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onFound</span><span class="params">(postcard: <span class="type">Postcard</span>)</span></span> &#123;&#125;</span><br><span class="line">        <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onLost</span><span class="params">(postcard: <span class="type">Postcard</span>)</span></span> &#123;&#125;</span><br><span class="line">        <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onArrival</span><span class="params">(postcard: <span class="type">Postcard</span>)</span></span> &#123;&#125;</span><br><span class="line">        <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onInterrupt</span><span class="params">(postcard: <span class="type">Postcard</span>)</span></span> &#123;&#125;</span><br><span class="line">    &#125;)</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、参数自动注入"><a href="#四、参数自动注入" class="headerlink" title="四、参数自动注入"></a>四、参数自动注入</h2><h3 id="定义字段"><a href="#定义字段" class="headerlink" title="定义字段"></a>定义字段</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Route(path = <span class="string">&quot;/user/detail&quot;</span>)</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">UserDetailActivity</span> : <span class="type">AppCompatActivity</span>() &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">lateinit</span> <span class="keyword">var</span> userId: String</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">var</span> age: <span class="built_in">Int</span> = <span class="number">0</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onCreate</span><span class="params">(savedInstanceState: <span class="type">Bundle</span>?)</span></span> &#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState)</span><br><span class="line">        ARouter.getInstance().inject(<span class="keyword">this</span>)</span><br><span class="line">        </span><br><span class="line">        println(<span class="string">&quot;userId: <span class="variable">$userId</span>, age: <span class="variable">$age</span>&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="五、服务发现"><a href="#五、服务发现" class="headerlink" title="五、服务发现"></a>五、服务发现</h2><h3 id="定义服务接口"><a href="#定义服务接口" class="headerlink" title="定义服务接口"></a>定义服务接口</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">interface</span> <span class="title class_">IUserService</span> : <span class="type">IProvider</span> &#123;</span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">getUserName</span><span class="params">()</span></span>: String</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="实现服务"><a href="#实现服务" class="headerlink" title="实现服务"></a>实现服务</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Route(path = <span class="string">&quot;/service/user&quot;</span>)</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">UserServiceImpl</span> : <span class="type">IUserService</span> &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">getUserName</span><span class="params">()</span></span>: String &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;Alice&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">init</span><span class="params">(context: <span class="type">Context</span>)</span></span> &#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="使用服务"><a href="#使用服务" class="headerlink" title="使用服务"></a>使用服务</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 通过路径获取</span></span><br><span class="line"><span class="keyword">val</span> userService = ARouter.getInstance()</span><br><span class="line">    .build(<span class="string">&quot;/service/user&quot;</span>)</span><br><span class="line">    .navigation() <span class="keyword">as</span> IUserService</span><br><span class="line"></span><br><span class="line"><span class="comment">// 通过类获取</span></span><br><span class="line"><span class="keyword">val</span> userService = ARouter.getInstance()</span><br><span class="line">    .navigation(IUserService::<span class="keyword">class</span>.java)</span><br></pre></td></tr></table></figure>
+
+<h2 id="六、拦截器"><a href="#六、拦截器" class="headerlink" title="六、拦截器"></a>六、拦截器</h2><h3 id="定义拦截器"><a href="#定义拦截器" class="headerlink" title="定义拦截器"></a>定义拦截器</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Interceptor(priority = 1, name = <span class="string">&quot;LoginInterceptor&quot;</span>)</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">LoginInterceptor</span> : <span class="type">IInterceptor</span> &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">process</span><span class="params">(postcard: <span class="type">Postcard</span>, callback: <span class="type">InterceptorCallback</span>)</span></span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (isLogin()) &#123;</span><br><span class="line">            callback.onContinue(postcard)</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            callback.onInterrupt(<span class="literal">null</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">init</span><span class="params">(context: <span class="type">Context</span>)</span></span> &#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="使用拦截器"><a href="#使用拦截器" class="headerlink" title="使用拦截器"></a>使用拦截器</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Route(path = <span class="string">&quot;/user/profile&quot;</span>, extras = Consts.REQUIRE_LOGIN)</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ProfileActivity</span> : <span class="type">AppCompatActivity</span>() &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="七、路由组"><a href="#七、路由组" class="headerlink" title="七、路由组"></a>七、路由组</h2><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Route(path = <span class="string">&quot;/user/profile&quot;</span>, group = <span class="string">&quot;user&quot;</span>)</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ProfileActivity</span> : <span class="type">AppCompatActivity</span>()</span><br><span class="line"></span><br><span class="line"><span class="meta">@Route(path = <span class="string">&quot;/order/list&quot;</span>, group = <span class="string">&quot;order&quot;</span>)</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">OrderListActivity</span> : <span class="type">AppCompatActivity</span>()</span><br></pre></td></tr></table></figure>
+
+<h2 id="八、最佳实践"><a href="#八、最佳实践" class="headerlink" title="八、最佳实践"></a>八、最佳实践</h2><ol>
+<li><strong>统一路径管理</strong>：使用常量类管理路由路径</li>
+<li><strong>拦截器优先级</strong>：合理设置拦截器优先级</li>
+<li><strong>服务单例</strong>：服务实现应为单例模式</li>
+<li><strong>错误处理</strong>：实现 NavigationCallback 处理跳转失败</li>
+</ol>
+<h2 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/alibaba/ARouter">ARouter GitHub</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/gitblog_00315/article/details/151470189">ARouter终极指南</a></li>
+<li><a target="_blank" rel="noopener" href="https://juejin.cn/post/7527204643325050907">Android组件化路由框架原理深入解析</a></li>
+</ul>
+<hr>
+<p><em>持续学习中…</em></p>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/ARouter/" rel="tag">ARouter</a>, <a class="tag-none-link" href="/blog/tags/Android/" rel="tag">Android</a>, <a class="tag-none-link" href="/blog/tags/%E6%A8%A1%E5%9D%97%E5%8C%96/" rel="tag">模块化</a>, <a class="tag-none-link" href="/blog/tags/%E7%BB%84%E4%BB%B6%E5%8C%96/" rel="tag">组件化</a>, <a class="tag-none-link" href="/blog/tags/%E8%B7%AF%E7%94%B1/" rel="tag">路由</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-03T15:38:52.464Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Android插件化Hook技术学习" href="/blog/2026/04/03/Android插件化Hook技术学习/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" Kotlin Multiplatform Ktor网络请求学习" href="/blog/2026/04/03/Kotlin-Multiplatform-Ktor网络请求学习/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>

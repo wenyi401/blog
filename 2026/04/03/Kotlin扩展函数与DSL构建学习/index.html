@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>Kotlin扩展函数与DSL构建学习 | Wenyi&#39;s Blog</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/03/Kotlin%E6%89%A9%E5%B1%95%E5%87%BD%E6%95%B0%E4%B8%8EDSL%E6%9E%84%E5%BB%BA%E5%AD%A6%E4%B9%A0/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="DSL, Kotlin, 扩展函数, 高阶函数" />
+  
+  <meta name="description" content="前言Kotlin 扩展函数让你可以在不使用继承或设计模式（如装饰器）的情况下，为类或接口添加新功能。当你无法直接修改第三方库时，扩展函数尤其有用。一旦创建，你可以像调用原始类或接口的成员一样调用这些扩展。 一、扩展函数基本语法12345678910111213fun String.truncate(maxLength: Int): String &#123;    return if (this.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kotlin扩展函数与DSL构建学习">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/03/Kotlin%E6%89%A9%E5%B1%95%E5%87%BD%E6%95%B0%E4%B8%8EDSL%E6%9E%84%E5%BB%BA%E5%AD%A6%E4%B9%A0/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:description" content="前言Kotlin 扩展函数让你可以在不使用继承或设计模式（如装饰器）的情况下，为类或接口添加新功能。当你无法直接修改第三方库时，扩展函数尤其有用。一旦创建，你可以像调用原始类或接口的成员一样调用这些扩展。 一、扩展函数基本语法12345678910111213fun String.truncate(maxLength: Int): String &#123;    return if (this.">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-04-03T23:18:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T15:19:13.396Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="DSL">
+<meta property="article:tag" content="Kotlin">
+<meta property="article:tag" content="扩展函数">
+<meta property="article:tag" content="高阶函数">
+<meta name="twitter:card" content="summary">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Kotlin扩展函数与DSL构建学习","description":"前言Kotlin 扩展函数让你可以在不使用继承或设计模式（如装饰器）的情况下，为类或接口添加新功能。当你无法直接修改第三方库时，扩展函数尤其有用。一旦创建，你...","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:18:00.000Z","dateModified":"2026-04-03T15:19:13.396Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Kotlin%E6%89%A9%E5%B1%95%E5%87%BD%E6%95%B0%E4%B8%8EDSL%E6%9E%84%E5%BB%BA%E5%AD%A6%E4%B9%A0/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/03/Kotlin%E6%89%A9%E5%B1%95%E5%87%BD%E6%95%B0%E4%B8%8EDSL%E6%9E%84%E5%BB%BA%E5%AD%A6%E4%B9%A0/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Kotlin扩展函数与DSL构建学习</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-03T23:18:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-03</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~4.95K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Kotlin 扩展函数让你可以在不使用继承或设计模式（如装饰器）的情况下，为类或接口添加新功能。当你无法直接修改第三方库时，扩展函数尤其有用。一旦创建，你可以像调用原始类或接口的成员一样调用这些扩展。</p>
+<h2 id="一、扩展函数"><a href="#一、扩展函数" class="headerlink" title="一、扩展函数"></a>一、扩展函数</h2><h3 id="基本语法"><a href="#基本语法" class="headerlink" title="基本语法"></a>基本语法</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> String.<span class="title">truncate</span><span class="params">(maxLength: <span class="type">Int</span>)</span></span>: String &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">if</span> (<span class="keyword">this</span>.length &lt;= maxLength) <span class="keyword">this</span> <span class="keyword">else</span> take(maxLength - <span class="number">3</span>) + <span class="string">&quot;...&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">val</span> shortUsername = <span class="string">&quot;KotlinFan42&quot;</span></span><br><span class="line">    <span class="keyword">val</span> longUsername = <span class="string">&quot;JetBrainsLoverForever&quot;</span></span><br><span class="line"></span><br><span class="line">    println(<span class="string">&quot;Short username: <span class="subst">$&#123;shortUsername.truncate(<span class="number">15</span>)&#125;</span>&quot;</span>)</span><br><span class="line">    <span class="comment">// KotlinFan42</span></span><br><span class="line">    println(<span class="string">&quot;Long username: <span class="subst">$&#123;longUsername.truncate(<span class="number">15</span>)&#125;</span>&quot;</span>)</span><br><span class="line">    <span class="comment">// JetBrainsLov...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="扩展接口"><a href="#扩展接口" class="headerlink" title="扩展接口"></a>扩展接口</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">interface</span> <span class="title class_">User</span> &#123;</span><br><span class="line">    <span class="keyword">val</span> name: String</span><br><span class="line">    <span class="keyword">val</span> email: String</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> User.<span class="title">displayInfo</span><span class="params">()</span></span>: String = <span class="string">&quot;User(name=<span class="variable">$name</span>, email=<span class="variable">$email</span>)&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">RegularUser</span>(<span class="keyword">override</span> <span class="keyword">val</span> name: String, <span class="keyword">override</span> <span class="keyword">val</span> email: String) : User</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">val</span> user = RegularUser(<span class="string">&quot;Alice&quot;</span>, <span class="string">&quot;alice@example.com&quot;</span>)</span><br><span class="line">    println(user.displayInfo())</span><br><span class="line">    <span class="comment">// User(name=Alice, email=alice@example.com)</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="扩展集合"><a href="#扩展集合" class="headerlink" title="扩展集合"></a>扩展集合</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> Map<span class="type">&lt;String, Int&gt;</span>.<span class="title">mostVoted</span><span class="params">()</span></span>: String? &#123;</span><br><span class="line">    <span class="keyword">return</span> maxByOrNull &#123; (key, value) -&gt; value &#125;?.key</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">val</span> poll = mapOf(</span><br><span class="line">        <span class="string">&quot;Cats&quot;</span> to <span class="number">37</span>,</span><br><span class="line">        <span class="string">&quot;Dogs&quot;</span> to <span class="number">58</span>,</span><br><span class="line">        <span class="string">&quot;Birds&quot;</span> to <span class="number">22</span></span><br><span class="line">    )</span><br><span class="line">    </span><br><span class="line">    println(<span class="string">&quot;Top choice: <span class="subst">$&#123;poll.mostVoted()&#125;</span>&quot;</span>)</span><br><span class="line">    <span class="comment">// Dogs</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="二、泛型扩展函数"><a href="#二、泛型扩展函数" class="headerlink" title="二、泛型扩展函数"></a>二、泛型扩展函数</h2><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="type">&lt;T&gt;</span> List<span class="type">&lt;T&gt;</span>.<span class="title">endpoints</span><span class="params">()</span></span>: Pair&lt;T, T&gt; &#123;</span><br><span class="line">    <span class="keyword">return</span> first() to last()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">val</span> cities = listOf(<span class="string">&quot;Paris&quot;</span>, <span class="string">&quot;London&quot;</span>, <span class="string">&quot;Berlin&quot;</span>, <span class="string">&quot;Prague&quot;</span>)</span><br><span class="line">    <span class="keyword">val</span> (start, end) = cities.endpoints()</span><br><span class="line">    println(<span class="string">&quot;Start: <span class="variable">$start</span>, End: <span class="variable">$end</span>&quot;</span>)</span><br><span class="line">    <span class="comment">// Start: Paris, End: Prague</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="三、扩展属性"><a href="#三、扩展属性" class="headerlink" title="三、扩展属性"></a>三、扩展属性</h2><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> String.isLong: <span class="built_in">Boolean</span></span><br><span class="line">    <span class="keyword">get</span>() = <span class="keyword">this</span>.length &gt; <span class="number">10</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> <span class="built_in">Int</span>.squared: <span class="built_in">Int</span></span><br><span class="line">    <span class="keyword">get</span>() = <span class="keyword">this</span> * <span class="keyword">this</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">val</span> text = <span class="string">&quot;Hello World&quot;</span></span><br><span class="line">    println(text.isLong) <span class="comment">// true</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">val</span> number = <span class="number">5</span></span><br><span class="line">    println(number.squared) <span class="comment">// 25</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、标准库扩展函数"><a href="#四、标准库扩展函数" class="headerlink" title="四、标准库扩展函数"></a>四、标准库扩展函数</h2><table>
+<thead>
+<tr>
+<th>函数</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>.map()</code></td>
+<td>转换集合元素</td>
+</tr>
+<tr>
+<td><code>.filter()</code></td>
+<td>过滤集合元素</td>
+</tr>
+<tr>
+<td><code>.reduce()</code></td>
+<td>累积计算</td>
+</tr>
+<tr>
+<td><code>.fold()</code></td>
+<td>带初始值的累积计算</td>
+</tr>
+<tr>
+<td><code>.groupBy()</code></td>
+<td>分组</td>
+</tr>
+<tr>
+<td><code>.joinToString()</code></td>
+<td>转换为字符串</td>
+</tr>
+<tr>
+<td><code>.filterNotNull()</code></td>
+<td>过滤空值</td>
+</tr>
+</tbody></table>
+<h2 id="五、高阶函数"><a href="#五、高阶函数" class="headerlink" title="五、高阶函数"></a>五、高阶函数</h2><h3 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h3><p>高阶函数是接受函数作为参数或返回函数的函数。</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="type">&lt;T&gt;</span> List<span class="type">&lt;T&gt;</span>.<span class="title">customFilter</span><span class="params">(predicate: (<span class="type">T</span>) -&gt; <span class="type">Boolean</span>)</span></span>: List&lt;T&gt; &#123;</span><br><span class="line">    <span class="keyword">val</span> result = mutableListOf&lt;T&gt;()</span><br><span class="line">    <span class="keyword">for</span> (item <span class="keyword">in</span> <span class="keyword">this</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (predicate(item)) &#123;</span><br><span class="line">            result.add(item)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> result</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">val</span> numbers = listOf(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>)</span><br><span class="line">    <span class="keyword">val</span> evenNumbers = numbers.customFilter &#123; it % <span class="number">2</span> == <span class="number">0</span> &#125;</span><br><span class="line">    println(evenNumbers) <span class="comment">// [2, 4]</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="六、内联函数"><a href="#六、内联函数" class="headerlink" title="六、内联函数"></a>六、内联函数</h2><h3 id="内联优化"><a href="#内联优化" class="headerlink" title="内联优化"></a>内联优化</h3><p>使用 <code>inline</code> 关键字可以消除高阶函数的运行时开销：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">inline</span> <span class="function"><span class="keyword">fun</span> <span class="type">&lt;T&gt;</span> List<span class="type">&lt;T&gt;</span>.<span class="title">customForEach</span><span class="params">(action: (<span class="type">T</span>) -&gt; <span class="type">Unit</span>)</span></span> &#123;</span><br><span class="line">    <span class="keyword">for</span> (item <span class="keyword">in</span> <span class="keyword">this</span>) &#123;</span><br><span class="line">        action(item)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="内联优势"><a href="#内联优势" class="headerlink" title="内联优势"></a>内联优势</h3><ul>
+<li>消除函数对象创建</li>
+<li>减少内存分配</li>
+<li>避免虚拟调用开销</li>
+</ul>
+<h2 id="七、DSL-构建"><a href="#七、DSL-构建" class="headerlink" title="七、DSL 构建"></a>七、DSL 构建</h2><h3 id="什么是-DSL？"><a href="#什么是-DSL？" class="headerlink" title="什么是 DSL？"></a>什么是 DSL？</h3><p>DSL（领域特定语言）是一种编程语言，被设计用来解决特定领域的问题。Kotlin 主要支持内部 DSL，可以利用 Kotlin 的语法和特性创建特定领域的语言。</p>
+<h3 id="DSL-示例"><a href="#DSL-示例" class="headerlink" title="DSL 示例"></a>DSL 示例</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">HTML</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> elements = mutableListOf&lt;String&gt;()</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">body</span><span class="params">(block: <span class="type">Body</span>.() -&gt; <span class="type">Unit</span>)</span></span> &#123;</span><br><span class="line">        <span class="keyword">val</span> body = Body()</span><br><span class="line">        body.block()</span><br><span class="line">        elements.add(body.toString())</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">toString</span><span class="params">()</span></span> = elements.joinToString(<span class="string">&quot;\n&quot;</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Body</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> content = StringBuilder()</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">p</span><span class="params">(text: <span class="type">String</span>)</span></span> &#123;</span><br><span class="line">        content.append(<span class="string">&quot;&lt;p&gt;<span class="variable">$text</span>&lt;/p&gt;\n&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">h1</span><span class="params">(text: <span class="type">String</span>)</span></span> &#123;</span><br><span class="line">        content.append(<span class="string">&quot;&lt;h1&gt;<span class="variable">$text</span>&lt;/h1&gt;\n&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">toString</span><span class="params">()</span></span> = <span class="string">&quot;&lt;body&gt;\n<span class="variable">$content</span>&lt;/body&gt;&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">html</span><span class="params">(block: <span class="type">HTML</span>.() -&gt; <span class="type">Unit</span>)</span></span>: HTML &#123;</span><br><span class="line">    <span class="keyword">val</span> html = HTML()</span><br><span class="line">    html.block()</span><br><span class="line">    <span class="keyword">return</span> html</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">val</span> document = html &#123;</span><br><span class="line">        body &#123;</span><br><span class="line">            h1(<span class="string">&quot;Hello, Kotlin DSL!&quot;</span>)</span><br><span class="line">            p(<span class="string">&quot;This is a paragraph.&quot;</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    println(document)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="DSL-核心"><a href="#DSL-核心" class="headerlink" title="DSL 核心"></a>DSL 核心</h3><ul>
+<li>扩展函数</li>
+<li>Lambda 表达式</li>
+<li>接收者 Lambda（<code>T.() -&gt; Unit</code>）</li>
+<li>内联函数</li>
+</ul>
+<h2 id="八、实际应用"><a href="#八、实际应用" class="headerlink" title="八、实际应用"></a>八、实际应用</h2><h3 id="Gradle-Kotlin-DSL"><a href="#Gradle-Kotlin-DSL" class="headerlink" title="Gradle Kotlin DSL"></a>Gradle Kotlin DSL</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">dependencies &#123;</span><br><span class="line">    implementation(<span class="string">&quot;androidx.core:core-ktx:1.12.0&quot;</span>)</span><br><span class="line">    implementation(<span class="string">&quot;androidx.appcompat:appcompat:1.6.1&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Compose-DSL"><a href="#Compose-DSL" class="headerlink" title="Compose DSL"></a>Compose DSL</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Column &#123;</span><br><span class="line">    Text(<span class="string">&quot;Hello, World!&quot;</span>)</span><br><span class="line">    Button(onClick = &#123; &#125;) &#123;</span><br><span class="line">        Text(<span class="string">&quot;Click Me&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Anko-SQL-DSL"><a href="#Anko-SQL-DSL" class="headerlink" title="Anko SQL DSL"></a>Anko SQL DSL</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">User</span>(<span class="keyword">val</span> id: <span class="built_in">Int</span>, <span class="keyword">val</span> name: String, <span class="keyword">val</span> email: String)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">users</span><span class="params">()</span></span> = <span class="string">&quot;SELECT * FROM users&quot;</span>.execAndParse &#123;</span><br><span class="line">    User(</span><br><span class="line">        id = it.getInt(<span class="string">&quot;id&quot;</span>),</span><br><span class="line">        name = it.getString(<span class="string">&quot;name&quot;</span>),</span><br><span class="line">        email = it.getString(<span class="string">&quot;email&quot;</span>)</span><br><span class="line">    )</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="九、最佳实践"><a href="#九、最佳实践" class="headerlink" title="九、最佳实践"></a>九、最佳实践</h2><ol>
+<li><strong>优先使用标准库扩展</strong>：避免重复造轮子</li>
+<li><strong>合理使用内联</strong>：对高阶函数使用 inline</li>
+<li><strong>保持扩展简洁</strong>：避免复杂的扩展逻辑</li>
+<li><strong>命名清晰</strong>：扩展函数名应该清晰表达意图</li>
+<li><strong>避免命名冲突</strong>：注意与成员函数的优先级</li>
+</ol>
+<h2 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://kotlinlang.org/docs/extensions.html">Extensions | Kotlin Documentation</a></li>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/624257394">魔法般的Kotlin DSL：让代码更优雅</a></li>
+<li><a target="_blank" rel="noopener" href="https://juejin.cn/post/7499050342775013430">Kotlin高阶函数——写法的演变过程</a></li>
+</ul>
+<hr>
+<p><em>持续学习中…</em></p>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/DSL/" rel="tag">DSL</a>, <a class="tag-none-link" href="/blog/tags/Kotlin/" rel="tag">Kotlin</a>, <a class="tag-none-link" href="/blog/tags/%E6%89%A9%E5%B1%95%E5%87%BD%E6%95%B0/" rel="tag">扩展函数</a>, <a class="tag-none-link" href="/blog/tags/%E9%AB%98%E9%98%B6%E5%87%BD%E6%95%B0/" rel="tag">高阶函数</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-03T15:19:13.396Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Android Retrofit与OkHttp网络请求进阶" href="/blog/2026/04/03/Android-Retrofit与OkHttp网络请求进阶/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" Android WebView与JSBridge交互学习" href="/blog/2026/04/03/Android-WebView与JSBridge交互学习/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>

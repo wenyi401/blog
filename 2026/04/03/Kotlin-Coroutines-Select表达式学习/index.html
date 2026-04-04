@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>Kotlin Coroutines Select表达式学习 | Wenyi&#39;s Blog</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/03/Kotlin-Coroutines-Select%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%AD%A6%E4%B9%A0/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="Coroutines, Kotlin, Select, 多路复用, 并发" />
+  
+  <meta name="description" content="前言Select 表达式允许同时等待多个挂起函数，并选择第一个可用的。类似于 IO 多路复用，在 Kotlin 协程中提供了强大的并发选择能力。 一、基本概念什么是 Select？Select 表达式是 kotlinx.coroutines 的实验性功能，允许：  同时等待多个挂起函数 选择第一个可用的结果 实现多路复用模式  二、从通道中选择基本示例12345678910111213141516">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kotlin Coroutines Select表达式学习">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/03/Kotlin-Coroutines-Select%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%AD%A6%E4%B9%A0/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:description" content="前言Select 表达式允许同时等待多个挂起函数，并选择第一个可用的。类似于 IO 多路复用，在 Kotlin 协程中提供了强大的并发选择能力。 一、基本概念什么是 Select？Select 表达式是 kotlinx.coroutines 的实验性功能，允许：  同时等待多个挂起函数 选择第一个可用的结果 实现多路复用模式  二、从通道中选择基本示例12345678910111213141516">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-04-03T23:37:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T15:37:44.248Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="Coroutines">
+<meta property="article:tag" content="Kotlin">
+<meta property="article:tag" content="Select">
+<meta property="article:tag" content="多路复用">
+<meta property="article:tag" content="并发">
+<meta name="twitter:card" content="summary">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Kotlin Coroutines Select表达式学习","description":"前言Select 表达式允许同时等待多个挂起函数，并选择第一个可用的。类似于 IO 多路复用，在 Kotlin 协程中提供了强大的并发选择能力。\n","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:37:00.000Z","dateModified":"2026-04-03T15:37:44.248Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Kotlin-Coroutines-Select%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%AD%A6%E4%B9%A0/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/03/Kotlin-Coroutines-Select%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%AD%A6%E4%B9%A0/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Kotlin Coroutines Select表达式学习</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-03T23:37:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-03</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~5.32K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Select 表达式允许同时等待多个挂起函数，并选择第一个可用的。类似于 IO 多路复用，在 Kotlin 协程中提供了强大的并发选择能力。</p>
+<h2 id="一、基本概念"><a href="#一、基本概念" class="headerlink" title="一、基本概念"></a>一、基本概念</h2><h3 id="什么是-Select？"><a href="#什么是-Select？" class="headerlink" title="什么是 Select？"></a>什么是 Select？</h3><p>Select 表达式是 kotlinx.coroutines 的实验性功能，允许：</p>
+<ul>
+<li>同时等待多个挂起函数</li>
+<li>选择第一个可用的结果</li>
+<li>实现多路复用模式</li>
+</ul>
+<h2 id="二、从通道中选择"><a href="#二、从通道中选择" class="headerlink" title="二、从通道中选择"></a>二、从通道中选择</h2><h3 id="基本示例"><a href="#基本示例" class="headerlink" title="基本示例"></a>基本示例</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> CoroutineScope.<span class="title">fizz</span><span class="params">()</span></span> = produce&lt;String&gt; &#123;</span><br><span class="line">    <span class="keyword">while</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">        delay(<span class="number">500</span>)</span><br><span class="line">        send(<span class="string">&quot;Fizz&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> CoroutineScope.<span class="title">buzz</span><span class="params">()</span></span> = produce&lt;String&gt; &#123;</span><br><span class="line">    <span class="keyword">while</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">        delay(<span class="number">1000</span>)</span><br><span class="line">        send(<span class="string">&quot;Buzz!&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">suspend</span> <span class="function"><span class="keyword">fun</span> <span class="title">selectFizzBuzz</span><span class="params">(fizz: <span class="type">ReceiveChannel</span>&lt;<span class="type">String</span>&gt;, buzz: <span class="type">ReceiveChannel</span>&lt;<span class="type">String</span>&gt;)</span></span> &#123;</span><br><span class="line">    select&lt;<span class="built_in">Unit</span>&gt; &#123;</span><br><span class="line">        fizz.onReceive &#123; value -&gt;</span><br><span class="line">            println(<span class="string">&quot;fizz -&gt; &#x27;<span class="variable">$value</span>&#x27;&quot;</span>)</span><br><span class="line">        &#125;</span><br><span class="line">        buzz.onReceive &#123; value -&gt;</span><br><span class="line">            println(<span class="string">&quot;buzz -&gt; &#x27;<span class="variable">$value</span>&#x27;&quot;</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="运行结果"><a href="#运行结果" class="headerlink" title="运行结果"></a>运行结果</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">fizz -&gt; &#x27;Fizz&#x27;</span><br><span class="line">buzz -&gt; &#x27;Buzz!&#x27;</span><br><span class="line">fizz -&gt; &#x27;Fizz&#x27;</span><br><span class="line">fizz -&gt; &#x27;Fizz&#x27;</span><br><span class="line">buzz -&gt; &#x27;Buzz!&#x27;</span><br><span class="line">fizz -&gt; &#x27;Fizz&#x27;</span><br><span class="line">fizz -&gt; &#x27;Fizz&#x27;</span><br></pre></td></tr></table></figure>
+
+<h2 id="三、Select-偏向性"><a href="#三、Select-偏向性" class="headerlink" title="三、Select 偏向性"></a>三、Select 偏向性</h2><h3 id="第一个子句优先"><a href="#第一个子句优先" class="headerlink" title="第一个子句优先"></a>第一个子句优先</h3><p>当多个子句同时可选时，选择第一个：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">suspend</span> <span class="function"><span class="keyword">fun</span> <span class="title">selectAorB</span><span class="params">(a: <span class="type">ReceiveChannel</span>&lt;<span class="type">String</span>&gt;, b: <span class="type">ReceiveChannel</span>&lt;<span class="type">String</span>&gt;)</span></span>: String =</span><br><span class="line">    select&lt;String&gt; &#123;</span><br><span class="line">        a.onReceiveCatching &#123; it -&gt;</span><br><span class="line">            <span class="keyword">val</span> value = it.getOrNull()</span><br><span class="line">            <span class="keyword">if</span> (value != <span class="literal">null</span>) <span class="string">&quot;a -&gt; &#x27;<span class="variable">$value</span>&#x27;&quot;</span> <span class="keyword">else</span> <span class="string">&quot;Channel &#x27;a&#x27; is closed&quot;</span></span><br><span class="line">        &#125;</span><br><span class="line">        b.onReceiveCatching &#123; it -&gt;</span><br><span class="line">            <span class="keyword">val</span> value = it.getOrNull()</span><br><span class="line">            <span class="keyword">if</span> (value != <span class="literal">null</span>) <span class="string">&quot;b -&gt; &#x27;<span class="variable">$value</span>&#x27;&quot;</span> <span class="keyword">else</span> <span class="string">&quot;Channel &#x27;b&#x27; is closed&quot;</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="结果分析"><a href="#结果分析" class="headerlink" title="结果分析"></a>结果分析</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">a -&gt; &#x27;Hello 0&#x27;  // a 优先</span><br><span class="line">a -&gt; &#x27;Hello 1&#x27;  // a 优先</span><br><span class="line">b -&gt; &#x27;World 0&#x27;  // a 被挂起，b 可用</span><br><span class="line">a -&gt; &#x27;Hello 2&#x27;</span><br><span class="line">a -&gt; &#x27;Hello 3&#x27;</span><br><span class="line">b -&gt; &#x27;World 1&#x27;</span><br><span class="line">Channel &#x27;a&#x27; is closed</span><br><span class="line">Channel &#x27;a&#x27; is closed</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、处理通道关闭"><a href="#四、处理通道关闭" class="headerlink" title="四、处理通道关闭"></a>四、处理通道关闭</h2><h3 id="onReceiveCatching"><a href="#onReceiveCatching" class="headerlink" title="onReceiveCatching"></a>onReceiveCatching</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">select&lt;String&gt; &#123;</span><br><span class="line">    channel.onReceiveCatching &#123; result -&gt;</span><br><span class="line">        <span class="keyword">val</span> value = result.getOrNull()</span><br><span class="line">        <span class="keyword">if</span> (value != <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="string">&quot;Received: <span class="variable">$value</span>&quot;</span></span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="string">&quot;Channel is closed&quot;</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="关闭处理"><a href="#关闭处理" class="headerlink" title="关闭处理"></a>关闭处理</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">suspend</span> <span class="function"><span class="keyword">fun</span> <span class="title">handleChannelClose</span><span class="params">(channel: <span class="type">ReceiveChannel</span>&lt;<span class="type">String</span>&gt;)</span></span> &#123;</span><br><span class="line">    select&lt;<span class="built_in">Unit</span>&gt; &#123;</span><br><span class="line">        channel.onReceiveCatching &#123; result -&gt;</span><br><span class="line">            result.getOrNull()?.let &#123; </span><br><span class="line">                println(<span class="string">&quot;Received: <span class="variable">$it</span>&quot;</span>) </span><br><span class="line">            &#125; ?: println(<span class="string">&quot;Channel closed&quot;</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="五、Select-子句类型"><a href="#五、Select-子句类型" class="headerlink" title="五、Select 子句类型"></a>五、Select 子句类型</h2><table>
+<thead>
+<tr>
+<th>子句</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>onReceive</code></td>
+<td>接收通道数据</td>
+</tr>
+<tr>
+<td><code>onReceiveCatching</code></td>
+<td>接收数据或处理关闭</td>
+</tr>
+<tr>
+<td><code>onSend</code></td>
+<td>发送数据到通道</td>
+</tr>
+<tr>
+<td><code>onAwait</code></td>
+<td>等待 Deferred 结果</td>
+</tr>
+</tbody></table>
+<h2 id="六、onSend-子句"><a href="#六、onSend-子句" class="headerlink" title="六、onSend 子句"></a>六、onSend 子句</h2><h3 id="发送数据"><a href="#发送数据" class="headerlink" title="发送数据"></a>发送数据</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">suspend</span> <span class="function"><span class="keyword">fun</span> <span class="title">sendToFirstAvailable</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">    channel1: <span class="type">SendChannel</span>&lt;<span class="type">String</span>&gt;,</span></span></span><br><span class="line"><span class="params"><span class="function">    channel2: <span class="type">SendChannel</span>&lt;<span class="type">String</span>&gt;,</span></span></span><br><span class="line"><span class="params"><span class="function">    value: <span class="type">String</span></span></span></span><br><span class="line"><span class="params"><span class="function">)</span></span> &#123;</span><br><span class="line">    select&lt;<span class="built_in">Unit</span>&gt; &#123;</span><br><span class="line">        channel1.onSend(value) &#123;</span><br><span class="line">            println(<span class="string">&quot;Sent to channel1&quot;</span>)</span><br><span class="line">        &#125;</span><br><span class="line">        channel2.onSend(value) &#123;</span><br><span class="line">            println(<span class="string">&quot;Sent to channel2&quot;</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="七、onAwait-子句"><a href="#七、onAwait-子句" class="headerlink" title="七、onAwait 子句"></a>七、onAwait 子句</h2><h3 id="等待-Deferred"><a href="#等待-Deferred" class="headerlink" title="等待 Deferred"></a>等待 Deferred</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">suspend</span> <span class="function"><span class="keyword">fun</span> <span class="title">selectFromDeferred</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">    deferred1: <span class="type">Deferred</span>&lt;<span class="type">String</span>&gt;,</span></span></span><br><span class="line"><span class="params"><span class="function">    deferred2: <span class="type">Deferred</span>&lt;<span class="type">String</span>&gt;</span></span></span><br><span class="line"><span class="params"><span class="function">)</span></span>: String = select&lt;String&gt; &#123;</span><br><span class="line">    deferred1.onAwait &#123; result -&gt;</span><br><span class="line">        <span class="string">&quot;Deferred1: <span class="variable">$result</span>&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">    deferred2.onAwait &#123; result -&gt;</span><br><span class="line">        <span class="string">&quot;Deferred2: <span class="variable">$result</span>&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="八、实际应用"><a href="#八、实际应用" class="headerlink" title="八、实际应用"></a>八、实际应用</h2><h3 id="1-超时控制"><a href="#1-超时控制" class="headerlink" title="1. 超时控制"></a>1. 超时控制</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">suspend</span> <span class="function"><span class="keyword">fun</span> <span class="title">withTimeoutSelect</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">    deferred: <span class="type">Deferred</span>&lt;<span class="type">String</span>&gt;,</span></span></span><br><span class="line"><span class="params"><span class="function">    timeoutMs: <span class="type">Long</span></span></span></span><br><span class="line"><span class="params"><span class="function">)</span></span>: String? = select&lt;String?&gt; &#123;</span><br><span class="line">    deferred.onAwait &#123; it &#125;</span><br><span class="line">    </span><br><span class="line">    onTimeout(timeoutMs) &#123;</span><br><span class="line">        deferred.cancel()</span><br><span class="line">        <span class="literal">null</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-快速响应"><a href="#2-快速响应" class="headerlink" title="2. 快速响应"></a>2. 快速响应</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">suspend</span> <span class="function"><span class="keyword">fun</span> <span class="title">fetchFromMultipleSources</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">    source1: <span class="type">suspend</span> () -&gt; <span class="type">String</span>,</span></span></span><br><span class="line"><span class="params"><span class="function">    source2: <span class="type">suspend</span> () -&gt; <span class="type">String</span></span></span></span><br><span class="line"><span class="params"><span class="function">)</span></span>: String = coroutineScope &#123;</span><br><span class="line">    <span class="keyword">val</span> deferred1 = async &#123; source1() &#125;</span><br><span class="line">    <span class="keyword">val</span> deferred2 = async &#123; source2() &#125;</span><br><span class="line">    </span><br><span class="line">    select&lt;String&gt; &#123;</span><br><span class="line">        deferred1.onAwait &#123; it &#125;</span><br><span class="line">        deferred2.onAwait &#123; it &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-取消处理"><a href="#3-取消处理" class="headerlink" title="3. 取消处理"></a>3. 取消处理</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">suspend</span> <span class="function"><span class="keyword">fun</span> <span class="title">processUntilCancelled</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">    channel: <span class="type">ReceiveChannel</span>&lt;<span class="type">String</span>&gt;,</span></span></span><br><span class="line"><span class="params"><span class="function">    cancellationToken: <span class="type">CancellationToken</span></span></span></span><br><span class="line"><span class="params"><span class="function">)</span></span> &#123;</span><br><span class="line">    <span class="keyword">while</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">        select&lt;<span class="built_in">Unit</span>&gt; &#123;</span><br><span class="line">            channel.onReceive &#123; value -&gt;</span><br><span class="line">                process(value)</span><br><span class="line">            &#125;</span><br><span class="line">            cancellationToken.onCancel &#123;</span><br><span class="line">                <span class="keyword">return</span>  <span class="comment">// 退出循环</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="九、注意事项"><a href="#九、注意事项" class="headerlink" title="九、注意事项"></a>九、注意事项</h2><h3 id="1-实验性功能"><a href="#1-实验性功能" class="headerlink" title="1. 实验性功能"></a>1. 实验性功能</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 需要添加 @OptIn</span></span><br><span class="line"><span class="meta">@OptIn(ExperimentalCoroutinesApi::class)</span></span><br><span class="line"><span class="keyword">suspend</span> <span class="function"><span class="keyword">fun</span> <span class="title">useSelect</span><span class="params">()</span></span> &#123;</span><br><span class="line">    select&lt;<span class="built_in">Unit</span>&gt; &#123;</span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-性能考虑"><a href="#2-性能考虑" class="headerlink" title="2. 性能考虑"></a>2. 性能考虑</h3><ul>
+<li>Select 有一定的性能开销</li>
+<li>避免在紧密循环中使用</li>
+<li>考虑使用 Flow 替代</li>
+</ul>
+<h3 id="3-错误处理"><a href="#3-错误处理" class="headerlink" title="3. 错误处理"></a>3. 错误处理</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">select&lt;String&gt; &#123;</span><br><span class="line">    channel.onReceiveCatching &#123; result -&gt;</span><br><span class="line">        result.exceptionOrNull()?.let &#123; </span><br><span class="line">            <span class="keyword">throw</span> it </span><br><span class="line">        &#125;</span><br><span class="line">        result.getOrNull() ?: <span class="string">&quot;Closed&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="十、Select-vs-Flow"><a href="#十、Select-vs-Flow" class="headerlink" title="十、Select vs Flow"></a>十、Select vs Flow</h2><table>
+<thead>
+<tr>
+<th>特性</th>
+<th>Select</th>
+<th>Flow</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>用途</strong></td>
+<td>单次选择</td>
+<td>流式处理</td>
+</tr>
+<tr>
+<td><strong>语法</strong></td>
+<td>命令式</td>
+<td>声明式</td>
+</tr>
+<tr>
+<td><strong>性能</strong></td>
+<td>较低开销</td>
+<td>更高开销</td>
+</tr>
+<tr>
+<td><strong>场景</strong></td>
+<td>多路复用</td>
+<td>数据流转换</td>
+</tr>
+</tbody></table>
+<h2 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://kotlinlang.org/docs/select-expression.html">Select expression | Kotlin Documentation</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.bennyhuo.com/2020/02/03/coroutine-select/">破解 Kotlin 协程（10）：Select 篇</a></li>
+<li><a target="_blank" rel="noopener" href="https://cloud.tencent.com/developer/article/2254060">Kotlin协程select函数实现多路复用</a></li>
+</ul>
+<hr>
+<p><em>持续学习中…</em></p>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/Coroutines/" rel="tag">Coroutines</a>, <a class="tag-none-link" href="/blog/tags/Kotlin/" rel="tag">Kotlin</a>, <a class="tag-none-link" href="/blog/tags/Select/" rel="tag">Select</a>, <a class="tag-none-link" href="/blog/tags/%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8/" rel="tag">多路复用</a>, <a class="tag-none-link" href="/blog/tags/%E5%B9%B6%E5%8F%91/" rel="tag">并发</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-03T15:37:44.248Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Android内存泄漏检测学习-LeakCanary与MAT" href="/blog/2026/04/03/Android内存泄漏检测学习-LeakCanary与MAT/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" Android插件化Hook技术学习" href="/blog/2026/04/03/Android插件化Hook技术学习/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>

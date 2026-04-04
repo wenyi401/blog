@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>Kotlin协程Job与SupervisorJob取消机制 | Wenyi&#39;s Blog</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/03/Kotlin%E5%8D%8F%E7%A8%8BJob%E4%B8%8ESupervisorJob%E5%8F%96%E6%B6%88%E6%9C%BA%E5%88%B6/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="Coroutines, Job, Kotlin, SupervisorJob, 取消" />
+  
+  <meta name="description" content="前言在 Kotlin 协程中，Job 和 SupervisorJob 是管理协程生命周期的核心组件。理解它们的取消机制和异常传播规则对于编写健壮的异步代码至关重要。 一、Job 概述什么是 Job？Job 是协程的生命周期控制器，代表一个可取消的工作单元。 123456val job &#x3D; launch &#123;    &#x2F;&#x2F; 协程体&#125;job.cancel()  &#x2F;&#x2F; 取消协程job.j">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kotlin协程Job与SupervisorJob取消机制">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/03/Kotlin%E5%8D%8F%E7%A8%8BJob%E4%B8%8ESupervisorJob%E5%8F%96%E6%B6%88%E6%9C%BA%E5%88%B6/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:description" content="前言在 Kotlin 协程中，Job 和 SupervisorJob 是管理协程生命周期的核心组件。理解它们的取消机制和异常传播规则对于编写健壮的异步代码至关重要。 一、Job 概述什么是 Job？Job 是协程的生命周期控制器，代表一个可取消的工作单元。 123456val job &#x3D; launch &#123;    &#x2F;&#x2F; 协程体&#125;job.cancel()  &#x2F;&#x2F; 取消协程job.j">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-04-03T23:46:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T15:48:43.200Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="Coroutines">
+<meta property="article:tag" content="Job">
+<meta property="article:tag" content="Kotlin">
+<meta property="article:tag" content="SupervisorJob">
+<meta property="article:tag" content="取消">
+<meta name="twitter:card" content="summary">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Kotlin协程Job与SupervisorJob取消机制","description":"前言在 Kotlin 协程中，Job 和 SupervisorJob 是管理协程生命周期的核心组件。理解它们的取消机制和异常传播规则对于编写健壮的异步代码至关...","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:46:00.000Z","dateModified":"2026-04-03T15:48:43.200Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Kotlin%E5%8D%8F%E7%A8%8BJob%E4%B8%8ESupervisorJob%E5%8F%96%E6%B6%88%E6%9C%BA%E5%88%B6/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/03/Kotlin%E5%8D%8F%E7%A8%8BJob%E4%B8%8ESupervisorJob%E5%8F%96%E6%B6%88%E6%9C%BA%E5%88%B6/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Kotlin协程Job与SupervisorJob取消机制</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-03T23:46:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-03</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~4.18K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在 Kotlin 协程中，Job 和 SupervisorJob 是管理协程生命周期的核心组件。理解它们的取消机制和异常传播规则对于编写健壮的异步代码至关重要。</p>
+<h2 id="一、Job-概述"><a href="#一、Job-概述" class="headerlink" title="一、Job 概述"></a>一、Job 概述</h2><h3 id="什么是-Job？"><a href="#什么是-Job？" class="headerlink" title="什么是 Job？"></a>什么是 Job？</h3><p>Job 是协程的生命周期控制器，代表一个可取消的工作单元。</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> job = launch &#123;</span><br><span class="line">    <span class="comment">// 协程体</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">job.cancel()  <span class="comment">// 取消协程</span></span><br><span class="line">job.join()    <span class="comment">// 等待协程完成</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="Job-状态"><a href="#Job-状态" class="headerlink" title="Job 状态"></a>Job 状态</h3><table>
+<thead>
+<tr>
+<th>状态</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>New</td>
+<td>新建</td>
+</tr>
+<tr>
+<td>Active</td>
+<td>活跃</td>
+</tr>
+<tr>
+<td>Completing</td>
+<td>完成中</td>
+</tr>
+<tr>
+<td>Completed</td>
+<td>已完成</td>
+</tr>
+<tr>
+<td>Cancelling</td>
+<td>取消中</td>
+</tr>
+<tr>
+<td>Cancelled</td>
+<td>已取消</td>
+</tr>
+<tr>
+<td>Failed</td>
+<td>失败</td>
+</tr>
+</tbody></table>
+<h2 id="二、Job-异常传播"><a href="#二、Job-异常传播" class="headerlink" title="二、Job 异常传播"></a>二、Job 异常传播</h2><h3 id="“连坐”机制"><a href="#“连坐”机制" class="headerlink" title="“连坐”机制"></a>“连坐”机制</h3><p>当一个子协程因未捕获的异常而失败时：</p>
+<ol>
+<li>向上传播异常到父协程</li>
+<li>父协程取消所有其他子协程</li>
+<li>父协程自己也失败</li>
+</ol>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> scope = CoroutineScope(Job())</span><br><span class="line"></span><br><span class="line">scope.launch &#123;</span><br><span class="line">    launch &#123;</span><br><span class="line">        delay(<span class="number">100</span>)</span><br><span class="line">        <span class="keyword">throw</span> RuntimeException(<span class="string">&quot;Child 1 failed&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    launch &#123;</span><br><span class="line">        delay(<span class="number">200</span>)</span><br><span class="line">        println(<span class="string">&quot;Child 2&quot;</span>)  <span class="comment">// 不会执行</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 结果：Child 1 失败，Child 2 也被取消</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="示例代码"><a href="#示例代码" class="headerlink" title="示例代码"></a>示例代码</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> = runBlocking &#123;</span><br><span class="line">    <span class="keyword">val</span> parentJob = launch &#123;</span><br><span class="line">        launch &#123;</span><br><span class="line">            println(<span class="string">&quot;Child 1 started&quot;</span>)</span><br><span class="line">            delay(<span class="number">100</span>)</span><br><span class="line">            <span class="keyword">throw</span> RuntimeException(<span class="string">&quot;Child 1 failed&quot;</span>)</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        launch &#123;</span><br><span class="line">            println(<span class="string">&quot;Child 2 started&quot;</span>)</span><br><span class="line">            delay(<span class="number">200</span>)</span><br><span class="line">            println(<span class="string">&quot;Child 2 finished&quot;</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    parentJob.join()</span><br><span class="line">    println(<span class="string">&quot;Parent state: <span class="subst">$&#123;parentJob.isCancelled&#125;</span>&quot;</span>)  <span class="comment">// true</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="三、SupervisorJob"><a href="#三、SupervisorJob" class="headerlink" title="三、SupervisorJob"></a>三、SupervisorJob</h2><h3 id="什么是-SupervisorJob？"><a href="#什么是-SupervisorJob？" class="headerlink" title="什么是 SupervisorJob？"></a>什么是 SupervisorJob？</h3><p>SupervisorJob 是 Job 的变体，它不会因为子协程的失败而取消其他子协程。</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> scope = CoroutineScope(SupervisorJob())</span><br><span class="line"></span><br><span class="line">scope.launch &#123;</span><br><span class="line">    launch &#123;</span><br><span class="line">        delay(<span class="number">100</span>)</span><br><span class="line">        <span class="keyword">throw</span> RuntimeException(<span class="string">&quot;Child 1 failed&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    launch &#123;</span><br><span class="line">        delay(<span class="number">200</span>)</span><br><span class="line">        println(<span class="string">&quot;Child 2 finished&quot;</span>)  <span class="comment">// 会执行</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="创建-SupervisorJob"><a href="#创建-SupervisorJob" class="headerlink" title="创建 SupervisorJob"></a>创建 SupervisorJob</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 方式一：直接创建</span></span><br><span class="line"><span class="keyword">val</span> supervisorJob = SupervisorJob()</span><br><span class="line"></span><br><span class="line"><span class="comment">// 方式二：使用 supervisorScope</span></span><br><span class="line">supervisorScope &#123;</span><br><span class="line">    launch &#123;</span><br><span class="line">        <span class="comment">// 子协程</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、Job-vs-SupervisorJob"><a href="#四、Job-vs-SupervisorJob" class="headerlink" title="四、Job vs SupervisorJob"></a>四、Job vs SupervisorJob</h2><table>
+<thead>
+<tr>
+<th>特性</th>
+<th>Job</th>
+<th>SupervisorJob</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>子协程失败</strong></td>
+<td>取消所有子协程</td>
+<td>不影响其他子协程</td>
+</tr>
+<tr>
+<td><strong>异常传播</strong></td>
+<td>向上传播</td>
+<td>隔离异常</td>
+</tr>
+<tr>
+<td><strong>使用场景</strong></td>
+<td>任务相关性强</td>
+<td>任务独立性高</td>
+</tr>
+</tbody></table>
+<h2 id="五、取消机制"><a href="#五、取消机制" class="headerlink" title="五、取消机制"></a>五、取消机制</h2><h3 id="cancel"><a href="#cancel" class="headerlink" title="cancel()"></a>cancel()</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> job = launch &#123;</span><br><span class="line">    repeat(<span class="number">10</span>) &#123;</span><br><span class="line">        delay(<span class="number">100</span>)</span><br><span class="line">        println(<span class="string">&quot;Working <span class="variable">$it</span>&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">delay(<span class="number">300</span>)</span><br><span class="line">job.cancel()  <span class="comment">// 取消协程</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="cancelAndJoin"><a href="#cancelAndJoin" class="headerlink" title="cancelAndJoin()"></a>cancelAndJoin()</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> job = launch &#123;</span><br><span class="line">    repeat(<span class="number">10</span>) &#123;</span><br><span class="line">        delay(<span class="number">100</span>)</span><br><span class="line">        println(<span class="string">&quot;Working <span class="variable">$it</span>&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">delay(<span class="number">300</span>)</span><br><span class="line">job.cancelAndJoin()  <span class="comment">// 取消并等待完成</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="协作式取消"><a href="#协作式取消" class="headerlink" title="协作式取消"></a>协作式取消</h3><p>协程不会立即停止，需要检查取消状态：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> job = launch &#123;</span><br><span class="line">    <span class="keyword">for</span> (i <span class="keyword">in</span> <span class="number">1.</span><span class="number">.100000</span>) &#123;</span><br><span class="line">        <span class="comment">// 检查取消状态</span></span><br><span class="line">        ensureActive()</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 或</span></span><br><span class="line">        <span class="keyword">if</span> (isActive) &#123;</span><br><span class="line">            <span class="comment">// 继续工作</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="六、Timeout"><a href="#六、Timeout" class="headerlink" title="六、Timeout"></a>六、Timeout</h2><h3 id="withTimeout"><a href="#withTimeout" class="headerlink" title="withTimeout"></a>withTimeout</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    withTimeout(<span class="number">1000</span>) &#123;</span><br><span class="line">        <span class="comment">// 超过 1 秒抛出 TimeoutCancellationException</span></span><br><span class="line">        delay(<span class="number">2000</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125; <span class="keyword">catch</span> (e: TimeoutCancellationException) &#123;</span><br><span class="line">    println(<span class="string">&quot;Timeout&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="withTimeoutOrNull"><a href="#withTimeoutOrNull" class="headerlink" title="withTimeoutOrNull"></a>withTimeoutOrNull</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> result = withTimeoutOrNull(<span class="number">1000</span>) &#123;</span><br><span class="line">    delay(<span class="number">2000</span>)</span><br><span class="line">    <span class="string">&quot;Result&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">println(result)  <span class="comment">// null</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="七、异常处理"><a href="#七、异常处理" class="headerlink" title="七、异常处理"></a>七、异常处理</h2><h3 id="try-catch"><a href="#try-catch" class="headerlink" title="try-catch"></a>try-catch</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> job = scope.launch &#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">throw</span> RuntimeException(<span class="string">&quot;Error&quot;</span>)</span><br><span class="line">    &#125; <span class="keyword">catch</span> (e: Exception) &#123;</span><br><span class="line">        println(<span class="string">&quot;Caught: <span class="variable">$e</span>&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="CoroutineExceptionHandler"><a href="#CoroutineExceptionHandler" class="headerlink" title="CoroutineExceptionHandler"></a>CoroutineExceptionHandler</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> handler = CoroutineExceptionHandler &#123; _, exception -&gt;</span><br><span class="line">    println(<span class="string">&quot;Caught: <span class="variable">$exception</span>&quot;</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> scope = CoroutineScope(SupervisorJob() + handler)</span><br><span class="line"></span><br><span class="line">scope.launch &#123;</span><br><span class="line">    <span class="keyword">throw</span> RuntimeException(<span class="string">&quot;Error&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="八、实战应用"><a href="#八、实战应用" class="headerlink" title="八、实战应用"></a>八、实战应用</h2><h3 id="1-并行网络请求"><a href="#1-并行网络请求" class="headerlink" title="1. 并行网络请求"></a>1. 并行网络请求</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">suspend</span> <span class="function"><span class="keyword">fun</span> <span class="title">fetchAll</span><span class="params">()</span></span>: List&lt;Data&gt; = coroutineScope &#123;</span><br><span class="line">    <span class="keyword">val</span> deferred1 = async &#123; fetchFromSource1() &#125;</span><br><span class="line">    <span class="keyword">val</span> deferred2 = async &#123; fetchFromSource2() &#125;</span><br><span class="line">    </span><br><span class="line">    listOf(deferred1.await(), deferred2.await())</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-独立任务"><a href="#2-独立任务" class="headerlink" title="2. 独立任务"></a>2. 独立任务</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">supervisorScope &#123;</span><br><span class="line">    launch &#123;</span><br><span class="line">        <span class="comment">// 任务 A</span></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    launch &#123;</span><br><span class="line">        <span class="comment">// 任务 B，即使 A 失败也会执行</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-超时控制"><a href="#3-超时控制" class="headerlink" title="3. 超时控制"></a>3. 超时控制</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">suspend</span> <span class="function"><span class="keyword">fun</span> <span class="title">fetchWithTimeout</span><span class="params">()</span></span>: Data? &#123;</span><br><span class="line">    <span class="keyword">return</span> withTimeoutOrNull(<span class="number">5000</span>) &#123;</span><br><span class="line">        fetchData()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="九、最佳实践"><a href="#九、最佳实践" class="headerlink" title="九、最佳实践"></a>九、最佳实践</h2><ol>
+<li><strong>使用 SupervisorJob</strong>：当子协程独立性高时</li>
+<li><strong>处理异常</strong>：使用 CoroutineExceptionHandler</li>
+<li><strong>协作式取消</strong>：定期检查 isActive</li>
+<li><strong>合理使用 Timeout</strong>：避免无限等待</li>
+<li><strong>结构化并发</strong>：使用 coroutineScope 管理作用域</li>
+</ol>
+<h2 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-supervisor-job.html">SupervisorJob | kotlinx.coroutines</a></li>
+<li><a target="_blank" rel="noopener" href="https://juejin.cn/post/7470010568830713866">Job vs. SupervisorJob：Kotlin协程的异常处理哲学</a></li>
+<li><a target="_blank" rel="noopener" href="https://jishuzhan.net/article/1983704997159305217">Kotlin 协程实践：深入理解 SupervisorJob、CoroutineScope、Dispatcher 与取消机制</a></li>
+</ul>
+<hr>
+<p><em>持续学习中…</em></p>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/Coroutines/" rel="tag">Coroutines</a>, <a class="tag-none-link" href="/blog/tags/Job/" rel="tag">Job</a>, <a class="tag-none-link" href="/blog/tags/Kotlin/" rel="tag">Kotlin</a>, <a class="tag-none-link" href="/blog/tags/SupervisorJob/" rel="tag">SupervisorJob</a>, <a class="tag-none-link" href="/blog/tags/%E5%8F%96%E6%B6%88/" rel="tag">取消</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-03T15:48:43.200Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Android依赖注入框架对比-Hilt vs Koin" href="/blog/2026/04/03/Android依赖注入框架对比-Hilt-vs-Koin/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" Jetpack Compose Material Design组件学习" href="/blog/2026/04/03/Jetpack-Compose-Material-Design组件学习/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>

@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>Android Fragment生命周期深度解析 | Wenyi&#39;s Blog</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/04/Android-Fragment%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="Android, Fragment, Lifecycle, 生命周期" />
+  
+  <meta name="description" content="前言每个 Fragment 实例都有自己的生命周期。Fragment 实现 LifecycleOwner 接口，公开可通过 getLifecycle() 方法访问的 Lifecycle 对象。本文将深入解析 Fragment 生命周期的核心概念。 一、生命周期状态Fragment 的 Lifecycle.State 枚举包含以下状态：    状态 说明    INITIALIZED 已实例化，但未">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android Fragment生命周期深度解析">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/04/Android-Fragment%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:description" content="前言每个 Fragment 实例都有自己的生命周期。Fragment 实现 LifecycleOwner 接口，公开可通过 getLifecycle() 方法访问的 Lifecycle 对象。本文将深入解析 Fragment 生命周期的核心概念。 一、生命周期状态Fragment 的 Lifecycle.State 枚举包含以下状态：    状态 说明    INITIALIZED 已实例化，但未">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-04-04T00:20:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T16:18:56.944Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="Fragment">
+<meta property="article:tag" content="Lifecycle">
+<meta property="article:tag" content="生命周期">
+<meta name="twitter:card" content="summary">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Android Fragment生命周期深度解析","description":"前言每个 Fragment 实例都有自己的生命周期。Fragment 实现 LifecycleOwner 接口，公开可通过 getLifecycle() 方法...","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-04T00:20:00.000Z","dateModified":"2026-04-03T16:18:56.944Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/04/Android-Fragment%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/04/Android-Fragment%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Android Fragment生命周期深度解析</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-04T00:20:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-04</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~4.64K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>每个 Fragment 实例都有自己的生命周期。Fragment 实现 LifecycleOwner 接口，公开可通过 getLifecycle() 方法访问的 Lifecycle 对象。本文将深入解析 Fragment 生命周期的核心概念。</p>
+<h2 id="一、生命周期状态"><a href="#一、生命周期状态" class="headerlink" title="一、生命周期状态"></a>一、生命周期状态</h2><p>Fragment 的 Lifecycle.State 枚举包含以下状态：</p>
+<table>
+<thead>
+<tr>
+<th>状态</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>INITIALIZED</td>
+<td>已实例化，但未添加到 FragmentManager</td>
+</tr>
+<tr>
+<td>CREATED</td>
+<td>已添加到 FragmentManager</td>
+</tr>
+<tr>
+<td>STARTED</td>
+<td>可见但不可交互</td>
+</tr>
+<tr>
+<td>RESUMED</td>
+<td>可见且可交互</td>
+</tr>
+<tr>
+<td>DESTROYED</td>
+<td>已销毁</td>
+</tr>
+</tbody></table>
+<h2 id="二、Fragment-和-FragmentManager"><a href="#二、Fragment-和-FragmentManager" class="headerlink" title="二、Fragment 和 FragmentManager"></a>二、Fragment 和 FragmentManager</h2><h3 id="状态转换规则"><a href="#状态转换规则" class="headerlink" title="状态转换规则"></a>状态转换规则</h3><p>FragmentManager 在确定 Fragment 的生命周期状态时会考虑：</p>
+<ol>
+<li>Fragment 的状态极限由 FragmentManager 确定</li>
+<li>可以通过 setMaxLifecycle() 设置状态极限</li>
+<li>Fragment 的状态不能超过其父级</li>
+</ol>
+<h3 id="onAttach-和-onDetach"><a href="#onAttach-和-onDetach" class="headerlink" title="onAttach() 和 onDetach()"></a>onAttach() 和 onDetach()</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MyFragment</span> : <span class="type">Fragment</span>() &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onAttach</span><span class="params">(context: <span class="type">Context</span>)</span></span> &#123;</span><br><span class="line">        <span class="keyword">super</span>.onAttach(context)</span><br><span class="line">        <span class="comment">// Fragment 已附加到宿主 Activity</span></span><br><span class="line">        <span class="comment">// 此时处于活跃状态</span></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onDetach</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="keyword">super</span>.onDetach()</span><br><span class="line">        <span class="comment">// Fragment 已从宿主 Activity 分离</span></span><br><span class="line">        <span class="comment">// 不再处于活跃状态</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="三、向上状态转换"><a href="#三、向上状态转换" class="headerlink" title="三、向上状态转换"></a>三、向上状态转换</h2><h3 id="CREATED-状态"><a href="#CREATED-状态" class="headerlink" title="CREATED 状态"></a>CREATED 状态</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onCreate</span><span class="params">(savedInstanceState: <span class="type">Bundle</span>?)</span></span> &#123;</span><br><span class="line">    <span class="keyword">super</span>.onCreate(savedInstanceState)</span><br><span class="line">    <span class="comment">// savedInstanceState 包含之前保存的状态</span></span><br><span class="line">    <span class="comment">// 首次创建时为 null，后续重建时非 null</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>关键点</strong>：</p>
+<ul>
+<li>Fragment 已添加到 FragmentManager</li>
+<li>onAttach() 已调用</li>
+<li>可以通过 SavedStateRegistry 恢复状态</li>
+<li>视图尚未创建</li>
+</ul>
+<h3 id="CREATED，视图-INITIALIZED"><a href="#CREATED，视图-INITIALIZED" class="headerlink" title="CREATED，视图 INITIALIZED"></a>CREATED，视图 INITIALIZED</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 方式一：使用构造函数传入布局</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyFragment</span> : <span class="type">Fragment</span>(R.layout.fragment_my)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 方式二：重写 onCreateView</span></span><br><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onCreateView</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">    inflater: <span class="type">LayoutInflater</span>,</span></span></span><br><span class="line"><span class="params"><span class="function">    container: <span class="type">ViewGroup</span>?,</span></span></span><br><span class="line"><span class="params"><span class="function">    savedInstanceState: <span class="type">Bundle</span>?</span></span></span><br><span class="line"><span class="params"><span class="function">)</span></span>: View &#123;</span><br><span class="line">    <span class="keyword">return</span> inflater.inflate(R.layout.fragment_my, container, <span class="literal">false</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onViewCreated</span><span class="params">(view: <span class="type">View</span>, savedInstanceState: <span class="type">Bundle</span>?)</span></span> &#123;</span><br><span class="line">    <span class="keyword">super</span>.onViewCreated(view, savedInstanceState)</span><br><span class="line">    <span class="comment">// 视图已创建，可以初始化视图组件</span></span><br><span class="line">    <span class="comment">// 适合设置 RecyclerView 适配器、观察 LiveData</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="CREATED，视图-CREATED"><a href="#CREATED，视图-CREATED" class="headerlink" title="CREATED，视图 CREATED"></a>CREATED，视图 CREATED</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onViewStateRestored</span><span class="params">(savedInstanceState: <span class="type">Bundle</span>?)</span></span> &#123;</span><br><span class="line">    <span class="keyword">super</span>.onViewStateRestored(savedInstanceState)</span><br><span class="line">    <span class="comment">// 视图状态已恢复</span></span><br><span class="line">    <span class="comment">// 适合恢复与视图相关的状态</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="STARTED-状态"><a href="#STARTED-状态" class="headerlink" title="STARTED 状态"></a>STARTED 状态</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onStart</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">super</span>.onStart()</span><br><span class="line">    <span class="comment">// Fragment 可见但不可交互</span></span><br><span class="line">    <span class="comment">// 适合开始生命周期感知型组件</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>最佳实践</strong>：</p>
+<ul>
+<li>STARTED 状态最适合执行 FragmentTransaction</li>
+<li>确保视图已创建且可用</li>
+</ul>
+<h3 id="RESUMED-状态"><a href="#RESUMED-状态" class="headerlink" title="RESUMED 状态"></a>RESUMED 状态</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onResume</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">super</span>.onResume()</span><br><span class="line">    <span class="comment">// Fragment 可见且可交互</span></span><br><span class="line">    <span class="comment">// 所有动画和转场效果已完成</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>注意</strong>：</p>
+<ul>
+<li>只有 RESUMED 状态才应手动设置焦点</li>
+<li>只有 RESUMED 状态才应处理输入法可见性</li>
+</ul>
+<h2 id="四、向下状态转换"><a href="#四、向下状态转换" class="headerlink" title="四、向下状态转换"></a>四、向下状态转换</h2><h3 id="STARTED-状态-1"><a href="#STARTED-状态-1" class="headerlink" title="STARTED 状态"></a>STARTED 状态</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onPause</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">super</span>.onPause()</span><br><span class="line">    <span class="comment">// 用户开始离开 Fragment</span></span><br><span class="line">    <span class="comment">// Fragment 仍然可见</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="CREATED-状态-1"><a href="#CREATED-状态-1" class="headerlink" title="CREATED 状态"></a>CREATED 状态</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onStop</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">super</span>.onStop()</span><br><span class="line">    <span class="comment">// Fragment 不再可见</span></span><br><span class="line">    <span class="comment">// ON_STOP 事件是安全执行 FragmentTransaction 的最后时机</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>API 级别差异</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>API 级别</th>
+<th>onStop() 和 onSaveInstanceState() 顺序</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>API &lt; 28</td>
+<td>onSaveInstanceState() 在 onStop() 之前</td>
+</tr>
+<tr>
+<td>API ≥ 28</td>
+<td>onStop() 在 onSaveInstanceState() 之前</td>
+</tr>
+</tbody></table>
+<h3 id="CREATED，视图-DESTROYED"><a href="#CREATED，视图-DESTROYED" class="headerlink" title="CREATED，视图 DESTROYED"></a>CREATED，视图 DESTROYED</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onDestroyView</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">super</span>.onDestroyView()</span><br><span class="line">    <span class="comment">// 视图已与窗口分离</span></span><br><span class="line">    <span class="comment">// 应移除对视图的所有引用，避免内存泄漏</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="DESTROYED-状态"><a href="#DESTROYED-状态" class="headerlink" title="DESTROYED 状态"></a>DESTROYED 状态</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onDestroy</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">super</span>.onDestroy()</span><br><span class="line">    <span class="comment">// Fragment 已被移除或 FragmentManager 已销毁</span></span><br><span class="line">    <span class="comment">// Fragment 生命周期结束</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="五、视图生命周期"><a href="#五、视图生命周期" class="headerlink" title="五、视图生命周期"></a>五、视图生命周期</h2><p>Fragment 的视图有独立的生命周期：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 获取视图生命周期所有者</span></span><br><span class="line"><span class="keyword">val</span> viewLifecycleOwner = viewLifecycleOwner</span><br><span class="line"></span><br><span class="line"><span class="comment">// 观察视图生命周期</span></span><br><span class="line">viewLifecycleOwnerLiveData.observe(<span class="keyword">this</span>) &#123; lifecycleOwner -&gt;</span><br><span class="line">    <span class="comment">// 视图生命周期变化</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>使用场景</strong>：</p>
+<ul>
+<li>观察只在视图存在时有效的 LiveData</li>
+<li>在视图中设置 RecyclerView 适配器</li>
+<li>管理视图相关的资源</li>
+</ul>
+<h2 id="六、生命周期最佳实践"><a href="#六、生命周期最佳实践" class="headerlink" title="六、生命周期最佳实践"></a>六、生命周期最佳实践</h2><h3 id="使用生命周期感知型组件"><a href="#使用生命周期感知型组件" class="headerlink" title="使用生命周期感知型组件"></a>使用生命周期感知型组件</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">LocationObserver</span> : <span class="type">DefaultLifecycleObserver</span> &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onStart</span><span class="params">(owner: <span class="type">LifecycleOwner</span>)</span></span> &#123;</span><br><span class="line">        <span class="comment">// 开始监听位置</span></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onStop</span><span class="params">(owner: <span class="type">LifecycleOwner</span>)</span></span> &#123;</span><br><span class="line">        <span class="comment">// 停止监听位置</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyFragment</span> : <span class="type">Fragment</span>() &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onCreate</span><span class="params">(savedInstanceState: <span class="type">Bundle</span>?)</span></span> &#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState)</span><br><span class="line">        lifecycle.addObserver(LocationObserver())</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="避免内存泄漏"><a href="#避免内存泄漏" class="headerlink" title="避免内存泄漏"></a>避免内存泄漏</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MyFragment</span> : <span class="type">Fragment</span>() &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">var</span> binding: FragmentMyBinding? = <span class="literal">null</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onCreateView</span><span class="params">(inflater: <span class="type">LayoutInflater</span>, container: <span class="type">ViewGroup</span>?, savedInstanceState: <span class="type">Bundle</span>?)</span></span>: View &#123;</span><br><span class="line">        binding = FragmentMyBinding.inflate(inflater, container, <span class="literal">false</span>)</span><br><span class="line">        <span class="keyword">return</span> binding!!.root</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onDestroyView</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="keyword">super</span>.onDestroyView()</span><br><span class="line">        binding = <span class="literal">null</span>  <span class="comment">// 清除引用</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="正确执行-FragmentTransaction"><a href="#正确执行-FragmentTransaction" class="headerlink" title="正确执行 FragmentTransaction"></a>正确执行 FragmentTransaction</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onStop</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">super</span>.onStop()</span><br><span class="line">    <span class="comment">// ON_STOP 是安全执行 FragmentTransaction 的最后时机</span></span><br><span class="line">    childFragmentManager.beginTransaction()</span><br><span class="line">        .remove(childFragment)</span><br><span class="line">        .commit()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="七、常见问题"><a href="#七、常见问题" class="headerlink" title="七、常见问题"></a>七、常见问题</h2><h3 id="问题-1：FragmentTransaction-在错误的生命周期状态执行"><a href="#问题-1：FragmentTransaction-在错误的生命周期状态执行" class="headerlink" title="问题 1：FragmentTransaction 在错误的生命周期状态执行"></a>问题 1：FragmentTransaction 在错误的生命周期状态执行</h3><p><strong>原因</strong>：在 onSaveInstanceState() 之后执行事务。</p>
+<p><strong>解决方案</strong>：</p>
+<ul>
+<li>在 ON_STOP 之前执行事务</li>
+<li>使用 commitNowAllowingStateLoss()</li>
+</ul>
+<h3 id="问题-2：视图状态丢失"><a href="#问题-2：视图状态丢失" class="headerlink" title="问题 2：视图状态丢失"></a>问题 2：视图状态丢失</h3><p><strong>原因</strong>：未正确处理视图生命周期。</p>
+<p><strong>解决方案</strong>：</p>
+<ul>
+<li>在 onViewStateRestored() 中恢复视图状态</li>
+<li>使用 ViewModel 存储数据</li>
+</ul>
+<h3 id="问题-3：内存泄漏"><a href="#问题-3：内存泄漏" class="headerlink" title="问题 3：内存泄漏"></a>问题 3：内存泄漏</h3><p><strong>原因</strong>：在 onDestroyView() 后仍持有视图引用。</p>
+<p><strong>解决方案</strong>：</p>
+<ul>
+<li>在 onDestroyView() 中清除所有视图引用</li>
+<li>使用 ViewBinding 并置为 null</li>
+</ul>
+<h2 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://developer.android.google.cn/guide/fragments/lifecycle?hl=zh-cn">fragment 生命周期 | Android Developers</a></li>
+<li><a target="_blank" rel="noopener" href="https://juejin.cn/post/7493111839438585871">一文弄懂Fragment的生命周期</a></li>
+</ul>
+<hr>
+<p><em>深入学习中…</em></p>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/Android/" rel="tag">Android</a>, <a class="tag-none-link" href="/blog/tags/Fragment/" rel="tag">Fragment</a>, <a class="tag-none-link" href="/blog/tags/Lifecycle/" rel="tag">Lifecycle</a>, <a class="tag-none-link" href="/blog/tags/%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/" rel="tag">生命周期</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-03T16:18:56.944Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Kotlin协程上下文与调度器深度解析" href="/blog/2026/04/04/Kotlin协程上下文与调度器深度解析/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" Kotlin异常处理深度解析" href="/blog/2026/04/04/Kotlin异常处理深度解析/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>

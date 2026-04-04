@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>Android Jetpack组件学习-Paging3分页加载 | Wenyi&#39;s Blog</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/03/Android-Jetpack%E7%BB%84%E4%BB%B6%E5%AD%A6%E4%B9%A0-Paging3%E5%88%86%E9%A1%B5%E5%8A%A0%E8%BD%BD/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="Android, Jetpack, Kotlin, Paging3, 分页" />
+  
+  <meta name="description" content="前言Paging 3 是 Android Jetpack 组件中用于高效分页加载数据的现代化方案，结合 Kotlin 协程和 Flow 特性，能够显著简化分页逻辑的实现。 Paging 3 概述核心优势 内置加载状态管理：自动处理加载、刷新、错误状态 协程与 Flow 原生支持：现代化异步编程 灵活的数据源支持：网络、数据库、内存 高效的内存管理：自动回收不可见的数据 可组合的架构：与 Recyc">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android Jetpack组件学习-Paging3分页加载">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/03/Android-Jetpack%E7%BB%84%E4%BB%B6%E5%AD%A6%E4%B9%A0-Paging3%E5%88%86%E9%A1%B5%E5%8A%A0%E8%BD%BD/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:description" content="前言Paging 3 是 Android Jetpack 组件中用于高效分页加载数据的现代化方案，结合 Kotlin 协程和 Flow 特性，能够显著简化分页逻辑的实现。 Paging 3 概述核心优势 内置加载状态管理：自动处理加载、刷新、错误状态 协程与 Flow 原生支持：现代化异步编程 灵活的数据源支持：网络、数据库、内存 高效的内存管理：自动回收不可见的数据 可组合的架构：与 Recyc">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-04-03T22:47:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T14:46:56.052Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="Jetpack">
+<meta property="article:tag" content="Kotlin">
+<meta property="article:tag" content="Paging3">
+<meta property="article:tag" content="分页">
+<meta name="twitter:card" content="summary">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Android Jetpack组件学习-Paging3分页加载","description":"前言Paging 3 是 Android Jetpack 组件中用于高效分页加载数据的现代化方案，结合 Kotlin 协程和 Flow 特性，能够显著简化分页...","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T22:47:00.000Z","dateModified":"2026-04-03T14:46:56.052Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Android-Jetpack%E7%BB%84%E4%BB%B6%E5%AD%A6%E4%B9%A0-Paging3%E5%88%86%E9%A1%B5%E5%8A%A0%E8%BD%BD/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/03/Android-Jetpack%E7%BB%84%E4%BB%B6%E5%AD%A6%E4%B9%A0-Paging3%E5%88%86%E9%A1%B5%E5%8A%A0%E8%BD%BD/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Android Jetpack组件学习-Paging3分页加载</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-03T22:47:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-03</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~5.21K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Paging 3 是 Android Jetpack 组件中用于高效分页加载数据的现代化方案，结合 Kotlin 协程和 Flow 特性，能够显著简化分页逻辑的实现。</p>
+<h2 id="Paging-3-概述"><a href="#Paging-3-概述" class="headerlink" title="Paging 3 概述"></a>Paging 3 概述</h2><h3 id="核心优势"><a href="#核心优势" class="headerlink" title="核心优势"></a>核心优势</h3><ul>
+<li><strong>内置加载状态管理</strong>：自动处理加载、刷新、错误状态</li>
+<li><strong>协程与 Flow 原生支持</strong>：现代化异步编程</li>
+<li><strong>灵活的数据源支持</strong>：网络、数据库、内存</li>
+<li><strong>高效的内存管理</strong>：自动回收不可见的数据</li>
+<li><strong>可组合的架构</strong>：与 RecyclerView 无缝集成</li>
+</ul>
+<h2 id="定义数据源"><a href="#定义数据源" class="headerlink" title="定义数据源"></a>定义数据源</h2><h3 id="PagingSource-类"><a href="#PagingSource-类" class="headerlink" title="PagingSource 类"></a>PagingSource 类</h3><p>PagingSource&lt;Key, Value&gt; 有两种类型参数：</p>
+<ul>
+<li><strong>Key</strong>：用于加载数据的标识符</li>
+<li><strong>Value</strong>：数据本身的类型</li>
+</ul>
+<h3 id="实现-PagingSource"><a href="#实现-PagingSource" class="headerlink" title="实现 PagingSource"></a>实现 PagingSource</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">ExamplePagingSource</span>(</span><br><span class="line">    <span class="keyword">val</span> backend: ExampleBackendService,</span><br><span class="line">    <span class="keyword">val</span> query: String</span><br><span class="line">) : PagingSource&lt;<span class="built_in">Int</span>, User&gt;() &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">override</span> <span class="keyword">suspend</span> <span class="function"><span class="keyword">fun</span> <span class="title">load</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">        params: <span class="type">LoadParams</span>&lt;<span class="type">Int</span>&gt;</span></span></span><br><span class="line"><span class="params"><span class="function">    )</span></span>: LoadResult&lt;<span class="built_in">Int</span>, User&gt; &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">// 如果未定义，从第1页开始刷新</span></span><br><span class="line">            <span class="keyword">val</span> nextPageNumber = params.key ?: <span class="number">1</span></span><br><span class="line">            <span class="keyword">val</span> response = backend.searchUsers(query, nextPageNumber)</span><br><span class="line">            <span class="keyword">return</span> LoadResult.Page(</span><br><span class="line">                <span class="keyword">data</span> = response.users,</span><br><span class="line">                prevKey = <span class="literal">null</span>, <span class="comment">// 只向前分页</span></span><br><span class="line">                nextKey = response.nextPageNumber</span><br><span class="line">            )</span><br><span class="line">        &#125; <span class="keyword">catch</span> (e: Exception) &#123;</span><br><span class="line">            <span class="keyword">return</span> LoadResult.Error(e)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">getRefreshKey</span><span class="params">(state: <span class="type">PagingState</span>&lt;<span class="type">Int</span>, User&gt;)</span></span>: <span class="built_in">Int</span>? &#123;</span><br><span class="line">        <span class="keyword">return</span> state.anchorPosition?.let &#123; anchorPosition -&gt;</span><br><span class="line">            <span class="keyword">val</span> anchorPage = state.closestPageToPosition(anchorPosition)</span><br><span class="line">            anchorPage?.prevKey?.plus(<span class="number">1</span>) ?: anchorPage?.nextKey?.minus(<span class="number">1</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="LoadParams-和-LoadResult"><a href="#LoadParams-和-LoadResult" class="headerlink" title="LoadParams 和 LoadResult"></a>LoadParams 和 LoadResult</h3><p><strong>LoadParams</strong> 包含：</p>
+<ul>
+<li><code>key</code>：要加载的键</li>
+<li><code>loadSize</code>：要加载的项数</li>
+</ul>
+<p><strong>LoadResult</strong> 包含：</p>
+<ul>
+<li><code>LoadResult.Page</code>：加载成功</li>
+<li><code>LoadResult.Error</code>：加载失败</li>
+</ul>
+<h2 id="创建-Pager"><a href="#创建-Pager" class="headerlink" title="创建 Pager"></a>创建 Pager</h2><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> flow = Pager(</span><br><span class="line">    config = PagingConfig(</span><br><span class="line">        pageSize = <span class="number">20</span>,</span><br><span class="line">        prefetchDistance = <span class="number">10</span>,</span><br><span class="line">        enablePlaceholders = <span class="literal">false</span></span><br><span class="line">    ),</span><br><span class="line">    pagingSourceFactory = &#123; ExamplePagingSource(backend, query) &#125;</span><br><span class="line">).flow</span><br></pre></td></tr></table></figure>
+
+<h3 id="PagingConfig-参数"><a href="#PagingConfig-参数" class="headerlink" title="PagingConfig 参数"></a>PagingConfig 参数</h3><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>描述</th>
+<th>默认值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>pageSize</td>
+<td>每页加载的项数</td>
+<td>-</td>
+</tr>
+<tr>
+<td>prefetchDistance</td>
+<td>预加载距离</td>
+<td>pageSize</td>
+</tr>
+<tr>
+<td>enablePlaceholders</td>
+<td>是否启用占位符</td>
+<td>true</td>
+</tr>
+<tr>
+<td>initialLoadSize</td>
+<td>初始加载数量</td>
+<td>pageSize * 3</td>
+</tr>
+<tr>
+<td>maxSize</td>
+<td>最大缓存数量</td>
+<td>Int.MAX_VALUE</td>
+</tr>
+</tbody></table>
+<h2 id="在-ViewModel-中使用"><a href="#在-ViewModel-中使用" class="headerlink" title="在 ViewModel 中使用"></a>在 ViewModel 中使用</h2><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MyViewModel</span>(</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> repository: MyRepository</span><br><span class="line">) : ViewModel() &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">getItems</span><span class="params">(query: <span class="type">String</span>)</span></span>: Flow&lt;PagingData&lt;Item&gt;&gt; &#123;</span><br><span class="line">        <span class="keyword">return</span> repository.getItems(query)</span><br><span class="line">            .cachedIn(viewModelScope)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>cachedIn()</code> 用于缓存 PagingData，避免在配置更改时重新加载数据。</p>
+<h2 id="在-Activity-Fragment-中使用"><a href="#在-Activity-Fragment-中使用" class="headerlink" title="在 Activity&#x2F;Fragment 中使用"></a>在 Activity&#x2F;Fragment 中使用</h2><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@AndroidEntryPoint</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyActivity</span> : <span class="type">AppCompatActivity</span>() &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> viewModel: MyViewModel <span class="keyword">by</span> viewModels()</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">lateinit</span> <span class="keyword">var</span> adapter: MyPagingAdapter</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onCreate</span><span class="params">(savedInstanceState: <span class="type">Bundle</span>?)</span></span> &#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState)</span><br><span class="line">        </span><br><span class="line">        adapter = MyPagingAdapter()</span><br><span class="line">        recyclerView.adapter = adapter</span><br><span class="line">        </span><br><span class="line">        lifecycleScope.launch &#123;</span><br><span class="line">            viewModel.getItems(<span class="string">&quot;query&quot;</span>)</span><br><span class="line">                .collectLatest &#123; pagingData -&gt;</span><br><span class="line">                    adapter.submitData(pagingData)</span><br><span class="line">                &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="创建-PagingDataAdapter"><a href="#创建-PagingDataAdapter" class="headerlink" title="创建 PagingDataAdapter"></a>创建 PagingDataAdapter</h2><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MyPagingAdapter</span> : <span class="type">PagingDataAdapter</span>&lt;<span class="type">Item, MyViewHolder</span>&gt;(DIFF_CALLBACK) &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onCreateViewHolder</span><span class="params">(parent: <span class="type">ViewGroup</span>, viewType: <span class="type">Int</span>)</span></span>: MyViewHolder &#123;</span><br><span class="line">        <span class="keyword">return</span> MyViewHolder(</span><br><span class="line">            LayoutInflater.from(parent.context)</span><br><span class="line">                .inflate(R.layout.item_layout, parent, <span class="literal">false</span>)</span><br><span class="line">        )</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onBindViewHolder</span><span class="params">(holder: <span class="type">MyViewHolder</span>, position: <span class="type">Int</span>)</span></span> &#123;</span><br><span class="line">        <span class="keyword">val</span> item = getItem(position)</span><br><span class="line">        item?.let &#123; holder.bind(it) &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">companion</span> <span class="keyword">object</span> &#123;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">val</span> DIFF_CALLBACK = <span class="keyword">object</span> : DiffUtil.ItemCallback&lt;Item&gt;() &#123;</span><br><span class="line">            <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">areItemsTheSame</span><span class="params">(oldItem: <span class="type">Item</span>, newItem: <span class="type">Item</span>)</span></span>: <span class="built_in">Boolean</span> &#123;</span><br><span class="line">                <span class="keyword">return</span> oldItem.id == newItem.id</span><br><span class="line">            &#125;</span><br><span class="line">            </span><br><span class="line">            <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">areContentsTheSame</span><span class="params">(oldItem: <span class="type">Item</span>, newItem: <span class="type">Item</span>)</span></span>: <span class="built_in">Boolean</span> &#123;</span><br><span class="line">                <span class="keyword">return</span> oldItem == newItem</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="处理加载状态"><a href="#处理加载状态" class="headerlink" title="处理加载状态"></a>处理加载状态</h2><h3 id="添加加载状态监听"><a href="#添加加载状态监听" class="headerlink" title="添加加载状态监听"></a>添加加载状态监听</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">adapter.addLoadStateListener &#123; loadState -&gt;</span><br><span class="line">    <span class="keyword">when</span> (loadState.refresh) &#123;</span><br><span class="line">        <span class="keyword">is</span> LoadState.Loading -&gt; &#123;</span><br><span class="line">            <span class="comment">// 显示加载中</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">is</span> LoadState.NotLoading -&gt; &#123;</span><br><span class="line">            <span class="comment">// 加载完成</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">is</span> LoadState.Error -&gt; &#123;</span><br><span class="line">            <span class="comment">// 显示错误</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="显示加载状态"><a href="#显示加载状态" class="headerlink" title="显示加载状态"></a>显示加载状态</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 在 Adapter 中使用 withLoadStateHeaderAndFooter</span></span><br><span class="line">adapter.withLoadStateHeaderAndFooter(</span><br><span class="line">    header = LoadingStateAdapter &#123; adapter.retry() &#125;,</span><br><span class="line">    footer = LoadingStateAdapter &#123; adapter.retry() &#125;</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<h2 id="刷新和重试"><a href="#刷新和重试" class="headerlink" title="刷新和重试"></a>刷新和重试</h2><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 刷新数据</span></span><br><span class="line">adapter.refresh()</span><br><span class="line"></span><br><span class="line"><span class="comment">// 重试失败的操作</span></span><br><span class="line">adapter.retry()</span><br></pre></td></tr></table></figure>
+
+<h2 id="与-Room-数据库集成"><a href="#与-Room-数据库集成" class="headerlink" title="与 Room 数据库集成"></a>与 Room 数据库集成</h2><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Dao</span></span><br><span class="line"><span class="keyword">interface</span> <span class="title class_">ItemDao</span> &#123;</span><br><span class="line">    <span class="meta">@Query(<span class="string">&quot;SELECT * FROM items ORDER BY id ASC&quot;</span>)</span></span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">getAllItems</span><span class="params">()</span></span>: PagingSource&lt;<span class="built_in">Int</span>, Item&gt;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyRepository</span>(<span class="keyword">private</span> <span class="keyword">val</span> dao: ItemDao) &#123;</span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">getItems</span><span class="params">()</span></span>: Flow&lt;PagingData&lt;Item&gt;&gt; &#123;</span><br><span class="line">        <span class="keyword">return</span> Pager(</span><br><span class="line">            config = PagingConfig(pageSize = <span class="number">20</span>),</span><br><span class="line">            pagingSourceFactory = &#123; dao.getAllItems() &#125;</span><br><span class="line">        ).flow</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://developer.android.google.cn/topic/libraries/architecture/paging/v3-paged-data?hl=zh-cn">加载并显示分页数据</a></li>
+<li><a target="_blank" rel="noopener" href="https://juejin.cn/post/7502329326098219017">Paging 3.0 + Kotlin 分页加载指南</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.51cto.com/u_14523369/6122236">Android Kotlin Paging3 Flow 完整教程</a></li>
+</ul>
+<h2 id="下一步"><a href="#下一步" class="headerlink" title="下一步"></a>下一步</h2><ul>
+<li>实践 Paging 3 与 Room 的集成</li>
+<li>学习 RemoteMediator（网络 + 数据库）</li>
+<li>探索 Paging 3 的性能优化</li>
+</ul>
+<hr>
+<p><em>持续学习中…</em></p>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/Android/" rel="tag">Android</a>, <a class="tag-none-link" href="/blog/tags/Jetpack/" rel="tag">Jetpack</a>, <a class="tag-none-link" href="/blog/tags/Kotlin/" rel="tag">Kotlin</a>, <a class="tag-none-link" href="/blog/tags/Paging3/" rel="tag">Paging3</a>, <a class="tag-none-link" href="/blog/tags/%E5%88%86%E9%A1%B5/" rel="tag">分页</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-03T14:46:56.052Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Android Jetpack组件学习-Hilt依赖注入" href="/blog/2026/04/03/Android-Jetpack组件学习-Hilt依赖注入/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" Java Android性能优化学习笔记" href="/blog/2026/04/03/Java-Android性能优化学习笔记/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>

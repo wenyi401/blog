@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>Android应用资源Resource深度解析 | Wenyi&#39;s Blog</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/04/Android%E5%BA%94%E7%94%A8%E8%B5%84%E6%BA%90Resource%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="Android, Resource, 资源, 限定符" />
+  
+  <meta name="description" content="前言资源是代码使用的附加文件和静态内容，例如位图、布局定义、界面字符串等。将应用资源与代码分离，便于独立维护和为特定设备配置提供备用资源。 一、资源类型   目录 资源类型    animator&#x2F; 属性动画   anim&#x2F; 补间动画   color&#x2F; 颜色状态列表   drawable&#x2F; 位图、形状等   mipmap&#x2F; 启动器图标   layo">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android应用资源Resource深度解析">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/04/Android%E5%BA%94%E7%94%A8%E8%B5%84%E6%BA%90Resource%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:description" content="前言资源是代码使用的附加文件和静态内容，例如位图、布局定义、界面字符串等。将应用资源与代码分离，便于独立维护和为特定设备配置提供备用资源。 一、资源类型   目录 资源类型    animator&#x2F; 属性动画   anim&#x2F; 补间动画   color&#x2F; 颜色状态列表   drawable&#x2F; 位图、形状等   mipmap&#x2F; 启动器图标   layo">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-04-04T06:50:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T22:48:06.756Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="Resource">
+<meta property="article:tag" content="资源">
+<meta property="article:tag" content="限定符">
+<meta name="twitter:card" content="summary">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Android应用资源Resource深度解析","description":"前言资源是代码使用的附加文件和静态内容，例如位图、布局定义、界面字符串等。将应用资源与代码分离，便于独立维护和为特定设备配置提供备用资源。\n","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-04T06:50:00.000Z","dateModified":"2026-04-03T22:48:06.756Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/04/Android%E5%BA%94%E7%94%A8%E8%B5%84%E6%BA%90Resource%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/04/Android%E5%BA%94%E7%94%A8%E8%B5%84%E6%BA%90Resource%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Android应用资源Resource深度解析</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-04T06:50:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-04</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            1199
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>资源是代码使用的附加文件和静态内容，例如位图、布局定义、界面字符串等。将应用资源与代码分离，便于独立维护和为特定设备配置提供备用资源。</p>
+<h2 id="一、资源类型"><a href="#一、资源类型" class="headerlink" title="一、资源类型"></a>一、资源类型</h2><table>
+<thead>
+<tr>
+<th>目录</th>
+<th>资源类型</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>animator&#x2F;</td>
+<td>属性动画</td>
+</tr>
+<tr>
+<td>anim&#x2F;</td>
+<td>补间动画</td>
+</tr>
+<tr>
+<td>color&#x2F;</td>
+<td>颜色状态列表</td>
+</tr>
+<tr>
+<td>drawable&#x2F;</td>
+<td>位图、形状等</td>
+</tr>
+<tr>
+<td>mipmap&#x2F;</td>
+<td>启动器图标</td>
+</tr>
+<tr>
+<td>layout&#x2F;</td>
+<td>界面布局</td>
+</tr>
+<tr>
+<td>menu&#x2F;</td>
+<td>应用菜单</td>
+</tr>
+<tr>
+<td>raw&#x2F;</td>
+<td>原始文件</td>
+</tr>
+<tr>
+<td>values&#x2F;</td>
+<td>字符串、颜色、维度等</td>
+</tr>
+<tr>
+<td>xml&#x2F;</td>
+<td>任意 XML 文件</td>
+</tr>
+<tr>
+<td>font&#x2F;</td>
+<td>字体文件</td>
+</tr>
+</tbody></table>
+<h2 id="二、提供备用资源"><a href="#二、提供备用资源" class="headerlink" title="二、提供备用资源"></a>二、提供备用资源</h2><p>使用配置限定符为不同设备提供备用资源：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">res/</span><br><span class="line">  drawable/</span><br><span class="line">    icon.png</span><br><span class="line">  drawable-hdpi/</span><br><span class="line">    icon.png</span><br><span class="line">  drawable-en/</span><br><span class="line">    icon.png</span><br></pre></td></tr></table></figure>
+
+<h2 id="三、配置限定符"><a href="#三、配置限定符" class="headerlink" title="三、配置限定符"></a>三、配置限定符</h2><h3 id="常用限定符"><a href="#常用限定符" class="headerlink" title="常用限定符"></a>常用限定符</h3><table>
+<thead>
+<tr>
+<th>限定符</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>en, fr</td>
+<td>语言</td>
+</tr>
+<tr>
+<td>port, land</td>
+<td>屏幕方向</td>
+</tr>
+<tr>
+<td>hdpi, xhdpi</td>
+<td>屏幕密度</td>
+</tr>
+<tr>
+<td>sw600dp</td>
+<td>最小宽度</td>
+</tr>
+<tr>
+<td>night, notnight</td>
+<td>夜间模式</td>
+</tr>
+</tbody></table>
+<h3 id="命名规则"><a href="#命名规则" class="headerlink" title="命名规则"></a>命名规则</h3><ul>
+<li>多个限定符用短划线分隔</li>
+<li>必须按优先级顺序排列</li>
+</ul>
+<h2 id="四、访问资源"><a href="#四、访问资源" class="headerlink" title="四、访问资源"></a>四、访问资源</h2><h3 id="在代码中"><a href="#在代码中" class="headerlink" title="在代码中"></a>在代码中</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> string = getString(R.string.hello)</span><br><span class="line"><span class="keyword">val</span> drawable = getDrawable(R.drawable.icon)</span><br><span class="line">setContentView(R.layout.main)</span><br></pre></td></tr></table></figure>
+
+<h3 id="在-XML-中"><a href="#在-XML-中" class="headerlink" title="在 XML 中"></a>在 XML 中</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">TextView</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:text</span>=<span class="string">&quot;@string/hello&quot;</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:background</span>=<span class="string">&quot;@drawable/icon&quot;</span> /&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="五、最佳实践"><a href="#五、最佳实践" class="headerlink" title="五、最佳实践"></a>五、最佳实践</h2><h3 id="1-始终提供默认资源"><a href="#1-始终提供默认资源" class="headerlink" title="1. 始终提供默认资源"></a>1. 始终提供默认资源</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 正确 --&gt;</span></span><br><span class="line">values/strings.xml</span><br><span class="line">values-en/strings.xml</span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- 错误：缺少默认资源 --&gt;</span></span><br><span class="line">values-en/strings.xml</span><br><span class="line">values-fr/strings.xml</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-使用-dp-而非-px"><a href="#2-使用-dp-而非-px" class="headerlink" title="2. 使用 dp 而非 px"></a>2. 使用 dp 而非 px</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">android:layout_margin=&quot;16dp&quot;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-使用别名资源"><a href="#3-使用别名资源" class="headerlink" title="3. 使用别名资源"></a>3. 使用别名资源</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">resources</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">drawable</span> <span class="attr">name</span>=<span class="string">&quot;icon&quot;</span>&gt;</span>@drawable/icon_ca<span class="tag">&lt;/<span class="name">drawable</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">resources</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://developer.android.google.cn/guide/topics/resources/providing-resources?hl=zh-cn">应用资源概览 | Android Developers</a></li>
+<li><a target="_blank" rel="noopener" href="https://developer.android.google.cn/guide/topics/resources/available-resources?hl=zh-cn">资源类型概览</a></li>
+</ul>
+<hr>
+<p><em>深入学习中…</em></p>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/Android/" rel="tag">Android</a>, <a class="tag-none-link" href="/blog/tags/Resource/" rel="tag">Resource</a>, <a class="tag-none-link" href="/blog/tags/%E8%B5%84%E6%BA%90/" rel="tag">资源</a>, <a class="tag-none-link" href="/blog/tags/%E9%99%90%E5%AE%9A%E7%AC%A6/" rel="tag">限定符</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-03T22:48:06.756Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Kotlin函数Functions深度解析" href="/blog/2026/04/04/Kotlin函数Functions深度解析/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" Kotlin类Classes深度解析" href="/blog/2026/04/04/Kotlin类Classes深度解析/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>

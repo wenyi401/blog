@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>Kotlin对象声明与表达式深度解析 | Wenyi&#39;s Blog</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/04/Kotlin%E5%AF%B9%E8%B1%A1%E5%A3%B0%E6%98%8E%E4%B8%8E%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="Kotlin, Object, 伴生对象, 单例" />
+  
+  <meta name="description" content="前言Kotlin 中的对象允许在单个步骤中定义类并创建其实例。这对于需要可重用的单例实例或一次性对象非常有用。 一、对象声明（Object Declarations）单例模式12345678910111213object DataProviderManager &#123;    private val providers &#x3D; mutableListOf&lt;DataProvider&gt;()">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kotlin对象声明与表达式深度解析">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/04/Kotlin%E5%AF%B9%E8%B1%A1%E5%A3%B0%E6%98%8E%E4%B8%8E%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:description" content="前言Kotlin 中的对象允许在单个步骤中定义类并创建其实例。这对于需要可重用的单例实例或一次性对象非常有用。 一、对象声明（Object Declarations）单例模式12345678910111213object DataProviderManager &#123;    private val providers &#x3D; mutableListOf&lt;DataProvider&gt;()">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-04-04T03:50:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T19:48:39.688Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="Kotlin">
+<meta property="article:tag" content="Object">
+<meta property="article:tag" content="伴生对象">
+<meta property="article:tag" content="单例">
+<meta name="twitter:card" content="summary">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Kotlin对象声明与表达式深度解析","description":"前言Kotlin 中的对象允许在单个步骤中定义类并创建其实例。这对于需要可重用的单例实例或一次性对象非常有用。\n","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-04T03:50:00.000Z","dateModified":"2026-04-03T19:48:39.688Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/04/Kotlin%E5%AF%B9%E8%B1%A1%E5%A3%B0%E6%98%8E%E4%B8%8E%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/04/Kotlin%E5%AF%B9%E8%B1%A1%E5%A3%B0%E6%98%8E%E4%B8%8E%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Kotlin对象声明与表达式深度解析</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-04T03:50:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-04</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~5.90K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Kotlin 中的对象允许在单个步骤中定义类并创建其实例。这对于需要可重用的单例实例或一次性对象非常有用。</p>
+<h2 id="一、对象声明（Object-Declarations）"><a href="#一、对象声明（Object-Declarations）" class="headerlink" title="一、对象声明（Object Declarations）"></a>一、对象声明（Object Declarations）</h2><h3 id="单例模式"><a href="#单例模式" class="headerlink" title="单例模式"></a>单例模式</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">object</span> DataProviderManager &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> providers = mutableListOf&lt;DataProvider&gt;()</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">registerDataProvider</span><span class="params">(provider: <span class="type">DataProvider</span>)</span></span> &#123;</span><br><span class="line">        providers.add(provider)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">val</span> allDataProviders: Collection&lt;DataProvider&gt;</span><br><span class="line">        <span class="keyword">get</span>() = providers</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用</span></span><br><span class="line">DataProviderManager.registerDataProvider(provider)</span><br></pre></td></tr></table></figure>
+
+<h3 id="继承超类型"><a href="#继承超类型" class="headerlink" title="继承超类型"></a>继承超类型</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">object</span> DefaultListener : MouseAdapter() &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">mouseClicked</span><span class="params">(e: <span class="type">MouseEvent</span>)</span></span> &#123; &#125;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">mouseEntered</span><span class="params">(e: <span class="type">MouseEvent</span>)</span></span> &#123; &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="限制"><a href="#限制" class="headerlink" title="限制"></a>限制</h3><p>对象声明不能是局部的（不能嵌套在函数内），但可以嵌套在其他对象声明或非内部类中。</p>
+<h2 id="二、数据对象（Data-Objects）"><a href="#二、数据对象（Data-Objects）" class="headerlink" title="二、数据对象（Data Objects）"></a>二、数据对象（Data Objects）</h2><h3 id="toString-改进"><a href="#toString-改进" class="headerlink" title="toString() 改进"></a>toString() 改进</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 普通对象</span></span><br><span class="line"><span class="keyword">object</span> MyObject</span><br><span class="line">println(MyObject) <span class="comment">// MyObject@hashcode</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 数据对象</span></span><br><span class="line"><span class="keyword">data</span> <span class="keyword">object</span> MyDataObject &#123;</span><br><span class="line">    <span class="keyword">val</span> number: <span class="built_in">Int</span> = <span class="number">3</span></span><br><span class="line">&#125;</span><br><span class="line">println(MyDataObject) <span class="comment">// MyDataObject</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="自动生成的函数"><a href="#自动生成的函数" class="headerlink" title="自动生成的函数"></a>自动生成的函数</h3><ul>
+<li><strong>toString()</strong>：返回对象名称</li>
+<li><strong>equals()&#x2F;hashCode()</strong>：支持相等性检查和哈希集合</li>
+</ul>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.lang.reflect.Constructor</span><br><span class="line"></span><br><span class="line"><span class="keyword">data</span> <span class="keyword">object</span> MySingleton</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">val</span> evilTwin = createInstanceViaReflection()</span><br><span class="line">    </span><br><span class="line">    println(MySingleton == evilTwin) <span class="comment">// true</span></span><br><span class="line">    println(MySingleton === evilTwin) <span class="comment">// false</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="与密封层次结构配合"><a href="#与密封层次结构配合" class="headerlink" title="与密封层次结构配合"></a>与密封层次结构配合</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">sealed</span> <span class="keyword">interface</span> <span class="title class_">ReadResult</span></span><br><span class="line"><span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">Number</span>(<span class="keyword">val</span> number: <span class="built_in">Int</span>) : ReadResult</span><br><span class="line"><span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">Text</span>(<span class="keyword">val</span> text: String) : ReadResult</span><br><span class="line"><span class="keyword">data</span> <span class="keyword">object</span> EndOfFile : ReadResult</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    println(Number(<span class="number">7</span>))  <span class="comment">// Number(number=7)</span></span><br><span class="line">    println(EndOfFile)  <span class="comment">// EndOfFile</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="data-object-vs-data-class"><a href="#data-object-vs-data-class" class="headerlink" title="data object vs data class"></a>data object vs data class</h3><table>
+<thead>
+<tr>
+<th>特性</th>
+<th>data object</th>
+<th>data class</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>copy()</td>
+<td>无</td>
+<td>有</td>
+</tr>
+<tr>
+<td>componentN()</td>
+<td>无</td>
+<td>有</td>
+</tr>
+<tr>
+<td>toString()</td>
+<td>返回名称</td>
+<td>返回属性</td>
+</tr>
+</tbody></table>
+<h2 id="三、伴生对象（Companion-Objects）"><a href="#三、伴生对象（Companion-Objects）" class="headerlink" title="三、伴生对象（Companion Objects）"></a>三、伴生对象（Companion Objects）</h2><h3 id="基本用法"><a href="#基本用法" class="headerlink" title="基本用法"></a>基本用法</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MyClass</span> &#123;</span><br><span class="line">    <span class="keyword">companion</span> <span class="keyword">object</span> Factory &#123;</span><br><span class="line">        <span class="function"><span class="keyword">fun</span> <span class="title">create</span><span class="params">()</span></span>: MyClass = MyClass()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 调用</span></span><br><span class="line"><span class="keyword">val</span> instance = MyClass.create()</span><br></pre></td></tr></table></figure>
+
+<h3 id="省略名称"><a href="#省略名称" class="headerlink" title="省略名称"></a>省略名称</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">User</span>(<span class="keyword">val</span> name: String) &#123;</span><br><span class="line">    <span class="keyword">companion</span> <span class="keyword">object</span> &#123; &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> companionUser = User.Companion</span><br></pre></td></tr></table></figure>
+
+<h3 id="访问私有成员"><a href="#访问私有成员" class="headerlink" title="访问私有成员"></a>访问私有成员</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">User</span>(<span class="keyword">val</span> name: String) &#123;</span><br><span class="line">    <span class="keyword">companion</span> <span class="keyword">object</span> &#123;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">val</span> defaultGreeting = <span class="string">&quot;Hello&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">sayHi</span><span class="params">()</span></span> &#123;</span><br><span class="line">        println(defaultGreeting)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="类名作为引用"><a href="#类名作为引用" class="headerlink" title="类名作为引用"></a>类名作为引用</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">User1</span> &#123;</span><br><span class="line">    <span class="keyword">companion</span> <span class="keyword">object</span> Named &#123;</span><br><span class="line">        <span class="function"><span class="keyword">fun</span> <span class="title">show</span><span class="params">()</span></span>: String = <span class="string">&quot;User1&#x27;s Named Companion Object&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">User2</span> &#123;</span><br><span class="line">    <span class="keyword">companion</span> <span class="keyword">object</span> &#123;</span><br><span class="line">        <span class="function"><span class="keyword">fun</span> <span class="title">show</span><span class="params">()</span></span>: String = <span class="string">&quot;User2&#x27;s Companion Object&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> reference1 = User1  <span class="comment">// 指向伴生对象</span></span><br><span class="line"><span class="keyword">val</span> reference2 = User2  <span class="comment">// 指向伴生对象</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="实现接口"><a href="#实现接口" class="headerlink" title="实现接口"></a>实现接口</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">interface</span> <span class="title class_">Factory</span>&lt;<span class="type">T</span>&gt; &#123;</span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">create</span><span class="params">(name: <span class="type">String</span>)</span></span>: T</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">User</span>(<span class="keyword">val</span> name: String) &#123;</span><br><span class="line">    <span class="keyword">companion</span> <span class="keyword">object</span> : Factory&lt;User&gt; &#123;</span><br><span class="line">        <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">create</span><span class="params">(name: <span class="type">String</span>)</span></span>: User = User(name)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用</span></span><br><span class="line"><span class="keyword">val</span> userFactory: Factory&lt;User&gt; = User</span><br><span class="line"><span class="keyword">val</span> newUser = userFactory.create(<span class="string">&quot;Example User&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="JvmStatic-注解"><a href="#JvmStatic-注解" class="headerlink" title="@JvmStatic 注解"></a>@JvmStatic 注解</h3><p>在 JVM 上，使用 @JvmStatic 生成真正的静态方法和字段：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">User</span> &#123;</span><br><span class="line">    <span class="keyword">companion</span> <span class="keyword">object</span> &#123;</span><br><span class="line">        <span class="meta">@JvmStatic</span></span><br><span class="line">        <span class="function"><span class="keyword">fun</span> <span class="title">create</span><span class="params">()</span></span>: User = User()</span><br><span class="line">        </span><br><span class="line">        <span class="meta">@JvmField</span></span><br><span class="line">        <span class="keyword">val</span> MAX_AGE = <span class="number">150</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、对象表达式（Object-Expressions）"><a href="#四、对象表达式（Object-Expressions）" class="headerlink" title="四、对象表达式（Object Expressions）"></a>四、对象表达式（Object Expressions）</h2><h3 id="从零创建匿名对象"><a href="#从零创建匿名对象" class="headerlink" title="从零创建匿名对象"></a>从零创建匿名对象</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> helloWorld = <span class="keyword">object</span> &#123;</span><br><span class="line">    <span class="keyword">val</span> hello = <span class="string">&quot;Hello&quot;</span></span><br><span class="line">    <span class="keyword">val</span> world = <span class="string">&quot;World&quot;</span></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">toString</span><span class="params">()</span></span> = <span class="string">&quot;<span class="variable">$hello</span> <span class="variable">$world</span>&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">print(helloWorld) <span class="comment">// Hello World</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="继承超类型-1"><a href="#继承超类型-1" class="headerlink" title="继承超类型"></a>继承超类型</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">window.addMouseListener(<span class="keyword">object</span> : MouseAdapter() &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">mouseClicked</span><span class="params">(e: <span class="type">MouseEvent</span>)</span></span> &#123; &#125;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">mouseEntered</span><span class="params">(e: <span class="type">MouseEvent</span>)</span></span> &#123; &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<h3 id="继承多个超类型"><a href="#继承多个超类型" class="headerlink" title="继承多个超类型"></a>继承多个超类型</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">open</span> <span class="keyword">class</span> <span class="title class_">BankAccount</span>(initialBalance: <span class="built_in">Int</span>) &#123;</span><br><span class="line">    <span class="keyword">open</span> <span class="keyword">val</span> balance: <span class="built_in">Int</span> = initialBalance</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">interface</span> <span class="title class_">Transaction</span> &#123;</span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">execute</span><span class="params">()</span></span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> temporaryAccount = <span class="keyword">object</span> : BankAccount(<span class="number">1000</span>), Transaction &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="keyword">val</span> balance = <span class="number">1500</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">execute</span><span class="params">()</span></span> &#123;</span><br><span class="line">        println(<span class="string">&quot;Executing transaction. Balance: <span class="variable">$balance</span>&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="作为返回值"><a href="#作为返回值" class="headerlink" title="作为返回值"></a>作为返回值</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">UserPreferences</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">getPreferences</span><span class="params">()</span></span> = <span class="keyword">object</span> &#123;</span><br><span class="line">        <span class="keyword">val</span> theme: String = <span class="string">&quot;Dark&quot;</span></span><br><span class="line">        <span class="keyword">val</span> fontSize: <span class="built_in">Int</span> = <span class="number">14</span></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">printPreferences</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="keyword">val</span> preferences = getPreferences()</span><br><span class="line">        println(<span class="string">&quot;Theme: <span class="subst">$&#123;preferences.theme&#125;</span>, Font Size: <span class="subst">$&#123;preferences.fontSize&#125;</span>&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="访问外部变量"><a href="#访问外部变量" class="headerlink" title="访问外部变量"></a>访问外部变量</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">countClicks</span><span class="params">(window: <span class="type">JComponent</span>)</span></span> &#123;</span><br><span class="line">    <span class="keyword">var</span> clickCount = <span class="number">0</span></span><br><span class="line">    <span class="keyword">var</span> enterCount = <span class="number">0</span></span><br><span class="line">    </span><br><span class="line">    window.addMouseListener(<span class="keyword">object</span> : MouseAdapter() &#123;</span><br><span class="line">        <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">mouseClicked</span><span class="params">(e: <span class="type">MouseEvent</span>)</span></span> &#123;</span><br><span class="line">            clickCount++</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">mouseEntered</span><span class="params">(e: <span class="type">MouseEvent</span>)</span></span> &#123;</span><br><span class="line">            enterCount++</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="五、行为差异"><a href="#五、行为差异" class="headerlink" title="五、行为差异"></a>五、行为差异</h2><table>
+<thead>
+<tr>
+<th>特性</th>
+<th>对象声明</th>
+<th>对象表达式</th>
+<th>伴生对象</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>初始化时机</td>
+<td>首次访问时</td>
+<td>立即执行</td>
+<td>类加载时</td>
+</tr>
+<tr>
+<td>作用域</td>
+<td>全局</td>
+<td>局部</td>
+<td>类级别</td>
+</tr>
+<tr>
+<td>命名</td>
+<td>必须</td>
+<td>可选</td>
+<td>可选</td>
+</tr>
+</tbody></table>
+<h2 id="六、最佳实践"><a href="#六、最佳实践" class="headerlink" title="六、最佳实践"></a>六、最佳实践</h2><h3 id="1-使用对象声明实现单例"><a href="#1-使用对象声明实现单例" class="headerlink" title="1. 使用对象声明实现单例"></a>1. 使用对象声明实现单例</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">object</span> DatabaseManager &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> database = createDatabase()</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">query</span><span class="params">(sql: <span class="type">String</span>)</span></span>: Result &#123;</span><br><span class="line">        <span class="keyword">return</span> database.execute(sql)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-使用伴生对象实现工厂方法"><a href="#2-使用伴生对象实现工厂方法" class="headerlink" title="2. 使用伴生对象实现工厂方法"></a>2. 使用伴生对象实现工厂方法</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">User</span> <span class="keyword">private</span> <span class="keyword">constructor</span>(<span class="keyword">val</span> name: String) &#123;</span><br><span class="line">    <span class="keyword">companion</span> <span class="keyword">object</span> &#123;</span><br><span class="line">        <span class="function"><span class="keyword">fun</span> <span class="title">create</span><span class="params">(name: <span class="type">String</span>)</span></span>: User = User(name)</span><br><span class="line">        <span class="function"><span class="keyword">fun</span> <span class="title">default</span><span class="params">()</span></span>: User = User(<span class="string">&quot;Anonymous&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-使用对象表达式处理回调"><a href="#3-使用对象表达式处理回调" class="headerlink" title="3. 使用对象表达式处理回调"></a>3. 使用对象表达式处理回调</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">button.setOnClickListener(<span class="keyword">object</span> : View.OnClickListener &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onClick</span><span class="params">(v: <span class="type">View</span>)</span></span> &#123;</span><br><span class="line">        <span class="comment">// 处理点击</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 或使用 SAM 转换</span></span><br><span class="line">button.setOnClickListener &#123;</span><br><span class="line">    <span class="comment">// 处理点击</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-使用-data-object-改进-toString"><a href="#4-使用-data-object-改进-toString" class="headerlink" title="4. 使用 data object 改进 toString()"></a>4. 使用 data object 改进 toString()</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">sealed</span> <span class="keyword">class</span> <span class="title class_">UiState</span> &#123;</span><br><span class="line">    <span class="keyword">data</span> <span class="keyword">object</span> Loading : UiState()</span><br><span class="line">    <span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">Success</span>(<span class="keyword">val</span> <span class="keyword">data</span>: String) : UiState()</span><br><span class="line">    <span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">Error</span>(<span class="keyword">val</span> message: String) : UiState()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="七、常见问题"><a href="#七、常见问题" class="headerlink" title="七、常见问题"></a>七、常见问题</h2><h3 id="问题-1：对象声明不能嵌套在函数中"><a href="#问题-1：对象声明不能嵌套在函数中" class="headerlink" title="问题 1：对象声明不能嵌套在函数中"></a>问题 1：对象声明不能嵌套在函数中</h3><p><strong>原因</strong>：对象声明必须是顶层或在类&#x2F;对象中。</p>
+<p><strong>解决方案</strong>：使用对象表达式或将其移到函数外部。</p>
+<h3 id="问题-2：匿名对象成员不可见"><a href="#问题-2：匿名对象成员不可见" class="headerlink" title="问题 2：匿名对象成员不可见"></a>问题 2：匿名对象成员不可见</h3><p><strong>原因</strong>：返回类型推断为 Any 或超类型。</p>
+<p><strong>解决方案</strong>：将函数或属性声明为 private，或显式声明返回类型。</p>
+<h3 id="问题-3：伴生对象访问问题"><a href="#问题-3：伴生对象访问问题" class="headerlink" title="问题 3：伴生对象访问问题"></a>问题 3：伴生对象访问问题</h3><p><strong>原因</strong>：伴生对象成员实际上是实例成员。</p>
+<p><strong>解决方案</strong>：使用 @JvmStatic 注解生成静态方法。</p>
+<h2 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://kotlinlang.org/docs/object-declarations.html">Object declarations and expressions | Kotlin Documentation</a></li>
+<li><a target="_blank" rel="noopener" href="https://kotlinlang.org/docs/object-declarations.html#companion-objects">Companion Objects | Kotlin Documentation</a></li>
+</ul>
+<hr>
+<p><em>深入学习中…</em></p>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/Kotlin/" rel="tag">Kotlin</a>, <a class="tag-none-link" href="/blog/tags/Object/" rel="tag">Object</a>, <a class="tag-none-link" href="/blog/tags/%E4%BC%B4%E7%94%9F%E5%AF%B9%E8%B1%A1/" rel="tag">伴生对象</a>, <a class="tag-none-link" href="/blog/tags/%E5%8D%95%E4%BE%8B/" rel="tag">单例</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-03T19:48:39.688Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Android Navigation导航组件深度解析" href="/blog/2026/04/04/Android-Navigation导航组件深度解析/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" Android Paging分页库深度解析" href="/blog/2026/04/04/Android-Paging分页库深度解析/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>

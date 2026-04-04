@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>Kotlin Scope Functions详解-let run with apply also | Wenyi&#39;s Blog</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/03/Kotlin-Scope-Functions%E8%AF%A6%E8%A7%A3-let-run-with-apply-also/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="Kotlin, Scope Functions, also, apply, let, run, with" />
+  
+  <meta name="description" content="前言Kotlin 标准库包含一组作用域函数，旨在通过在对象上下文中执行代码块来简化代码。这些函数包括：let、run、with、apply 和 also。 一、函数对比   函数 对象引用 返回值 使用场景    let it Lambda 结果 空安全调用   run this Lambda 结果 执行代码块   with this Lambda 结果 操作对象   apply this 对象本">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kotlin Scope Functions详解-let run with apply also">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/03/Kotlin-Scope-Functions%E8%AF%A6%E8%A7%A3-let-run-with-apply-also/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:description" content="前言Kotlin 标准库包含一组作用域函数，旨在通过在对象上下文中执行代码块来简化代码。这些函数包括：let、run、with、apply 和 also。 一、函数对比   函数 对象引用 返回值 使用场景    let it Lambda 结果 空安全调用   run this Lambda 结果 执行代码块   with this Lambda 结果 操作对象   apply this 对象本">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-04-03T23:43:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T15:44:52.832Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="Kotlin">
+<meta property="article:tag" content="Scope Functions">
+<meta property="article:tag" content="also">
+<meta property="article:tag" content="apply">
+<meta property="article:tag" content="let">
+<meta property="article:tag" content="run">
+<meta property="article:tag" content="with">
+<meta name="twitter:card" content="summary">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Kotlin Scope Functions详解-let run with apply also","description":"前言Kotlin 标准库包含一组作用域函数，旨在通过在对象上下文中执行代码块来简化代码。这些函数包括：let、run、with、apply 和 also。","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:43:00.000Z","dateModified":"2026-04-03T15:44:52.832Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Kotlin-Scope-Functions%E8%AF%A6%E8%A7%A3-let-run-with-apply-also/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/03/Kotlin-Scope-Functions%E8%AF%A6%E8%A7%A3-let-run-with-apply-also/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Kotlin Scope Functions详解-let run with apply also</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-03T23:43:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-03</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~4.50K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Kotlin 标准库包含一组作用域函数，旨在通过在对象上下文中执行代码块来简化代码。这些函数包括：let、run、with、apply 和 also。</p>
+<h2 id="一、函数对比"><a href="#一、函数对比" class="headerlink" title="一、函数对比"></a>一、函数对比</h2><table>
+<thead>
+<tr>
+<th>函数</th>
+<th>对象引用</th>
+<th>返回值</th>
+<th>使用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>let</code></td>
+<td><code>it</code></td>
+<td>Lambda 结果</td>
+<td>空安全调用</td>
+</tr>
+<tr>
+<td><code>run</code></td>
+<td><code>this</code></td>
+<td>Lambda 结果</td>
+<td>执行代码块</td>
+</tr>
+<tr>
+<td><code>with</code></td>
+<td><code>this</code></td>
+<td>Lambda 结果</td>
+<td>操作对象</td>
+</tr>
+<tr>
+<td><code>apply</code></td>
+<td><code>this</code></td>
+<td>对象本身</td>
+<td>对象配置</td>
+</tr>
+<tr>
+<td><code>also</code></td>
+<td><code>it</code></td>
+<td>对象本身</td>
+<td>附加操作</td>
+</tr>
+</tbody></table>
+<h2 id="二、let"><a href="#二、let" class="headerlink" title="二、let"></a>二、let</h2><h3 id="基本用法"><a href="#基本用法" class="headerlink" title="基本用法"></a>基本用法</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> result = <span class="string">&quot;Hello&quot;</span>.let &#123;</span><br><span class="line">    println(it)  <span class="comment">// Hello</span></span><br><span class="line">    it.length    <span class="comment">// 返回 5</span></span><br><span class="line">&#125;</span><br><span class="line">println(result)  <span class="comment">// 5</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="空安全调用"><a href="#空安全调用" class="headerlink" title="空安全调用"></a>空安全调用</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> name: String? = <span class="string">&quot;Kotlin&quot;</span></span><br><span class="line"></span><br><span class="line">name?.let &#123;</span><br><span class="line">    println(<span class="string">&quot;Name: <span class="variable">$it</span>&quot;</span>)</span><br><span class="line">    println(<span class="string">&quot;Length: <span class="subst">$&#123;it.length&#125;</span>&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="变量作用域"><a href="#变量作用域" class="headerlink" title="变量作用域"></a>变量作用域</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ❌ 错误：变量名冲突</span></span><br><span class="line"><span class="keyword">val</span> items = listOf(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>)</span><br><span class="line"><span class="keyword">val</span> items = items.map &#123; it * <span class="number">2</span> &#125;  <span class="comment">// 错误</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// ✅ 正确：使用 let</span></span><br><span class="line"><span class="keyword">val</span> items = listOf(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>)</span><br><span class="line">items.let &#123; original -&gt;</span><br><span class="line">    <span class="keyword">val</span> transformed = original.map &#123; it * <span class="number">2</span> &#125;</span><br><span class="line">    println(transformed)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="三、run"><a href="#三、run" class="headerlink" title="三、run"></a>三、run</h2><h3 id="基本用法-1"><a href="#基本用法-1" class="headerlink" title="基本用法"></a>基本用法</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> result = run &#123;</span><br><span class="line">    <span class="keyword">val</span> a = <span class="number">1</span></span><br><span class="line">    <span class="keyword">val</span> b = <span class="number">2</span></span><br><span class="line">    a + b</span><br><span class="line">&#125;</span><br><span class="line">println(result)  <span class="comment">// 3</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="对象-run"><a href="#对象-run" class="headerlink" title="对象 run"></a>对象 run</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> result = <span class="string">&quot;Hello&quot;</span>.run &#123;</span><br><span class="line">    length  <span class="comment">// this.length</span></span><br><span class="line">&#125;</span><br><span class="line">println(result)  <span class="comment">// 5</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="与-let-区别"><a href="#与-let-区别" class="headerlink" title="与 let 区别"></a>与 let 区别</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// let：使用 it</span></span><br><span class="line"><span class="string">&quot;Hello&quot;</span>.let &#123;</span><br><span class="line">    println(it.length)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// run：使用 this</span></span><br><span class="line"><span class="string">&quot;Hello&quot;</span>.run &#123;</span><br><span class="line">    println(length)  <span class="comment">// 省略 this</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、with"><a href="#四、with" class="headerlink" title="四、with"></a>四、with</h2><h3 id="基本用法-2"><a href="#基本用法-2" class="headerlink" title="基本用法"></a>基本用法</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> person = Person(<span class="string">&quot;Alice&quot;</span>, <span class="number">25</span>)</span><br><span class="line"></span><br><span class="line">with(person) &#123;</span><br><span class="line">    println(name)</span><br><span class="line">    println(age)</span><br><span class="line">    celebrateBirthday()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="返回值"><a href="#返回值" class="headerlink" title="返回值"></a>返回值</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> result = with(StringBuilder()) &#123;</span><br><span class="line">    append(<span class="string">&quot;Hello&quot;</span>)</span><br><span class="line">    append(<span class="string">&quot; &quot;</span>)</span><br><span class="line">    append(<span class="string">&quot;World&quot;</span>)</span><br><span class="line">    toString()  <span class="comment">// 返回结果</span></span><br><span class="line">&#125;</span><br><span class="line">println(result)  <span class="comment">// Hello World</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="与-run-区别"><a href="#与-run-区别" class="headerlink" title="与 run 区别"></a>与 run 区别</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// with：对象作为参数</span></span><br><span class="line">with(person) &#123; ... &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// run：对象调用</span></span><br><span class="line">person.run &#123; ... &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="五、apply"><a href="#五、apply" class="headerlink" title="五、apply"></a>五、apply</h2><h3 id="基本用法-3"><a href="#基本用法-3" class="headerlink" title="基本用法"></a>基本用法</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> person = Person().apply &#123;</span><br><span class="line">    name = <span class="string">&quot;Alice&quot;</span></span><br><span class="line">    age = <span class="number">25</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="对象配置"><a href="#对象配置" class="headerlink" title="对象配置"></a>对象配置</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> intent = Intent().apply &#123;</span><br><span class="line">    putExtra(<span class="string">&quot;id&quot;</span>, <span class="number">1</span>)</span><br><span class="line">    putExtra(<span class="string">&quot;name&quot;</span>, <span class="string">&quot;Alice&quot;</span>)</span><br><span class="line">    setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Builder-模式"><a href="#Builder-模式" class="headerlink" title="Builder 模式"></a>Builder 模式</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> request = Request.Builder().apply &#123;</span><br><span class="line">    url(<span class="string">&quot;https://api.example.com&quot;</span>)</span><br><span class="line">    addHeader(<span class="string">&quot;Authorization&quot;</span>, <span class="string">&quot;Bearer token&quot;</span>)</span><br><span class="line">    post(body)</span><br><span class="line">&#125;.build()</span><br></pre></td></tr></table></figure>
+
+<h3 id="与-run-区别-1"><a href="#与-run-区别-1" class="headerlink" title="与 run 区别"></a>与 run 区别</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// run：返回 Lambda 结果</span></span><br><span class="line"><span class="keyword">val</span> result = person.run &#123; name &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// apply：返回对象本身</span></span><br><span class="line"><span class="keyword">val</span> person = person.apply &#123; name = <span class="string">&quot;Bob&quot;</span> &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="六、also"><a href="#六、also" class="headerlink" title="六、also"></a>六、also</h2><h3 id="基本用法-4"><a href="#基本用法-4" class="headerlink" title="基本用法"></a>基本用法</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> person = Person(<span class="string">&quot;Alice&quot;</span>, <span class="number">25</span>).also &#123;</span><br><span class="line">    println(<span class="string">&quot;Created: <span class="subst">$&#123;it.name&#125;</span>&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="附加操作"><a href="#附加操作" class="headerlink" title="附加操作"></a>附加操作</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> numbers = mutableListOf(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>)</span><br><span class="line">    .also &#123; println(<span class="string">&quot;Original: <span class="variable">$it</span>&quot;</span>) &#125;</span><br><span class="line">    .map &#123; it * <span class="number">2</span> &#125;</span><br><span class="line">    .also &#123; println(<span class="string">&quot;Transformed: <span class="variable">$it</span>&quot;</span>) &#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="日志记录"><a href="#日志记录" class="headerlink" title="日志记录"></a>日志记录</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">processData</span><span class="params">(<span class="keyword">data</span>: <span class="type">String</span>)</span></span>: String &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">data</span>.also &#123;</span><br><span class="line">        log(<span class="string">&quot;Processing: <span class="variable">$it</span>&quot;</span>)</span><br><span class="line">    &#125;.uppercase().also &#123;</span><br><span class="line">        log(<span class="string">&quot;Result: <span class="variable">$it</span>&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="与-let-区别-1"><a href="#与-let-区别-1" class="headerlink" title="与 let 区别"></a>与 let 区别</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// let：返回 Lambda 结果</span></span><br><span class="line"><span class="keyword">val</span> length = <span class="string">&quot;Hello&quot;</span>.let &#123; it.length &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// also：返回对象本身</span></span><br><span class="line"><span class="keyword">val</span> str = <span class="string">&quot;Hello&quot;</span>.also &#123; println(it) &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="七、选择指南"><a href="#七、选择指南" class="headerlink" title="七、选择指南"></a>七、选择指南</h2><h3 id="选择依据"><a href="#选择依据" class="headerlink" title="选择依据"></a>选择依据</h3><table>
+<thead>
+<tr>
+<th>场景</th>
+<th>函数</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>空安全调用</td>
+<td><code>let</code></td>
+</tr>
+<tr>
+<td>对象配置</td>
+<td><code>apply</code></td>
+</tr>
+<tr>
+<td>执行代码块</td>
+<td><code>run</code></td>
+</tr>
+<tr>
+<td>附加操作</td>
+<td><code>also</code></td>
+</tr>
+<tr>
+<td>操作对象（无返回值）</td>
+<td><code>with</code></td>
+</tr>
+</tbody></table>
+<h3 id="决策流程"><a href="#决策流程" class="headerlink" title="决策流程"></a>决策流程</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">需要返回对象本身？</span><br><span class="line">├── 是 → 需要配置对象？</span><br><span class="line">│         ├── 是 → apply</span><br><span class="line">│         └── 否 → also</span><br><span class="line">└── 否 → 需要空安全？</span><br><span class="line">          ├── 是 → let</span><br><span class="line">          └── 否 → 需要操作已有对象？</span><br><span class="line">                    ├── 是 → with</span><br><span class="line">                    └── 否 → run</span><br></pre></td></tr></table></figure>
+
+<h2 id="八、实战应用"><a href="#八、实战应用" class="headerlink" title="八、实战应用"></a>八、实战应用</h2><h3 id="1-空安全调用"><a href="#1-空安全调用" class="headerlink" title="1. 空安全调用"></a>1. 空安全调用</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">user?.let &#123;</span><br><span class="line">    println(it.name)</span><br><span class="line">    println(it.age)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-对象初始化"><a href="#2-对象初始化" class="headerlink" title="2. 对象初始化"></a>2. 对象初始化</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> recyclerView = RecyclerView(context).apply &#123;</span><br><span class="line">    layoutManager = LinearLayoutManager(context)</span><br><span class="line">    adapter = myAdapter</span><br><span class="line">    addItemDecoration(divider)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-链式调用"><a href="#3-链式调用" class="headerlink" title="3. 链式调用"></a>3. 链式调用</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> result = <span class="string">&quot;  Hello World  &quot;</span></span><br><span class="line">    .also &#123; println(<span class="string">&quot;Original: &#x27;<span class="variable">$it</span>&#x27;&quot;</span>) &#125;</span><br><span class="line">    .trim()</span><br><span class="line">    .also &#123; println(<span class="string">&quot;Trimmed: &#x27;<span class="variable">$it</span>&#x27;&quot;</span>) &#125;</span><br><span class="line">    .uppercase()</span><br><span class="line">    .also &#123; println(<span class="string">&quot;Upper: &#x27;<span class="variable">$it</span>&#x27;&quot;</span>) &#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-资源管理"><a href="#4-资源管理" class="headerlink" title="4. 资源管理"></a>4. 资源管理</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">File(<span class="string">&quot;data.txt&quot;</span>).apply &#123;</span><br><span class="line">    <span class="keyword">if</span> (!exists()) createNewFile()</span><br><span class="line">    writeText(<span class="string">&quot;Hello&quot;</span>)</span><br><span class="line">&#125;.also &#123;</span><br><span class="line">    println(<span class="string">&quot;File written: <span class="subst">$&#123;it.absolutePath&#125;</span>&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="九、组合使用"><a href="#九、组合使用" class="headerlink" title="九、组合使用"></a>九、组合使用</h2><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> person = Person().apply &#123;</span><br><span class="line">    name = <span class="string">&quot;Alice&quot;</span></span><br><span class="line">    age = <span class="number">25</span></span><br><span class="line">&#125;.also &#123;</span><br><span class="line">    println(<span class="string">&quot;Created person: <span class="variable">$it</span>&quot;</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">person?.let &#123;</span><br><span class="line">    it.celebrateBirthday()</span><br><span class="line">    println(<span class="string">&quot;Age: <span class="subst">$&#123;it.age&#125;</span>&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="十、最佳实践"><a href="#十、最佳实践" class="headerlink" title="十、最佳实践"></a>十、最佳实践</h2><ol>
+<li><strong>命名参数</strong>：let 中使用命名参数避免 it 歧义</li>
+<li><strong>返回值</strong>：根据需求选择 apply（对象）或 let（结果）</li>
+<li><strong>可读性</strong>：避免过度嵌套</li>
+<li><strong>空安全</strong>：善用 ?.let</li>
+<li><strong>日志调试</strong>：使用 also 添加日志</li>
+</ol>
+<h2 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://kotlinlang.org/docs/scope-functions.html">Scope functions | Kotlin Documentation</a></li>
+<li><a target="_blank" rel="noopener" href="https://medium.com/@harshpatel_/kotlin-scope-functions-finally-explained-let-run-with-apply-and-also-ca1c803fb12d">Kotlin Scope Functions Finally Explained</a></li>
+<li><a target="_blank" rel="noopener" href="https://openillumi.com/en/en-kotlin-scope-functions-run-let-apply-difference/">Kotlin Scope Functions: Master run, let, apply, also, with Usage</a></li>
+</ul>
+<hr>
+<p><em>持续学习中…</em></p>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/Kotlin/" rel="tag">Kotlin</a>, <a class="tag-none-link" href="/blog/tags/Scope-Functions/" rel="tag">Scope Functions</a>, <a class="tag-none-link" href="/blog/tags/also/" rel="tag">also</a>, <a class="tag-none-link" href="/blog/tags/apply/" rel="tag">apply</a>, <a class="tag-none-link" href="/blog/tags/let/" rel="tag">let</a>, <a class="tag-none-link" href="/blog/tags/run/" rel="tag">run</a>, <a class="tag-none-link" href="/blog/tags/with/" rel="tag">with</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-03T15:44:52.832Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Android JNI NDK Native开发学习" href="/blog/2026/04/03/Android-JNI-NDK-Native开发学习/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" Android RxJava响应式编程学习" href="/blog/2026/04/03/Android-RxJava响应式编程学习/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>

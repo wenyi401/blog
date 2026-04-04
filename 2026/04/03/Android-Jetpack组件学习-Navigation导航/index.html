@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>Android Jetpack组件学习-Navigation导航 | Wenyi&#39;s Blog</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/03/Android-Jetpack%E7%BB%84%E4%BB%B6%E5%AD%A6%E4%B9%A0-Navigation%E5%AF%BC%E8%88%AA/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="Android, Jetpack, Kotlin, Navigation" />
+  
+  <meta name="description" content="前言Navigation 组件是 Android Jetpack 的一部分，用于简化应用内的导航逻辑，统一管理 Fragment、Activity 的切换和回退栈。 主要概念   概念 描述 类型    宿主 包含当前导航目的地的界面元素 NavHost（Compose）、NavHostFragment（Fragment）   图表 定义应用中所有导航目的地及其连接关系 NavGraph   控制">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android Jetpack组件学习-Navigation导航">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/03/Android-Jetpack%E7%BB%84%E4%BB%B6%E5%AD%A6%E4%B9%A0-Navigation%E5%AF%BC%E8%88%AA/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:description" content="前言Navigation 组件是 Android Jetpack 的一部分，用于简化应用内的导航逻辑，统一管理 Fragment、Activity 的切换和回退栈。 主要概念   概念 描述 类型    宿主 包含当前导航目的地的界面元素 NavHost（Compose）、NavHostFragment（Fragment）   图表 定义应用中所有导航目的地及其连接关系 NavGraph   控制">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-04-03T16:41:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T08:42:35.976Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="Jetpack">
+<meta property="article:tag" content="Kotlin">
+<meta property="article:tag" content="Navigation">
+<meta name="twitter:card" content="summary">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Android Jetpack组件学习-Navigation导航","description":"前言Navigation 组件是 Android Jetpack 的一部分，用于简化应用内的导航逻辑，统一管理 Fragment、Activity 的切换和回...","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T16:41:00.000Z","dateModified":"2026-04-03T08:42:35.976Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Android-Jetpack%E7%BB%84%E4%BB%B6%E5%AD%A6%E4%B9%A0-Navigation%E5%AF%BC%E8%88%AA/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/03/Android-Jetpack%E7%BB%84%E4%BB%B6%E5%AD%A6%E4%B9%A0-Navigation%E5%AF%BC%E8%88%AA/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Android Jetpack组件学习-Navigation导航</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-03T16:41:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-03</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~3.33K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Navigation 组件是 Android Jetpack 的一部分，用于简化应用内的导航逻辑，统一管理 Fragment、Activity 的切换和回退栈。</p>
+<h2 id="主要概念"><a href="#主要概念" class="headerlink" title="主要概念"></a>主要概念</h2><table>
+<thead>
+<tr>
+<th>概念</th>
+<th>描述</th>
+<th>类型</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>宿主</strong></td>
+<td>包含当前导航目的地的界面元素</td>
+<td>NavHost（Compose）、NavHostFragment（Fragment）</td>
+</tr>
+<tr>
+<td><strong>图表</strong></td>
+<td>定义应用中所有导航目的地及其连接关系</td>
+<td>NavGraph</td>
+</tr>
+<tr>
+<td><strong>控制器</strong></td>
+<td>管理目的地之间导航的中央协调器</td>
+<td>NavController</td>
+</tr>
+<tr>
+<td><strong>目的地</strong></td>
+<td>导航图中的节点</td>
+<td>NavDestination</td>
+</tr>
+<tr>
+<td><strong>路线</strong></td>
+<td>唯一标识目的地及其所需数据</td>
+<td>可序列化的数据类型</td>
+</tr>
+</tbody></table>
+<h2 id="优点和功能"><a href="#优点和功能" class="headerlink" title="优点和功能"></a>优点和功能</h2><ul>
+<li><strong>动画和过渡</strong>：提供标准化资源</li>
+<li><strong>深层链接</strong>：直接跳转到目的地</li>
+<li><strong>界面模式</strong>：支持抽屉式导航栏和底部导航</li>
+<li><strong>类型安全</strong>：在目的地之间传递类型安全的数据</li>
+<li><strong>ViewModel 支持</strong>：将 ViewModel 作用域限定为导航图</li>
+<li><strong>Fragment 事务</strong>：全面支持和处理</li>
+<li><strong>返回和向上</strong>：默认正确处理</li>
+</ul>
+<h2 id="设置依赖"><a href="#设置依赖" class="headerlink" title="设置依赖"></a>设置依赖</h2><figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">plugins &#123;</span><br><span class="line">    kotlin(<span class="string">&quot;plugin.serialization&quot;</span>) version <span class="string">&quot;2.0.21&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">dependencies</span> &#123;</span><br><span class="line">    val nav_version = <span class="string">&quot;2.9.7&quot;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// Jetpack Compose integration</span></span><br><span class="line">    implementation(<span class="string">&quot;androidx.navigation:navigation-compose:$nav_version&quot;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Views/Fragments integration</span></span><br><span class="line">    implementation(<span class="string">&quot;androidx.navigation:navigation-fragment:$nav_version&quot;</span>)</span><br><span class="line">    implementation(<span class="string">&quot;androidx.navigation:navigation-ui:$nav_version&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Compose-中使用-Navigation"><a href="#Compose-中使用-Navigation" class="headerlink" title="Compose 中使用 Navigation"></a>Compose 中使用 Navigation</h2><h3 id="创建-NavController"><a href="#创建-NavController" class="headerlink" title="创建 NavController"></a>创建 NavController</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> navController = rememberNavController()</span><br></pre></td></tr></table></figure>
+
+<h3 id="创建-NavHost"><a href="#创建-NavHost" class="headerlink" title="创建 NavHost"></a>创建 NavHost</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">NavHost(</span><br><span class="line">    navController = navController,</span><br><span class="line">    startDestination = <span class="string">&quot;home&quot;</span></span><br><span class="line">) &#123;</span><br><span class="line">    composable(<span class="string">&quot;home&quot;</span>) &#123; HomeScreen() &#125;</span><br><span class="line">    composable(<span class="string">&quot;detail/&#123;itemId&#125;&quot;</span>) &#123; backStackEntry -&gt;</span><br><span class="line">        DetailScreen(</span><br><span class="line">            itemId = backStackEntry.arguments?.getString(<span class="string">&quot;itemId&quot;</span>)</span><br><span class="line">        )</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="导航到目的地"><a href="#导航到目的地" class="headerlink" title="导航到目的地"></a>导航到目的地</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 简单导航</span></span><br><span class="line">navController.navigate(<span class="string">&quot;detail&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 带参数导航</span></span><br><span class="line">navController.navigate(<span class="string">&quot;detail/123&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 返回</span></span><br><span class="line">navController.popBackStack()</span><br></pre></td></tr></table></figure>
+
+<h2 id="Fragment-中使用-Navigation"><a href="#Fragment-中使用-Navigation" class="headerlink" title="Fragment 中使用 Navigation"></a>Fragment 中使用 Navigation</h2><h3 id="创建导航图"><a href="#创建导航图" class="headerlink" title="创建导航图"></a>创建导航图</h3><p>在 <code>res/navigation/nav_graph.xml</code>：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">navigation</span> <span class="attr">xmlns:android</span>=<span class="string">&quot;http://schemas.android.com/apk/res/android&quot;</span></span></span><br><span class="line"><span class="tag">    <span class="attr">xmlns:app</span>=<span class="string">&quot;http://schemas.android.com/apk/res-auto&quot;</span></span></span><br><span class="line"><span class="tag">    <span class="attr">app:startDestination</span>=<span class="string">&quot;@id/homeFragment&quot;</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">fragment</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:id</span>=<span class="string">&quot;@+id/homeFragment&quot;</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:name</span>=<span class="string">&quot;com.example.HomeFragment&quot;</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:label</span>=<span class="string">&quot;Home&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">action</span></span></span><br><span class="line"><span class="tag">            <span class="attr">android:id</span>=<span class="string">&quot;@+id/action_home_to_detail&quot;</span></span></span><br><span class="line"><span class="tag">            <span class="attr">app:destination</span>=<span class="string">&quot;@id/detailFragment&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">fragment</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">fragment</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:id</span>=<span class="string">&quot;@+id/detailFragment&quot;</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:name</span>=<span class="string">&quot;com.example.DetailFragment&quot;</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:label</span>=<span class="string">&quot;Detail&quot;</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">navigation</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="在-Activity-中使用-NavHostFragment"><a href="#在-Activity-中使用-NavHostFragment" class="headerlink" title="在 Activity 中使用 NavHostFragment"></a>在 Activity 中使用 NavHostFragment</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">androidx.fragment.app.FragmentContainerView</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:id</span>=<span class="string">&quot;@+id/nav_host_fragment&quot;</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:name</span>=<span class="string">&quot;androidx.navigation.fragment.NavHostFragment&quot;</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:layout_width</span>=<span class="string">&quot;match_parent&quot;</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:layout_height</span>=<span class="string">&quot;match_parent&quot;</span></span></span><br><span class="line"><span class="tag">    <span class="attr">app:navGraph</span>=<span class="string">&quot;@navigation/nav_graph&quot;</span> /&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="导航操作"><a href="#导航操作" class="headerlink" title="导航操作"></a>导航操作</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 导航</span></span><br><span class="line">findNavController().navigate(R.id.action_home_to_detail)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 返回</span></span><br><span class="line">findNavController().navigateUp()</span><br></pre></td></tr></table></figure>
+
+<h2 id="传递参数"><a href="#传递参数" class="headerlink" title="传递参数"></a>传递参数</h2><h3 id="安全参数传递"><a href="#安全参数传递" class="headerlink" title="安全参数传递"></a>安全参数传递</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 定义参数</span></span><br><span class="line">composable(</span><br><span class="line">    <span class="string">&quot;detail/&#123;itemId&#125;&quot;</span>,</span><br><span class="line">    arguments = listOf(navArgument(<span class="string">&quot;itemId&quot;</span>) &#123; type = NavType.StringType &#125;)</span><br><span class="line">) &#123; backStackEntry -&gt;</span><br><span class="line">    <span class="keyword">val</span> itemId = backStackEntry.arguments?.getString(<span class="string">&quot;itemId&quot;</span>)</span><br><span class="line">    DetailScreen(itemId = itemId)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 导航</span></span><br><span class="line">navController.navigate(<span class="string">&quot;detail/item_123&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<h2 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://developer.android.google.cn/guide/navigation?hl=zh-cn">Navigation 官方文档</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/CodePulse/article/details/153922730">Kotlin导航组件深度指南</a></li>
+<li><a target="_blank" rel="noopener" href="https://juejin.cn/post/7486000831100338187">Android Jetpack Navigation 详解</a></li>
+</ul>
+<h2 id="下一步"><a href="#下一步" class="headerlink" title="下一步"></a>下一步</h2><ul>
+<li>学习深层链接实现</li>
+<li>学习类型安全导航</li>
+<li>学习 Navigation 与 ViewModel 配合</li>
+</ul>
+<hr>
+<p><em>持续学习中…</em></p>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/Android/" rel="tag">Android</a>, <a class="tag-none-link" href="/blog/tags/Jetpack/" rel="tag">Jetpack</a>, <a class="tag-none-link" href="/blog/tags/Kotlin/" rel="tag">Kotlin</a>, <a class="tag-none-link" href="/blog/tags/Navigation/" rel="tag">Navigation</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-03T08:42:35.976Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Jetpack Compose入门学习" href="/blog/2026/04/03/Jetpack-Compose入门学习/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" Android Jetpack组件学习-DataStore数据存储" href="/blog/2026/04/03/Android-Jetpack组件学习-DataStore数据存储/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>

@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>Jetpack Compose动画学习-自定义动画 | Wenyi&#39;s Blog</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/03/Jetpack-Compose%E5%8A%A8%E7%94%BB%E5%AD%A6%E4%B9%A0-%E8%87%AA%E5%AE%9A%E4%B9%89%E5%8A%A8%E7%94%BB/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="Android, Jetpack Compose, Kotlin, 动画" />
+  
+  <meta name="description" content="前言Jetpack Compose 提供了一套创新的声明式动画系统，通过状态驱动实现 UI 的动态效果。相比传统 Android 动画，Compose 动画具有更简洁的声明式语法、与 UI 状态深度绑定、可组合性强等优势。 AnimationSpec 参数大多数动画 API 允许开发者通过可选的 AnimationSpec 参数来自定义动画规范。 12345val alpha: Float by">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Jetpack Compose动画学习-自定义动画">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/03/Jetpack-Compose%E5%8A%A8%E7%94%BB%E5%AD%A6%E4%B9%A0-%E8%87%AA%E5%AE%9A%E4%B9%89%E5%8A%A8%E7%94%BB/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:description" content="前言Jetpack Compose 提供了一套创新的声明式动画系统，通过状态驱动实现 UI 的动态效果。相比传统 Android 动画，Compose 动画具有更简洁的声明式语法、与 UI 状态深度绑定、可组合性强等优势。 AnimationSpec 参数大多数动画 API 允许开发者通过可选的 AnimationSpec 参数来自定义动画规范。 12345val alpha: Float by">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-04-03T23:05:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T15:03:46.044Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="Jetpack Compose">
+<meta property="article:tag" content="Kotlin">
+<meta property="article:tag" content="动画">
+<meta name="twitter:card" content="summary">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Jetpack Compose动画学习-自定义动画","description":"前言Jetpack Compose 提供了一套创新的声明式动画系统，通过状态驱动实现 UI 的动态效果。相比传统 Android 动画，Compose 动画具...","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:05:00.000Z","dateModified":"2026-04-03T15:03:46.044Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Jetpack-Compose%E5%8A%A8%E7%94%BB%E5%AD%A6%E4%B9%A0-%E8%87%AA%E5%AE%9A%E4%B9%89%E5%8A%A8%E7%94%BB/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/03/Jetpack-Compose%E5%8A%A8%E7%94%BB%E5%AD%A6%E4%B9%A0-%E8%87%AA%E5%AE%9A%E4%B9%89%E5%8A%A8%E7%94%BB/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Jetpack Compose动画学习-自定义动画</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-03T23:05:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-03</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~4.60K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Jetpack Compose 提供了一套创新的声明式动画系统，通过状态驱动实现 UI 的动态效果。相比传统 Android 动画，Compose 动画具有更简洁的声明式语法、与 UI 状态深度绑定、可组合性强等优势。</p>
+<h2 id="AnimationSpec-参数"><a href="#AnimationSpec-参数" class="headerlink" title="AnimationSpec 参数"></a>AnimationSpec 参数</h2><p>大多数动画 API 允许开发者通过可选的 <code>AnimationSpec</code> 参数来自定义动画规范。</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> alpha: <span class="built_in">Float</span> <span class="keyword">by</span> animateFloatAsState(</span><br><span class="line">    targetValue = <span class="keyword">if</span> (enabled) <span class="number">1f</span> <span class="keyword">else</span> <span class="number">0.5f</span>,</span><br><span class="line">    animationSpec = tween(durationMillis = <span class="number">300</span>, easing = FastOutSlowInEasing),</span><br><span class="line">    label = <span class="string">&quot;alpha&quot;</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="一、spring-基于物理特性的动画"><a href="#一、spring-基于物理特性的动画" class="headerlink" title="一、spring - 基于物理特性的动画"></a>一、spring - 基于物理特性的动画</h2><p><code>spring</code> 可在起始值和结束值之间创建基于物理特性的动画。</p>
+<h3 id="参数"><a href="#参数" class="headerlink" title="参数"></a>参数</h3><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>描述</th>
+<th>默认值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>dampingRatio</code></td>
+<td>弹簧的弹性</td>
+<td><code>Spring.DampingRatioNoBouncy</code></td>
+</tr>
+<tr>
+<td><code>stiffness</code></td>
+<td>弹簧向结束值移动的速度</td>
+<td><code>Spring.StiffnessMedium</code></td>
+</tr>
+</tbody></table>
+<h3 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> value <span class="keyword">by</span> animateFloatAsState(</span><br><span class="line">    targetValue = <span class="number">1f</span>,</span><br><span class="line">    animationSpec = spring(</span><br><span class="line">        dampingRatio = Spring.DampingRatioHighBouncy,</span><br><span class="line">        stiffness = Spring.StiffnessMedium</span><br><span class="line">    ),</span><br><span class="line">    label = <span class="string">&quot;spring spec&quot;</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<h3 id="优势"><a href="#优势" class="headerlink" title="优势"></a>优势</h3><p>相比基于时长的 <code>AnimationSpec</code> 类型，<code>spring</code> 可以更流畅地处理中断，因为它可以在目标值在动画中变化时保证速度的连续性。</p>
+<hr>
+<h2 id="二、tween-基于时长的动画"><a href="#二、tween-基于时长的动画" class="headerlink" title="二、tween - 基于时长的动画"></a>二、tween - 基于时长的动画</h2><p><code>tween</code> 在指定的 <code>durationMillis</code> 内使用缓和曲线在起始值和结束值之间添加动画效果。</p>
+<h3 id="参数-1"><a href="#参数-1" class="headerlink" title="参数"></a>参数</h3><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>durationMillis</code></td>
+<td>动画时长</td>
+</tr>
+<tr>
+<td><code>delayMillis</code></td>
+<td>延迟开始时间</td>
+</tr>
+<tr>
+<td><code>easing</code></td>
+<td>缓和曲线</td>
+</tr>
+</tbody></table>
+<h3 id="示例-1"><a href="#示例-1" class="headerlink" title="示例"></a>示例</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> value <span class="keyword">by</span> animateFloatAsState(</span><br><span class="line">    targetValue = <span class="number">1f</span>,</span><br><span class="line">    animationSpec = tween(</span><br><span class="line">        durationMillis = <span class="number">300</span>,</span><br><span class="line">        delayMillis = <span class="number">50</span>,</span><br><span class="line">        easing = LinearOutSlowInEasing</span><br><span class="line">    ),</span><br><span class="line">    label = <span class="string">&quot;tween delay&quot;</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="三、keyframes-关键帧动画"><a href="#三、keyframes-关键帧动画" class="headerlink" title="三、keyframes - 关键帧动画"></a>三、keyframes - 关键帧动画</h2><p><code>keyframes</code> 会根据在动画时长内的不同时间戳中指定的快照值添加动画效果。</p>
+<h3 id="示例-2"><a href="#示例-2" class="headerlink" title="示例"></a>示例</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> value <span class="keyword">by</span> animateFloatAsState(</span><br><span class="line">    targetValue = <span class="number">1f</span>,</span><br><span class="line">    animationSpec = keyframes &#123;</span><br><span class="line">        durationMillis = <span class="number">375</span></span><br><span class="line">        <span class="number">0.0f</span> at <span class="number">0</span> using LinearOutSlowInEasing <span class="comment">// 0-15 ms</span></span><br><span class="line">        <span class="number">0.2f</span> at <span class="number">15</span> using FastOutLinearInEasing <span class="comment">// 15-75 ms</span></span><br><span class="line">        <span class="number">0.4f</span> at <span class="number">75</span> <span class="comment">// ms</span></span><br><span class="line">        <span class="number">0.4f</span> at <span class="number">225</span> <span class="comment">// ms</span></span><br><span class="line">    &#125;,</span><br><span class="line">    label = <span class="string">&quot;keyframe&quot;</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="四、keyframesWithSplines-平滑关键帧动画"><a href="#四、keyframesWithSplines-平滑关键帧动画" class="headerlink" title="四、keyframesWithSplines - 平滑关键帧动画"></a>四、keyframesWithSplines - 平滑关键帧动画</h2><p>如需创建在值之间转换时遵循平滑曲线的动画，可以使用 <code>keyframesWithSplines</code>。</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> offset <span class="keyword">by</span> animateOffsetAsState(</span><br><span class="line">    targetValue = Offset(<span class="number">300f</span>, <span class="number">300f</span>),</span><br><span class="line">    animationSpec = keyframesWithSpline &#123;</span><br><span class="line">        durationMillis = <span class="number">6000</span></span><br><span class="line">        Offset(<span class="number">0f</span>, <span class="number">0f</span>) at <span class="number">0</span></span><br><span class="line">        Offset(<span class="number">150f</span>, <span class="number">200f</span>) atFraction <span class="number">0.5f</span></span><br><span class="line">        Offset(<span class="number">0f</span>, <span class="number">100f</span>) atFraction <span class="number">0.7f</span></span><br><span class="line">    &#125;</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>基于样条曲线的关键帧对于屏幕上项的 2D 移动尤为有用。</p>
+<hr>
+<h2 id="五、repeatable-重复动画"><a href="#五、repeatable-重复动画" class="headerlink" title="五、repeatable - 重复动画"></a>五、repeatable - 重复动画</h2><p><code>repeatable</code> 反复运行基于时长的动画，直至达到指定的迭代计数。</p>
+<h3 id="参数-2"><a href="#参数-2" class="headerlink" title="参数"></a>参数</h3><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>iterations</code></td>
+<td>迭代次数</td>
+</tr>
+<tr>
+<td><code>animation</code></td>
+<td>动画规范</td>
+</tr>
+<tr>
+<td><code>repeatMode</code></td>
+<td>重复模式（Restart&#x2F;Reverse）</td>
+</tr>
+</tbody></table>
+<h3 id="示例-3"><a href="#示例-3" class="headerlink" title="示例"></a>示例</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> value <span class="keyword">by</span> animateFloatAsState(</span><br><span class="line">    targetValue = <span class="number">1f</span>,</span><br><span class="line">    animationSpec = repeatable(</span><br><span class="line">        iterations = <span class="number">3</span>,</span><br><span class="line">        animation = tween(durationMillis = <span class="number">300</span>),</span><br><span class="line">        repeatMode = RepeatMode.Reverse</span><br><span class="line">    ),</span><br><span class="line">    label = <span class="string">&quot;repeatable spec&quot;</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="六、infiniteRepeatable-无限重复动画"><a href="#六、infiniteRepeatable-无限重复动画" class="headerlink" title="六、infiniteRepeatable - 无限重复动画"></a>六、infiniteRepeatable - 无限重复动画</h2><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> value <span class="keyword">by</span> animateFloatAsState(</span><br><span class="line">    targetValue = <span class="number">1f</span>,</span><br><span class="line">    animationSpec = infiniteRepeatable(</span><br><span class="line">        animation = tween(durationMillis = <span class="number">300</span>),</span><br><span class="line">        repeatMode = RepeatMode.Reverse</span><br><span class="line">    ),</span><br><span class="line">    label = <span class="string">&quot;infinite repeatable&quot;</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="七、snap-立即切换"><a href="#七、snap-立即切换" class="headerlink" title="七、snap - 立即切换"></a>七、snap - 立即切换</h2><p><code>snap</code> 会立即将值切换到结束值。</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> value <span class="keyword">by</span> animateFloatAsState(</span><br><span class="line">    targetValue = <span class="number">1f</span>,</span><br><span class="line">    animationSpec = snap(delayMillis = <span class="number">50</span>),</span><br><span class="line">    label = <span class="string">&quot;snap spec&quot;</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="Easing-函数"><a href="#Easing-函数" class="headerlink" title="Easing 函数"></a>Easing 函数</h2><p>基于时长的 <code>AnimationSpec</code> 操作使用 <code>Easing</code> 来调整动画的小数值。</p>
+<h3 id="内置-Easing-函数"><a href="#内置-Easing-函数" class="headerlink" title="内置 Easing 函数"></a>内置 Easing 函数</h3><table>
+<thead>
+<tr>
+<th>Easing</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>FastOutSlowInEasing</code></td>
+<td>快出慢入</td>
+</tr>
+<tr>
+<td><code>LinearOutSlowInEasing</code></td>
+<td>线性出慢入</td>
+</tr>
+<tr>
+<td><code>FastOutLinearEasing</code></td>
+<td>快出线性入</td>
+</tr>
+<tr>
+<td><code>LinearEasing</code></td>
+<td>线性</td>
+</tr>
+<tr>
+<td><code>CubicBezierEasing</code></td>
+<td>贝塞尔曲线</td>
+</tr>
+</tbody></table>
+<h3 id="自定义-Easing"><a href="#自定义-Easing" class="headerlink" title="自定义 Easing"></a>自定义 Easing</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> CustomEasing = Easing &#123; fraction -&gt; fraction * fraction &#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Composable</span></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">EasingUsage</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">val</span> value <span class="keyword">by</span> animateFloatAsState(</span><br><span class="line">        targetValue = <span class="number">1f</span>,</span><br><span class="line">        animationSpec = tween(</span><br><span class="line">            durationMillis = <span class="number">300</span>,</span><br><span class="line">            easing = CustomEasing</span><br><span class="line">        ),</span><br><span class="line">        label = <span class="string">&quot;custom easing&quot;</span></span><br><span class="line">    )</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="自定义数据类型动画"><a href="#自定义数据类型动画" class="headerlink" title="自定义数据类型动画"></a>自定义数据类型动画</h2><h3 id="TwoWayConverter"><a href="#TwoWayConverter" class="headerlink" title="TwoWayConverter"></a>TwoWayConverter</h3><p>任何动画值都表示为 <code>AnimationVector</code>。使用 <code>TwoWayConverter</code> 将值转换为 <code>AnimationVector</code>，反之亦然。</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> IntToVector: TwoWayConverter&lt;<span class="built_in">Int</span>, AnimationVector1D&gt; =</span><br><span class="line">    TwoWayConverter(</span><br><span class="line">        &#123; AnimationVector1D(it.toFloat()) &#125;,</span><br><span class="line">        &#123; it.value.toInt() &#125;</span><br><span class="line">    )</span><br></pre></td></tr></table></figure>
+
+<h3 id="AnimationVector-类型"><a href="#AnimationVector-类型" class="headerlink" title="AnimationVector 类型"></a>AnimationVector 类型</h3><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>维度</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>AnimationVector1D</code></td>
+<td>1 个浮点值</td>
+</tr>
+<tr>
+<td><code>AnimationVector2D</code></td>
+<td>2 个浮点值</td>
+</tr>
+<tr>
+<td><code>AnimationVector3D</code></td>
+<td>3 个浮点值</td>
+</tr>
+<tr>
+<td><code>AnimationVector4D</code></td>
+<td>4 个浮点值</td>
+</tr>
+</tbody></table>
+<h3 id="自定义类型示例"><a href="#自定义类型示例" class="headerlink" title="自定义类型示例"></a>自定义类型示例</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">MySize</span>(<span class="keyword">val</span> width: Dp, <span class="keyword">val</span> height: Dp)</span><br><span class="line"></span><br><span class="line"><span class="meta">@Composable</span></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">MyAnimation</span><span class="params">(targetSize: <span class="type">MySize</span>)</span></span> &#123;</span><br><span class="line">    <span class="keyword">val</span> animSize: MySize <span class="keyword">by</span> animateValueAsState(</span><br><span class="line">        targetSize,</span><br><span class="line">        TwoWayConverter(</span><br><span class="line">            convertToVector = &#123; size: MySize -&gt;</span><br><span class="line">                AnimationVector2D(size.width.value, size.height.value)</span><br><span class="line">            &#125;,</span><br><span class="line">            convertFromVector = &#123; vector: AnimationVector2D -&gt;</span><br><span class="line">                MySize(vector.v1.dp, vector.v2.dp)</span><br><span class="line">            &#125;</span><br><span class="line">        ),</span><br><span class="line">        label = <span class="string">&quot;size&quot;</span></span><br><span class="line">    )</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="内置-VectorConverter"><a href="#内置-VectorConverter" class="headerlink" title="内置 VectorConverter"></a>内置 VectorConverter</h3><ul>
+<li><code>Color.VectorConverter</code></li>
+<li><code>Dp.VectorConverter</code></li>
+<li><code>Offset.VectorConverter</code></li>
+<li><code>Int.VectorConverter</code></li>
+<li><code>Float.VectorConverter</code></li>
+<li><code>IntSize.VectorConverter</code></li>
+</ul>
+<hr>
+<h2 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://developer.android.google.cn/develop/ui/compose/animation/customize?hl=zh-cn">自定义动画 | Android Developers</a></li>
+<li><a target="_blank" rel="noopener" href="https://m3.material.io/styles/motion/easing-and-duration/applying-easing-and-duration">速度 - Material Design</a></li>
+</ul>
+<hr>
+<p><em>持续学习中…</em></p>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/Android/" rel="tag">Android</a>, <a class="tag-none-link" href="/blog/tags/Jetpack-Compose/" rel="tag">Jetpack Compose</a>, <a class="tag-none-link" href="/blog/tags/Kotlin/" rel="tag">Kotlin</a>, <a class="tag-none-link" href="/blog/tags/%E5%8A%A8%E7%94%BB/" rel="tag">动画</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-03T15:03:46.044Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Android逆向分析-Xposed模块开发实战" href="/blog/2026/04/03/Android逆向分析-Xposed模块开发实战/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" Kotlin Serialization-JSON序列化学习" href="/blog/2026/04/03/Kotlin-Serialization-JSON序列化学习/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>

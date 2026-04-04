@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>Kotlin委托模式学习-类委托与属性委托 | Wenyi&#39;s Blog</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/03/Kotlin%E5%A7%94%E6%89%98%E6%A8%A1%E5%BC%8F%E5%AD%A6%E4%B9%A0-%E7%B1%BB%E5%A7%94%E6%89%98%E4%B8%8E%E5%B1%9E%E6%80%A7%E5%A7%94%E6%89%98/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="Delegate, Kotlin, 委托, 设计模式" />
+  
+  <meta name="description" content="前言委托模式（Delegation pattern）已被证明是实现继承的良好替代方案，Kotlin 原生支持委托，无需样板代码。 一、类委托基本语法1234567891011121314interface Base &#123;    fun print()&#125;class BaseImpl(val x: Int) : Base &#123;    override fun print()">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kotlin委托模式学习-类委托与属性委托">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/03/Kotlin%E5%A7%94%E6%89%98%E6%A8%A1%E5%BC%8F%E5%AD%A6%E4%B9%A0-%E7%B1%BB%E5%A7%94%E6%89%98%E4%B8%8E%E5%B1%9E%E6%80%A7%E5%A7%94%E6%89%98/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:description" content="前言委托模式（Delegation pattern）已被证明是实现继承的良好替代方案，Kotlin 原生支持委托，无需样板代码。 一、类委托基本语法1234567891011121314interface Base &#123;    fun print()&#125;class BaseImpl(val x: Int) : Base &#123;    override fun print()">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-04-03T23:20:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T15:21:29.200Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="Delegate">
+<meta property="article:tag" content="Kotlin">
+<meta property="article:tag" content="委托">
+<meta property="article:tag" content="设计模式">
+<meta name="twitter:card" content="summary">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Kotlin委托模式学习-类委托与属性委托","description":"前言委托模式（Delegation pattern）已被证明是实现继承的良好替代方案，Kotlin 原生支持委托，无需样板代码。\n","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-03T23:20:00.000Z","dateModified":"2026-04-03T15:21:29.200Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/03/Kotlin%E5%A7%94%E6%89%98%E6%A8%A1%E5%BC%8F%E5%AD%A6%E4%B9%A0-%E7%B1%BB%E5%A7%94%E6%89%98%E4%B8%8E%E5%B1%9E%E6%80%A7%E5%A7%94%E6%89%98/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/03/Kotlin%E5%A7%94%E6%89%98%E6%A8%A1%E5%BC%8F%E5%AD%A6%E4%B9%A0-%E7%B1%BB%E5%A7%94%E6%89%98%E4%B8%8E%E5%B1%9E%E6%80%A7%E5%A7%94%E6%89%98/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Kotlin委托模式学习-类委托与属性委托</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-03T23:20:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-03</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~5.77K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>委托模式（Delegation pattern）已被证明是实现继承的良好替代方案，Kotlin 原生支持委托，无需样板代码。</p>
+<h2 id="一、类委托"><a href="#一、类委托" class="headerlink" title="一、类委托"></a>一、类委托</h2><h3 id="基本语法"><a href="#基本语法" class="headerlink" title="基本语法"></a>基本语法</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">interface</span> <span class="title class_">Base</span> &#123;</span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">print</span><span class="params">()</span></span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">BaseImpl</span>(<span class="keyword">val</span> x: <span class="built_in">Int</span>) : Base &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">print</span><span class="params">()</span></span> &#123; print(x) &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Derived</span>(b: Base) : Base <span class="keyword">by</span> b</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">val</span> base = BaseImpl(<span class="number">10</span>)</span><br><span class="line">    Derived(base).print() <span class="comment">// 10</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>by</code> 子句表示 <code>b</code> 将在 <code>Derived</code> 对象内部存储，编译器会生成所有 <code>Base</code> 的方法，转发给 <code>b</code>。</p>
+<h3 id="覆盖委托成员"><a href="#覆盖委托成员" class="headerlink" title="覆盖委托成员"></a>覆盖委托成员</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">interface</span> <span class="title class_">Base</span> &#123;</span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">printMessage</span><span class="params">()</span></span></span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">printMessageLine</span><span class="params">()</span></span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">BaseImpl</span>(<span class="keyword">val</span> x: <span class="built_in">Int</span>) : Base &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">printMessage</span><span class="params">()</span></span> &#123; print(x) &#125;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">printMessageLine</span><span class="params">()</span></span> &#123; println(x) &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Derived</span>(b: Base) : Base <span class="keyword">by</span> b &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">printMessage</span><span class="params">()</span></span> &#123; print(<span class="string">&quot;abc&quot;</span>) &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">val</span> base = BaseImpl(<span class="number">10</span>)</span><br><span class="line">    Derived(base).printMessage() <span class="comment">// abc</span></span><br><span class="line">    Derived(base).printMessageLine() <span class="comment">// 10</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h3><p>委托对象只能访问自己的实现：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">interface</span> <span class="title class_">Base</span> &#123;</span><br><span class="line">    <span class="keyword">val</span> message: String</span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">print</span><span class="params">()</span></span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">BaseImpl</span>(x: <span class="built_in">Int</span>) : Base &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="keyword">val</span> message = <span class="string">&quot;BaseImpl: x = <span class="variable">$x</span>&quot;</span></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">print</span><span class="params">()</span></span> &#123; println(message) &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Derived</span>(b: Base) : Base <span class="keyword">by</span> b &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="keyword">val</span> message = <span class="string">&quot;Message of Derived&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">val</span> b = BaseImpl(<span class="number">10</span>)</span><br><span class="line">    <span class="keyword">val</span> derived = Derived(b)</span><br><span class="line">    derived.print() <span class="comment">// BaseImpl: x = 10</span></span><br><span class="line">    println(derived.message) <span class="comment">// Message of Derived</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="二、属性委托"><a href="#二、属性委托" class="headerlink" title="二、属性委托"></a>二、属性委托</h2><h3 id="延迟属性（lazy）"><a href="#延迟属性（lazy）" class="headerlink" title="延迟属性（lazy）"></a>延迟属性（lazy）</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> lazyValue: String <span class="keyword">by</span> lazy &#123;</span><br><span class="line">    println(<span class="string">&quot;computed!&quot;</span>)</span><br><span class="line">    <span class="string">&quot;Hello&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    println(lazyValue) <span class="comment">// computed! \n Hello</span></span><br><span class="line">    println(lazyValue) <span class="comment">// Hello（不再计算）</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="可观察属性（observable）"><a href="#可观察属性（observable）" class="headerlink" title="可观察属性（observable）"></a>可观察属性（observable）</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> kotlin.properties.Delegates</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> name: String <span class="keyword">by</span> Delegates.observable(<span class="string">&quot;&lt;no name&gt;&quot;</span>) &#123; </span><br><span class="line">    _, old, new -&gt;</span><br><span class="line">    println(<span class="string">&quot;Name changed from <span class="variable">$old</span> to <span class="variable">$new</span>&quot;</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    name = <span class="string">&quot;Alice&quot;</span> <span class="comment">// Name changed from &lt;no name&gt; to Alice</span></span><br><span class="line">    name = <span class="string">&quot;Bob&quot;</span> <span class="comment">// Name changed from Alice to Bob</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="否决属性（vetoable）"><a href="#否决属性（vetoable）" class="headerlink" title="否决属性（vetoable）"></a>否决属性（vetoable）</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> age: <span class="built_in">Int</span> <span class="keyword">by</span> Delegates.vetoable(<span class="number">0</span>) &#123; _, old, new -&gt;</span><br><span class="line">    <span class="keyword">if</span> (new &lt; <span class="number">0</span>) &#123;</span><br><span class="line">        println(<span class="string">&quot;Age cannot be negative&quot;</span>)</span><br><span class="line">        <span class="literal">false</span> <span class="comment">// 拒绝修改</span></span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="literal">true</span> <span class="comment">// 允许修改</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    age = <span class="number">25</span> <span class="comment">// 允许</span></span><br><span class="line">    age = -<span class="number">5</span> <span class="comment">// Age cannot be negative，拒绝</span></span><br><span class="line">    println(age) <span class="comment">// 25</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="映射属性"><a href="#映射属性" class="headerlink" title="映射属性"></a>映射属性</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">User</span>(<span class="keyword">val</span> map: Map&lt;String, Any?&gt;) &#123;</span><br><span class="line">    <span class="keyword">val</span> name: String <span class="keyword">by</span> map</span><br><span class="line">    <span class="keyword">val</span> age: <span class="built_in">Int</span> <span class="keyword">by</span> map</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">val</span> user = User(mapOf(</span><br><span class="line">        <span class="string">&quot;name&quot;</span> to <span class="string">&quot;Alice&quot;</span>,</span><br><span class="line">        <span class="string">&quot;age&quot;</span> to <span class="number">25</span></span><br><span class="line">    ))</span><br><span class="line">    println(user.name) <span class="comment">// Alice</span></span><br><span class="line">    println(user.age) <span class="comment">// 25</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="三、自定义委托"><a href="#三、自定义委托" class="headerlink" title="三、自定义委托"></a>三、自定义委托</h2><h3 id="定义-ReadWriteProperty"><a href="#定义-ReadWriteProperty" class="headerlink" title="定义 ReadWriteProperty"></a>定义 ReadWriteProperty</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> kotlin.properties.ReadWriteProperty</span><br><span class="line"><span class="keyword">import</span> kotlin.reflect.KProperty</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">LoggingDelegate</span>&lt;<span class="type">T</span>&gt;(<span class="keyword">private</span> <span class="keyword">var</span> value: T) : ReadWriteProperty&lt;Any?, T&gt; &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">getValue</span><span class="params">(thisRef: <span class="type">Any</span>?, property: <span class="type">KProperty</span>&lt;*&gt;)</span></span>: T &#123;</span><br><span class="line">        println(<span class="string">&quot;Getting <span class="subst">$&#123;property.name&#125;</span>: <span class="variable">$value</span>&quot;</span>)</span><br><span class="line">        <span class="keyword">return</span> value</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">setValue</span><span class="params">(thisRef: <span class="type">Any</span>?, property: <span class="type">KProperty</span>&lt;*&gt;, value: <span class="type">T</span>)</span></span> &#123;</span><br><span class="line">        println(<span class="string">&quot;Setting <span class="subst">$&#123;property.name&#125;</span>: <span class="variable">$value</span>&quot;</span>)</span><br><span class="line">        <span class="keyword">this</span>.value = value</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Example</span> &#123;</span><br><span class="line">    <span class="keyword">var</span> name: String <span class="keyword">by</span> LoggingDelegate(<span class="string">&quot;Default&quot;</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">val</span> example = Example()</span><br><span class="line">    println(example.name) <span class="comment">// Getting name: Default</span></span><br><span class="line">    example.name = <span class="string">&quot;Alice&quot;</span> <span class="comment">// Setting name: Alice</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="使用-provideDelegate"><a href="#使用-provideDelegate" class="headerlink" title="使用 provideDelegate"></a>使用 provideDelegate</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">ResourceLoader</span> &#123;</span><br><span class="line">    <span class="keyword">operator</span> <span class="function"><span class="keyword">fun</span> <span class="title">provideDelegate</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">        thisRef: <span class="type">Any</span>?,</span></span></span><br><span class="line"><span class="params"><span class="function">        property: <span class="type">KProperty</span>&lt;*&gt;</span></span></span><br><span class="line"><span class="params"><span class="function">    )</span></span>: ReadOnlyProperty&lt;Any?, String&gt; &#123;</span><br><span class="line">        <span class="comment">// 在属性初始化时执行逻辑</span></span><br><span class="line">        println(<span class="string">&quot;Creating delegate for <span class="subst">$&#123;property.name&#125;</span>&quot;</span>)</span><br><span class="line">        <span class="keyword">return</span> ReadOnlyProperty &#123; _, _ -&gt; <span class="string">&quot;Value&quot;</span> &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> resource: String <span class="keyword">by</span> ResourceLoader()</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、标准委托"><a href="#四、标准委托" class="headerlink" title="四、标准委托"></a>四、标准委托</h2><table>
+<thead>
+<tr>
+<th>委托</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>lazy</code></td>
+<td>延迟初始化</td>
+</tr>
+<tr>
+<td><code>Delegates.observable</code></td>
+<td>属性变化通知</td>
+</tr>
+<tr>
+<td><code>Delegates.vetoable</code></td>
+<td>条件性属性修改</td>
+</tr>
+<tr>
+<td><code>Delegates.notNull</code></td>
+<td>非空属性延迟初始化</td>
+</tr>
+<tr>
+<td><code>map</code></td>
+<td>映射属性</td>
+</tr>
+</tbody></table>
+<h2 id="五、委托-vs-继承"><a href="#五、委托-vs-继承" class="headerlink" title="五、委托 vs 继承"></a>五、委托 vs 继承</h2><table>
+<thead>
+<tr>
+<th>特性</th>
+<th>委托</th>
+<th>继承</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>耦合度</strong></td>
+<td>松散</td>
+<td>紧密</td>
+</tr>
+<tr>
+<td><strong>灵活性</strong></td>
+<td>运行时改变</td>
+<td>编译时固定</td>
+</tr>
+<tr>
+<td><strong>多继承</strong></td>
+<td>支持</td>
+<td>不支持</td>
+</tr>
+<tr>
+<td><strong>代码复用</strong></td>
+<td>组合优于继承</td>
+<td>IS-A 关系</td>
+</tr>
+</tbody></table>
+<h2 id="六、实际应用"><a href="#六、实际应用" class="headerlink" title="六、实际应用"></a>六、实际应用</h2><h3 id="Android-ViewModel-委托"><a href="#Android-ViewModel-委托" class="headerlink" title="Android ViewModel 委托"></a>Android ViewModel 委托</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MainViewModel</span>(</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> repository: Repository</span><br><span class="line">) : Repository <span class="keyword">by</span> repository &#123;</span><br><span class="line">    <span class="comment">// 自动继承 Repository 的方法</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="属性委托存储"><a href="#属性委托存储" class="headerlink" title="属性委托存储"></a>属性委托存储</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">SharedPreferencesDelegate</span>&lt;<span class="type">T</span>&gt;(</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> prefs: SharedPreferences,</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> key: String,</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> defaultValue: T</span><br><span class="line">) : ReadWriteProperty&lt;Any?, T&gt; &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Suppress(<span class="string">&quot;UNCHECKED_CAST&quot;</span>)</span></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">getValue</span><span class="params">(thisRef: <span class="type">Any</span>?, property: <span class="type">KProperty</span>&lt;*&gt;)</span></span>: T &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">when</span> (defaultValue) &#123;</span><br><span class="line">            <span class="keyword">is</span> String -&gt; prefs.getString(key, defaultValue) <span class="keyword">as</span> T</span><br><span class="line">            <span class="keyword">is</span> <span class="built_in">Int</span> -&gt; prefs.getInt(key, defaultValue) <span class="keyword">as</span> T</span><br><span class="line">            <span class="keyword">is</span> <span class="built_in">Boolean</span> -&gt; prefs.getBoolean(key, defaultValue) <span class="keyword">as</span> T</span><br><span class="line">            <span class="keyword">else</span> -&gt; <span class="keyword">throw</span> IllegalArgumentException(<span class="string">&quot;Unsupported type&quot;</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">setValue</span><span class="params">(thisRef: <span class="type">Any</span>?, property: <span class="type">KProperty</span>&lt;*&gt;, value: <span class="type">T</span>)</span></span> &#123;</span><br><span class="line">        with(prefs.edit()) &#123;</span><br><span class="line">            <span class="keyword">when</span> (value) &#123;</span><br><span class="line">                <span class="keyword">is</span> String -&gt; putString(key, value)</span><br><span class="line">                <span class="keyword">is</span> <span class="built_in">Int</span> -&gt; putInt(key, value)</span><br><span class="line">                <span class="keyword">is</span> <span class="built_in">Boolean</span> -&gt; putBoolean(key, value)</span><br><span class="line">                <span class="keyword">else</span> -&gt; <span class="keyword">throw</span> IllegalArgumentException(<span class="string">&quot;Unsupported type&quot;</span>)</span><br><span class="line">            &#125;</span><br><span class="line">            apply()</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="七、最佳实践"><a href="#七、最佳实践" class="headerlink" title="七、最佳实践"></a>七、最佳实践</h2><ol>
+<li><strong>优先使用委托而非继承</strong>：组合优于继承</li>
+<li><strong>合理使用 lazy</strong>：避免不必要的初始化</li>
+<li><strong>注意线程安全</strong>：lazy 默认是线程安全的</li>
+<li><strong>避免过度委托</strong>：保持代码可读性</li>
+<li><strong>理解委托的生命周期</strong>：避免内存泄漏</li>
+</ol>
+<h2 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://kotlinlang.org/docs/delegation.html">Delegation | Kotlin Documentation</a></li>
+<li><a target="_blank" rel="noopener" href="https://book.kotlincn.net/text/delegated-properties.html">属性委托 · Kotlin 官方文档 中文版</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/jzssuanfa/p/19813208">深入解析Kotlin委托</a></li>
+</ul>
+<hr>
+<p><em>持续学习中…</em></p>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/Delegate/" rel="tag">Delegate</a>, <a class="tag-none-link" href="/blog/tags/Kotlin/" rel="tag">Kotlin</a>, <a class="tag-none-link" href="/blog/tags/%E5%A7%94%E6%89%98/" rel="tag">委托</a>, <a class="tag-none-link" href="/blog/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-03T15:21:29.200Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Android WebView与JSBridge交互学习" href="/blog/2026/04/03/Android-WebView与JSBridge交互学习/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" Android IPC Binder进程间通信学习" href="/blog/2026/04/03/Android-IPC-Binder进程间通信学习/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>

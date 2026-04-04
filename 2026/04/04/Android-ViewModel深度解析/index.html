@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>Android ViewModel深度解析 | Wenyi&#39;s Blog</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/04/Android-ViewModel%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="Android, Jetpack, ViewModel, 状态管理" />
+  
+  <meta name="description" content="前言ViewModel 类是业务逻辑或屏幕级状态容器，用于将状态公开给界面，并封装相关的业务逻辑。它的主要优点是可以缓存状态，并可在配置更改后持久保留相应状态。 一、ViewModel 的优势1. 持久性ViewModel 允许数据在配置更改（如屏幕旋转）后持久存在，无需重新提取数据。 2. 业务逻辑访问ViewModel 是在界面层处理业务逻辑的正确位置，负责处理事件并委托给其他层。 二、Vie">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android ViewModel深度解析">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/04/Android-ViewModel%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:description" content="前言ViewModel 类是业务逻辑或屏幕级状态容器，用于将状态公开给界面，并封装相关的业务逻辑。它的主要优点是可以缓存状态，并可在配置更改后持久保留相应状态。 一、ViewModel 的优势1. 持久性ViewModel 允许数据在配置更改（如屏幕旋转）后持久存在，无需重新提取数据。 2. 业务逻辑访问ViewModel 是在界面层处理业务逻辑的正确位置，负责处理事件并委托给其他层。 二、Vie">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-04-04T02:20:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T18:18:56.472Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="Jetpack">
+<meta property="article:tag" content="ViewModel">
+<meta property="article:tag" content="状态管理">
+<meta name="twitter:card" content="summary">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Android ViewModel深度解析","description":"前言ViewModel 类是业务逻辑或屏幕级状态容器，用于将状态公开给界面，并封装相关的业务逻辑。它的主要优点是可以缓存状态，并可在配置更改后持久保留相应状态...","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-04T02:20:00.000Z","dateModified":"2026-04-03T18:18:56.472Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/04/Android-ViewModel%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/04/Android-ViewModel%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Android ViewModel深度解析</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-04T02:20:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-04</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~4.84K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>ViewModel 类是业务逻辑或屏幕级状态容器，用于将状态公开给界面，并封装相关的业务逻辑。它的主要优点是可以缓存状态，并可在配置更改后持久保留相应状态。</p>
+<h2 id="一、ViewModel-的优势"><a href="#一、ViewModel-的优势" class="headerlink" title="一、ViewModel 的优势"></a>一、ViewModel 的优势</h2><h3 id="1-持久性"><a href="#1-持久性" class="headerlink" title="1. 持久性"></a>1. 持久性</h3><p>ViewModel 允许数据在配置更改（如屏幕旋转）后持久存在，无需重新提取数据。</p>
+<h3 id="2-业务逻辑访问"><a href="#2-业务逻辑访问" class="headerlink" title="2. 业务逻辑访问"></a>2. 业务逻辑访问</h3><p>ViewModel 是在界面层处理业务逻辑的正确位置，负责处理事件并委托给其他层。</p>
+<h2 id="二、ViewModel-作用域"><a href="#二、ViewModel-作用域" class="headerlink" title="二、ViewModel 作用域"></a>二、ViewModel 作用域</h2><p>实例化 ViewModel 时，向其传递实现 ViewModelStoreOwner 接口的对象：</p>
+<ul>
+<li>Navigation 目的地</li>
+<li>Navigation 图表</li>
+<li>Activity</li>
+<li>Fragment</li>
+</ul>
+<p>ViewModel 会一直保留在内存中，直到其 ViewModelStoreOwner 永久消失。</p>
+<h2 id="三、实现-ViewModel"><a href="#三、实现-ViewModel" class="headerlink" title="三、实现 ViewModel"></a>三、实现 ViewModel</h2><h3 id="基本-Kotlin-实现"><a href="#基本-Kotlin-实现" class="headerlink" title="基本 Kotlin 实现"></a>基本 Kotlin 实现</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">DiceUiState</span>(</span><br><span class="line">    <span class="keyword">val</span> firstDieValue: <span class="built_in">Int</span>? = <span class="literal">null</span>,</span><br><span class="line">    <span class="keyword">val</span> secondDieValue: <span class="built_in">Int</span>? = <span class="literal">null</span>,</span><br><span class="line">    <span class="keyword">val</span> numberOfRolls: <span class="built_in">Int</span> = <span class="number">0</span>,</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">DiceRollViewModel</span> : <span class="type">ViewModel</span>() &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> _uiState = MutableStateFlow(DiceUiState())</span><br><span class="line">    <span class="keyword">val</span> uiState: StateFlow&lt;DiceUiState&gt; = _uiState.asStateFlow()</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">rollDice</span><span class="params">()</span></span> &#123;</span><br><span class="line">        _uiState.update &#123; currentState -&gt;</span><br><span class="line">            currentState.copy(</span><br><span class="line">                firstDieValue = Random.nextInt(from = <span class="number">1</span>, until = <span class="number">7</span>),</span><br><span class="line">                secondDieValue = Random.nextInt(from = <span class="number">1</span>, until = <span class="number">7</span>),</span><br><span class="line">                numberOfRolls = currentState.numberOfRolls + <span class="number">1</span>,</span><br><span class="line">            )</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="在-Activity-中使用"><a href="#在-Activity-中使用" class="headerlink" title="在 Activity 中使用"></a>在 Activity 中使用</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> androidx.activity.viewModels</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">DiceRollActivity</span> : <span class="type">AppCompatActivity</span>() &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onCreate</span><span class="params">(savedInstanceState: <span class="type">Bundle</span>?)</span></span> &#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState)</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">val</span> viewModel: DiceRollViewModel <span class="keyword">by</span> viewModels()</span><br><span class="line">        </span><br><span class="line">        lifecycleScope.launch &#123;</span><br><span class="line">            repeatOnLifecycle(Lifecycle.State.STARTED) &#123;</span><br><span class="line">                viewModel.uiState.collect &#123;</span><br><span class="line">                    <span class="comment">// 更新 UI</span></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="在-Compose-中使用"><a href="#在-Compose-中使用" class="headerlink" title="在 Compose 中使用"></a>在 Compose 中使用</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> androidx.lifecycle.viewmodel.compose.viewModel</span><br><span class="line"></span><br><span class="line"><span class="meta">@Composable</span></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">DiceRollScreen</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">    viewModel: <span class="type">DiceRollViewModel</span> = viewModel()</span></span></span><br><span class="line">) &#123;</span><br><span class="line">    <span class="keyword">val</span> uiState <span class="keyword">by</span> viewModel.uiState.collectAsStateWithLifecycle()</span><br><span class="line">    <span class="comment">// 更新 UI</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、SavedStateHandle"><a href="#四、SavedStateHandle" class="headerlink" title="四、SavedStateHandle"></a>四、SavedStateHandle</h2><p>SavedStateHandle 允许在进程重新创建过程中持久保留数据：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MyViewModel</span>(</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> savedStateHandle: SavedStateHandle</span><br><span class="line">) : ViewModel() &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> _data = savedStateHandle.getMutableStateFlow(<span class="string">&quot;key&quot;</span>, defaultValue)</span><br><span class="line">    <span class="keyword">val</span> <span class="keyword">data</span>: StateFlow&lt;String&gt; = _data</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">updateData</span><span class="params">(newValue: <span class="type">String</span>)</span></span> &#123;</span><br><span class="line">        savedStateHandle[<span class="string">&quot;key&quot;</span>] = newValue</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="五、ViewModel-生命周期"><a href="#五、ViewModel-生命周期" class="headerlink" title="五、ViewModel 生命周期"></a>五、ViewModel 生命周期</h2><p>ViewModel 的生命周期与其作用域直接关联：</p>
+<ul>
+<li><strong>Activity</strong>：在 activity 完成时销毁</li>
+<li><strong>Fragment</strong>：在 fragment 分离时销毁</li>
+<li><strong>Navigation 条目</strong>：在从返回堆栈移除时销毁</li>
+</ul>
+<h3 id="onCleared-方法"><a href="#onCleared-方法" class="headerlink" title="onCleared() 方法"></a>onCleared() 方法</h3><p>ViewModel 销毁时调用，用于清理资源：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MyViewModel</span>(</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> coroutineScope: CoroutineScope =</span><br><span class="line">        CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)</span><br><span class="line">) : ViewModel() &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onCleared</span><span class="params">()</span></span> &#123;</span><br><span class="line">        coroutineScope.cancel()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="使用-Closeable"><a href="#使用-Closeable" class="headerlink" title="使用 Closeable"></a>使用 Closeable</h3><p>从 Lifecycle 2.5 开始，可以传递 Closeable 对象：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">CloseableCoroutineScope</span>(</span><br><span class="line">    context: CoroutineContext = SupervisorJob() + Dispatchers.Main.immediate</span><br><span class="line">) : Closeable, CoroutineScope &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="keyword">val</span> coroutineContext: CoroutineContext = context</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">close</span><span class="params">()</span></span> &#123;</span><br><span class="line">        coroutineContext.cancel()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyViewModel</span>(</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> coroutineScope: CoroutineScope = CloseableCoroutineScope()</span><br><span class="line">) : ViewModel(coroutineScope) &#123;</span><br><span class="line">    <span class="comment">// ViewModel 逻辑</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="六、ViewModel-与协程"><a href="#六、ViewModel-与协程" class="headerlink" title="六、ViewModel 与协程"></a>六、ViewModel 与协程</h2><h3 id="viewModelScope"><a href="#viewModelScope" class="headerlink" title="viewModelScope"></a>viewModelScope</h3><p>ViewModel 内置的 CoroutineScope，自动遵循 ViewModel 生命周期：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MyViewModel</span> : <span class="type">ViewModel</span>() &#123;</span><br><span class="line">    <span class="keyword">init</span> &#123;</span><br><span class="line">        viewModelScope.launch &#123;</span><br><span class="line">            <span class="comment">// 协程会在 ViewModel 清除时自动取消</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="七、最佳实践"><a href="#七、最佳实践" class="headerlink" title="七、最佳实践"></a>七、最佳实践</h2><h3 id="1-用作屏幕级状态容器"><a href="#1-用作屏幕级状态容器" class="headerlink" title="1. 用作屏幕级状态容器"></a>1. 用作屏幕级状态容器</h3><p>ViewModel 应该作为屏幕级状态容器，不要用于可复用的 UI 组件。</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 正确：屏幕级 ViewModel</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">UserProfileViewModel</span> : <span class="type">ViewModel</span>()</span><br><span class="line"></span><br><span class="line"><span class="comment">// 错误：不要为可复用组件创建 ViewModel</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ChipViewModel</span> : <span class="type">ViewModel</span>() <span class="comment">// 不推荐</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="2-不暴露-UI-实现细节"><a href="#2-不暴露-UI-实现细节" class="headerlink" title="2. 不暴露 UI 实现细节"></a>2. 不暴露 UI 实现细节</h3><p>使用通用名称，适应不同设备类型：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 推荐</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ProfileViewModel</span> : <span class="type">ViewModel</span>() &#123;</span><br><span class="line">    <span class="keyword">sealed</span> <span class="keyword">class</span> <span class="title class_">State</span> &#123;</span><br><span class="line">        <span class="keyword">object</span> Loading : State()</span><br><span class="line">        <span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">Success</span>(<span class="keyword">val</span> <span class="keyword">data</span>: UserProfile) : State()</span><br><span class="line">        <span class="keyword">data</span> <span class="keyword">class</span> <span class="title class_">Error</span>(<span class="keyword">val</span> message: String) : State()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 不推荐</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">PhoneProfileViewModel</span> : <span class="type">ViewModel</span>() <span class="comment">// 设备特定</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="3-避免内存泄漏"><a href="#3-避免内存泄漏" class="headerlink" title="3. 避免内存泄漏"></a>3. 避免内存泄漏</h3><p>ViewModel 不应保留 Context 或 Resources 的引用：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 错误：持有 Context 引用</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyViewModel</span>(<span class="keyword">private</span> <span class="keyword">val</span> context: Context) : ViewModel()</span><br><span class="line"></span><br><span class="line"><span class="comment">// 正确：使用 Application Context 或依赖注入</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyViewModel</span>(<span class="keyword">private</span> <span class="keyword">val</span> application: Application) : ViewModel()</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-不要传递-ViewModel"><a href="#4-不要传递-ViewModel" class="headerlink" title="4. 不要传递 ViewModel"></a>4. 不要传递 ViewModel</h3><p>ViewModel 应该靠近平台管理：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 错误：传递 ViewModel</span></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">someFunction</span><span class="params">(viewModel: <span class="type">MyViewModel</span>)</span></span> &#123; &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 正确：在需要的地方获取 ViewModel</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyActivity</span> : <span class="type">AppCompatActivity</span>() &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> viewModel: MyViewModel <span class="keyword">by</span> viewModels()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="八、常见问题"><a href="#八、常见问题" class="headerlink" title="八、常见问题"></a>八、常见问题</h2><h3 id="问题-1：ViewModel-在配置更改后丢失数据"><a href="#问题-1：ViewModel-在配置更改后丢失数据" class="headerlink" title="问题 1：ViewModel 在配置更改后丢失数据"></a>问题 1：ViewModel 在配置更改后丢失数据</h3><p><strong>原因</strong>：未正确使用 ViewModel。</p>
+<p><strong>解决方案</strong>：确保 ViewModel 作用域正确，使用 by viewModels() 委托。</p>
+<h3 id="问题-2：ViewModel-内存泄漏"><a href="#问题-2：ViewModel-内存泄漏" class="headerlink" title="问题 2：ViewModel 内存泄漏"></a>问题 2：ViewModel 内存泄漏</h3><p><strong>原因</strong>：ViewModel 持有 Context 或其他生命周期敏感对象的引用。</p>
+<p><strong>解决方案</strong>：</p>
+<ul>
+<li>使用 Application Context</li>
+<li>使用依赖注入框架</li>
+<li>在 onCleared() 中清理引用</li>
+</ul>
+<h3 id="问题-3：ViewModel-与-Compose-配合问题"><a href="#问题-3：ViewModel-与-Compose-配合问题" class="headerlink" title="问题 3：ViewModel 与 Compose 配合问题"></a>问题 3：ViewModel 与 Compose 配合问题</h3><p><strong>原因</strong>：将 ViewModel 作用域限定为可组合项。</p>
+<p><strong>解决方案</strong>：将 ViewModel 作用域限定为 Navigation 目的地或 Activity。</p>
+<h2 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://developer.android.google.cn/topic/libraries/architecture/viewmodel?hl=zh-cn">ViewModel 概览 | Android Developers</a></li>
+<li><a target="_blank" rel="noopener" href="https://developer.android.google.cn/topic/architecture/ui-layer?hl=zh-cn">界面层 | Android Developers</a></li>
+</ul>
+<hr>
+<p><em>深入学习中…</em></p>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/Android/" rel="tag">Android</a>, <a class="tag-none-link" href="/blog/tags/Jetpack/" rel="tag">Jetpack</a>, <a class="tag-none-link" href="/blog/tags/ViewModel/" rel="tag">ViewModel</a>, <a class="tag-none-link" href="/blog/tags/%E7%8A%B6%E6%80%81%E7%AE%A1%E7%90%86/" rel="tag">状态管理</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-03T18:18:56.472Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Kotlin泛型深度解析-in-out-where" href="/blog/2026/04/04/Kotlin泛型深度解析-in-out-where/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" Kotlin集合框架深度解析" href="/blog/2026/04/04/Kotlin集合框架深度解析/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>

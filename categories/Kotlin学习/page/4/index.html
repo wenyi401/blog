@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>分类: Kotlin学习 | Wenyi&#39;s Blog</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/categories/Kotlin%E5%AD%A6%E4%B9%A0/page/4/index.html">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="" />
+  
+  <meta property="og:type" content="website">
+<meta property="og:title" content="分类: Kotlin学习">
+<meta property="og:url" content="https://wenyi401.github.io/blog/categories/Kotlin%E5%AD%A6%E4%B9%A0/page/4/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:locale" content="en_US">
+<meta property="article:author" content="Wenyi">
+<meta name="twitter:card" content="summary">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <!-- Breadcrumb for tag & category page -->
+
+    <article class="kratos-hentry kratos-entry-border clearfix">
+    <div class="kratos-breadcrumb">
+        <a href="/blog/">
+            <i class="fa fa-home"></i>
+        </a>
+        <i class="fa fa-angle-right"></i>
+        
+
+            <a href="/blog/categories/">
+                分类
+            </a>
+
+            
+            
+                <i class="fa fa-angle-right"></i>
+                <a href="/blog/categories/Kotlin%E5%AD%A6%E4%B9%A0/">
+                    Kotlin学习
+                </a>
+            
+        
+        
+            <i class="fa fa-angle-right"></i>
+            <span class="page-no">
+                第 4 页
+            </a>
+        
+    </div>
+</article>
+
+
+
+
+    
+    
+        <article class="kratos-hentry clearfix" itemscope itemtype="https://schema.org/Article">
+    <div class="kratos-entry-border clearfix">
+        
+        <div class="kratos-entry-post-main">
+            
+            
+                <div class="kratos-entry-thumb">
+                    <a href="/blog/2026/04/03/Kotlin%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8FRegex%E5%AE%9E%E6%88%98%E5%AD%A6%E4%B9%A0/">
+                        <img class="kratos-entry-thumb-img" src="/images/default.webp" alt="Kotlin正则表达式Regex实战学习">
+                    </a>
+                </div>
+            
+            <div class="kratos-entry-post-inner">
+                <header class="kratos-entry-header">
+                        <a class="label-link" href="/blog/categories/Kotlin%E5%AD%A6%E4%B9%A0/">Kotlin学习</a>
+                    <h2 class="kratos-entry-title"><a href="/blog/2026/04/03/Kotlin%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8FRegex%E5%AE%9E%E6%88%98%E5%AD%A6%E4%B9%A0/" itemprop="mainEntityOfPage"><span itemprop="name headline">Kotlin正则表达式Regex实战学习</span></a>
+                </header>
+                <div class="kratos-entry-content">
+                    <p itemProp="description">
+                        
+                            前言正则表达式是文本处理的强大工具。Kotlin 提供了简洁易用的 Regex 类，相比 Java 的 Pattern 和 Matcher 更加优雅。
+一、创建 Regex使用 Regex 构造函数1val regex &#x3D; Regex...
+                        
+                    </p>
+                </div>
+            </div>
+        </div>
+        <footer class="kratos-entry-post-meta">
+            <span class="pull-left">
+                <time datetime="2026-04-03T23:47:00.000Z" itemprop="datePublished">
+                    <a><i class="fa fa-calendar"></i> 2026-04-03</a>
+                </time>
+                <a>
+                    
+                        <i class="fa fa-tags"></i>
+                        <a class="tag-none-link" href="/blog/tags/Kotlin/" rel="tag">Kotlin</a>, <a class="tag-none-link" href="/blog/tags/Regex/" rel="tag">Regex</a>, <a class="tag-none-link" href="/blog/tags/%E5%8C%B9%E9%85%8D/" rel="tag">匹配</a>
+                    
+                </a>
+                
+                
+            </span>
+            <span class="pull-right">
+                <a class="read-more" href="/blog/2026/04/03/Kotlin%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8FRegex%E5%AE%9E%E6%88%98%E5%AD%A6%E4%B9%A0/" title="阅读全文">阅读全文<i class="fa fa-chevron-circle-right"></i></a>
+            </span>
+        </footer>
+    </div>
+</article>
+    
+
+    
+    
+        <article class="kratos-hentry clearfix" itemscope itemtype="https://schema.org/Article">
+    <div class="kratos-entry-border clearfix">
+        
+        <div class="kratos-entry-post-main">
+            
+            
+                <div class="kratos-entry-thumb">
+                    <a href="/blog/2026/04/03/Kotlin%E5%8D%8F%E7%A8%8BJob%E4%B8%8ESupervisorJob%E5%8F%96%E6%B6%88%E6%9C%BA%E5%88%B6/">
+                        <img class="kratos-entry-thumb-img" src="/images/default.webp" alt="Kotlin协程Job与SupervisorJob取消机制">
+                    </a>
+                </div>
+            
+            <div class="kratos-entry-post-inner">
+                <header class="kratos-entry-header">
+                        <a class="label-link" href="/blog/categories/Kotlin%E5%AD%A6%E4%B9%A0/">Kotlin学习</a>
+                    <h2 class="kratos-entry-title"><a href="/blog/2026/04/03/Kotlin%E5%8D%8F%E7%A8%8BJob%E4%B8%8ESupervisorJob%E5%8F%96%E6%B6%88%E6%9C%BA%E5%88%B6/" itemprop="mainEntityOfPage"><span itemprop="name headline">Kotlin协程Job与SupervisorJob取消机制</span></a>
+                </header>
+                <div class="kratos-entry-content">
+                    <p itemProp="description">
+                        
+                            前言在 Kotlin 协程中，Job 和 SupervisorJob 是管理协程生命周期的核心组件。理解它们的取消机制和异常传播规则对于编写健壮的异步代码至关重要。
+一、Job 概述什么是 Job？Job 是协程的生命周期控制器，代表...
+                        
+                    </p>
+                </div>
+            </div>
+        </div>
+        <footer class="kratos-entry-post-meta">
+            <span class="pull-left">
+                <time datetime="2026-04-03T23:46:00.000Z" itemprop="datePublished">
+                    <a><i class="fa fa-calendar"></i> 2026-04-03</a>
+                </time>
+                <a>
+                    
+                        <i class="fa fa-tags"></i>
+                        <a class="tag-none-link" href="/blog/tags/Coroutines/" rel="tag">Coroutines</a>, <a class="tag-none-link" href="/blog/tags/Job/" rel="tag">Job</a>, <a class="tag-none-link" href="/blog/tags/Kotlin/" rel="tag">Kotlin</a>
+                    
+                </a>
+                
+                
+            </span>
+            <span class="pull-right">
+                <a class="read-more" href="/blog/2026/04/03/Kotlin%E5%8D%8F%E7%A8%8BJob%E4%B8%8ESupervisorJob%E5%8F%96%E6%B6%88%E6%9C%BA%E5%88%B6/" title="阅读全文">阅读全文<i class="fa fa-chevron-circle-right"></i></a>
+            </span>
+        </footer>
+    </div>
+</article>
+    
+
+    
+    
+        <article class="kratos-hentry clearfix" itemscope itemtype="https://schema.org/Article">
+    <div class="kratos-entry-border clearfix">
+        
+        <div class="kratos-entry-post-main">
+            
+            
+                <div class="kratos-entry-thumb">
+                    <a href="/blog/2026/04/03/Kotlin-Collection%E6%93%8D%E4%BD%9C%E7%AC%A6%E5%AE%9E%E6%88%98-map-filter-fold/">
+                        <img class="kratos-entry-thumb-img" src="/images/default.webp" alt="Kotlin Collection操作符实战-map filter fold">
+                    </a>
+                </div>
+            
+            <div class="kratos-entry-post-inner">
+                <header class="kratos-entry-header">
+                        <a class="label-link" href="/blog/categories/Kotlin%E5%AD%A6%E4%B9%A0/">Kotlin学习</a>
+                    <h2 class="kratos-entry-title"><a href="/blog/2026/04/03/Kotlin-Collection%E6%93%8D%E4%BD%9C%E7%AC%A6%E5%AE%9E%E6%88%98-map-filter-fold/" itemprop="mainEntityOfPage"><span itemprop="name headline">Kotlin Collection操作符实战-map filter fold</span></a>
+                </header>
+                <div class="kratos-entry-content">
+                    <p itemProp="description">
+                        
+                            前言Kotlin 集合操作符是函数式编程的核心工具，通过链式调用实现数据转换、过滤和聚合。本文将详细介绍 map、filter、fold 等常用操作符。
+一、操作符分类
+
+
+类别
+操作符
+
+
+
+转换
+map, flatMap, gro...
+                        
+                    </p>
+                </div>
+            </div>
+        </div>
+        <footer class="kratos-entry-post-meta">
+            <span class="pull-left">
+                <time datetime="2026-04-03T23:44:00.000Z" itemprop="datePublished">
+                    <a><i class="fa fa-calendar"></i> 2026-04-03</a>
+                </time>
+                <a>
+                    
+                        <i class="fa fa-tags"></i>
+                        <a class="tag-none-link" href="/blog/tags/Collection/" rel="tag">Collection</a>, <a class="tag-none-link" href="/blog/tags/Kotlin/" rel="tag">Kotlin</a>, <a class="tag-none-link" href="/blog/tags/filter/" rel="tag">filter</a>
+                    
+                </a>
+                
+                
+            </span>
+            <span class="pull-right">
+                <a class="read-more" href="/blog/2026/04/03/Kotlin-Collection%E6%93%8D%E4%BD%9C%E7%AC%A6%E5%AE%9E%E6%88%98-map-filter-fold/" title="阅读全文">阅读全文<i class="fa fa-chevron-circle-right"></i></a>
+            </span>
+        </footer>
+    </div>
+</article>
+    
+
+    
+    
+        <article class="kratos-hentry clearfix" itemscope itemtype="https://schema.org/Article">
+    <div class="kratos-entry-border clearfix">
+        
+        <div class="kratos-entry-post-main">
+            
+            
+                <div class="kratos-entry-thumb">
+                    <a href="/blog/2026/04/03/Kotlin-Scope-Functions%E8%AF%A6%E8%A7%A3-let-run-with-apply-also/">
+                        <img class="kratos-entry-thumb-img" src="/images/default.webp" alt="Kotlin Scope Functions详解-let run with apply also">
+                    </a>
+                </div>
+            
+            <div class="kratos-entry-post-inner">
+                <header class="kratos-entry-header">
+                        <a class="label-link" href="/blog/categories/Kotlin%E5%AD%A6%E4%B9%A0/">Kotlin学习</a>
+                    <h2 class="kratos-entry-title"><a href="/blog/2026/04/03/Kotlin-Scope-Functions%E8%AF%A6%E8%A7%A3-let-run-with-apply-also/" itemprop="mainEntityOfPage"><span itemprop="name headline">Kotlin Scope Functions详解-let run with apply also</span></a>
+                </header>
+                <div class="kratos-entry-content">
+                    <p itemProp="description">
+                        
+                            前言Kotlin 标准库包含一组作用域函数，旨在通过在对象上下文中执行代码块来简化代码。这些函数包括：let、run、with、apply 和 also。
+一、函数对比
+
+
+函数
+对象引用
+返回值
+使用场景
+
+
+
+let
+it
+Lam...
+                        
+                    </p>
+                </div>
+            </div>
+        </div>
+        <footer class="kratos-entry-post-meta">
+            <span class="pull-left">
+                <time datetime="2026-04-03T23:43:00.000Z" itemprop="datePublished">
+                    <a><i class="fa fa-calendar"></i> 2026-04-03</a>
+                </time>
+                <a>
+                    
+                        <i class="fa fa-tags"></i>
+                        <a class="tag-none-link" href="/blog/tags/Kotlin/" rel="tag">Kotlin</a>, <a class="tag-none-link" href="/blog/tags/Scope-Functions/" rel="tag">Scope Functions</a>, <a class="tag-none-link" href="/blog/tags/also/" rel="tag">also</a>
+                    
+                </a>
+                
+                
+            </span>
+            <span class="pull-right">
+                <a class="read-more" href="/blog/2026/04/03/Kotlin-Scope-Functions%E8%AF%A6%E8%A7%A3-let-run-with-apply-also/" title="阅读全文">阅读全文<i class="fa fa-chevron-circle-right"></i></a>
+            </span>
+        </footer>
+    </div>
+</article>
+    
+
+    
+    
+        <article class="kratos-hentry clearfix" itemscope itemtype="https://schema.org/Article">
+    <div class="kratos-entry-border clearfix">
+        
+        <div class="kratos-entry-post-main">
+            
+            
+                <div class="kratos-entry-thumb">
+                    <a href="/blog/2026/04/03/Kotlin-Flow%E6%93%8D%E4%BD%9C%E7%AC%A6%E5%AE%9E%E6%88%98-map-filter-transform/">
+                        <img class="kratos-entry-thumb-img" src="/images/default.webp" alt="Kotlin Flow操作符实战-map filter transform">
+                    </a>
+                </div>
+            
+            <div class="kratos-entry-post-inner">
+                <header class="kratos-entry-header">
+                        <a class="label-link" href="/blog/categories/Kotlin%E5%AD%A6%E4%B9%A0/">Kotlin学习</a>
+                    <h2 class="kratos-entry-title"><a href="/blog/2026/04/03/Kotlin-Flow%E6%93%8D%E4%BD%9C%E7%AC%A6%E5%AE%9E%E6%88%98-map-filter-transform/" itemprop="mainEntityOfPage"><span itemprop="name headline">Kotlin Flow操作符实战-map filter transform</span></a>
+                </header>
+                <div class="kratos-entry-content">
+                    <p itemProp="description">
+                        
+                            前言Kotlin Flow 操作符是处理异步数据流的核心工具。本文将详细介绍常用的转换和过滤操作符，包括 map、filter、transform 等。
+一、操作符分类
+
+
+类别
+操作符
+
+
+
+转换
+map, mapLatest, t...
+                        
+                    </p>
+                </div>
+            </div>
+        </div>
+        <footer class="kratos-entry-post-meta">
+            <span class="pull-left">
+                <time datetime="2026-04-03T23:42:00.000Z" itemprop="datePublished">
+                    <a><i class="fa fa-calendar"></i> 2026-04-03</a>
+                </time>
+                <a>
+                    
+                        <i class="fa fa-tags"></i>
+                        <a class="tag-none-link" href="/blog/tags/Flow/" rel="tag">Flow</a>, <a class="tag-none-link" href="/blog/tags/Kotlin/" rel="tag">Kotlin</a>, <a class="tag-none-link" href="/blog/tags/filter/" rel="tag">filter</a>
+                    
+                </a>
+                
+                
+            </span>
+            <span class="pull-right">
+                <a class="read-more" href="/blog/2026/04/03/Kotlin-Flow%E6%93%8D%E4%BD%9C%E7%AC%A6%E5%AE%9E%E6%88%98-map-filter-transform/" title="阅读全文">阅读全文<i class="fa fa-chevron-circle-right"></i></a>
+            </span>
+        </footer>
+    </div>
+</article>
+    
+
+    
+    
+        <article class="kratos-hentry clearfix" itemscope itemtype="https://schema.org/Article">
+    <div class="kratos-entry-border clearfix">
+        
+        <div class="kratos-entry-post-main">
+            
+            
+                <div class="kratos-entry-thumb">
+                    <a href="/blog/2026/04/03/Kotlin%E6%95%B0%E6%8D%AE%E7%B1%BB%E4%B8%8Ewhen%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%AE%9E%E6%88%98/">
+                        <img class="kratos-entry-thumb-img" src="/images/default.webp" alt="Kotlin数据类与when表达式实战">
+                    </a>
+                </div>
+            
+            <div class="kratos-entry-post-inner">
+                <header class="kratos-entry-header">
+                        <a class="label-link" href="/blog/categories/Kotlin%E5%AD%A6%E4%B9%A0/">Kotlin学习</a>
+                    <h2 class="kratos-entry-title"><a href="/blog/2026/04/03/Kotlin%E6%95%B0%E6%8D%AE%E7%B1%BB%E4%B8%8Ewhen%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%AE%9E%E6%88%98/" itemprop="mainEntityOfPage"><span itemprop="name headline">Kotlin数据类与when表达式实战</span></a>
+                </header>
+                <div class="kratos-entry-content">
+                    <p itemProp="description">
+                        
+                            前言Kotlin 的数据类（Data Class）和 when 表达式结合使用，配合密封类（Sealed Class），可以实现编译时安全的模式匹配。
+一、Data Class基本定义1data class User(val name...
+                        
+                    </p>
+                </div>
+            </div>
+        </div>
+        <footer class="kratos-entry-post-meta">
+            <span class="pull-left">
+                <time datetime="2026-04-03T23:41:00.000Z" itemprop="datePublished">
+                    <a><i class="fa fa-calendar"></i> 2026-04-03</a>
+                </time>
+                <a>
+                    
+                        <i class="fa fa-tags"></i>
+                        <a class="tag-none-link" href="/blog/tags/Data-Class/" rel="tag">Data Class</a>, <a class="tag-none-link" href="/blog/tags/Kotlin/" rel="tag">Kotlin</a>, <a class="tag-none-link" href="/blog/tags/Sealed-Class/" rel="tag">Sealed Class</a>
+                    
+                </a>
+                
+                
+            </span>
+            <span class="pull-right">
+                <a class="read-more" href="/blog/2026/04/03/Kotlin%E6%95%B0%E6%8D%AE%E7%B1%BB%E4%B8%8Ewhen%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%AE%9E%E6%88%98/" title="阅读全文">阅读全文<i class="fa fa-chevron-circle-right"></i></a>
+            </span>
+        </footer>
+    </div>
+</article>
+    
+
+    
+    
+        <article class="kratos-hentry clearfix" itemscope itemtype="https://schema.org/Article">
+    <div class="kratos-entry-border clearfix">
+        
+        <div class="kratos-entry-post-main">
+            
+            
+                <div class="kratos-entry-thumb">
+                    <a href="/blog/2026/04/03/Kotlin-Multiplatform-Ktor%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82%E5%AD%A6%E4%B9%A0/">
+                        <img class="kratos-entry-thumb-img" src="/images/default.webp" alt="Kotlin Multiplatform Ktor网络请求学习">
+                    </a>
+                </div>
+            
+            <div class="kratos-entry-post-inner">
+                <header class="kratos-entry-header">
+                        <a class="label-link" href="/blog/categories/Kotlin%E5%AD%A6%E4%B9%A0/">Kotlin学习</a>
+                    <h2 class="kratos-entry-title"><a href="/blog/2026/04/03/Kotlin-Multiplatform-Ktor%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82%E5%AD%A6%E4%B9%A0/" itemprop="mainEntityOfPage"><span itemprop="name headline">Kotlin Multiplatform Ktor网络请求学习</span></a>
+                </header>
+                <div class="kratos-entry-content">
+                    <p itemProp="description">
+                        
+                            前言Ktor HTTP 客户端可以在多平台项目中使用。本文将介绍如何在 Kotlin Multiplatform Mobile 应用中使用 Ktor 进行网络请求。
+一、添加依赖版本目录12345678910# gradle&#x2F;libs...
+                        
+                    </p>
+                </div>
+            </div>
+        </div>
+        <footer class="kratos-entry-post-meta">
+            <span class="pull-left">
+                <time datetime="2026-04-03T23:40:00.000Z" itemprop="datePublished">
+                    <a><i class="fa fa-calendar"></i> 2026-04-03</a>
+                </time>
+                <a>
+                    
+                        <i class="fa fa-tags"></i>
+                        <a class="tag-none-link" href="/blog/tags/KMP/" rel="tag">KMP</a>, <a class="tag-none-link" href="/blog/tags/Kotlin/" rel="tag">Kotlin</a>, <a class="tag-none-link" href="/blog/tags/Ktor/" rel="tag">Ktor</a>
+                    
+                </a>
+                
+                
+            </span>
+            <span class="pull-right">
+                <a class="read-more" href="/blog/2026/04/03/Kotlin-Multiplatform-Ktor%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82%E5%AD%A6%E4%B9%A0/" title="阅读全文">阅读全文<i class="fa fa-chevron-circle-right"></i></a>
+            </span>
+        </footer>
+    </div>
+</article>
+    
+
+    
+    
+        <article class="kratos-hentry clearfix" itemscope itemtype="https://schema.org/Article">
+    <div class="kratos-entry-border clearfix">
+        
+        <div class="kratos-entry-post-main">
+            
+            
+                <div class="kratos-entry-thumb">
+                    <a href="/blog/2026/04/03/Kotlin-Coroutines-Select%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%AD%A6%E4%B9%A0/">
+                        <img class="kratos-entry-thumb-img" src="/images/default.webp" alt="Kotlin Coroutines Select表达式学习">
+                    </a>
+                </div>
+            
+            <div class="kratos-entry-post-inner">
+                <header class="kratos-entry-header">
+                        <a class="label-link" href="/blog/categories/Kotlin%E5%AD%A6%E4%B9%A0/">Kotlin学习</a>
+                    <h2 class="kratos-entry-title"><a href="/blog/2026/04/03/Kotlin-Coroutines-Select%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%AD%A6%E4%B9%A0/" itemprop="mainEntityOfPage"><span itemprop="name headline">Kotlin Coroutines Select表达式学习</span></a>
+                </header>
+                <div class="kratos-entry-content">
+                    <p itemProp="description">
+                        
+                            前言Select 表达式允许同时等待多个挂起函数，并选择第一个可用的。类似于 IO 多路复用，在 Kotlin 协程中提供了强大的并发选择能力。
+一、基本概念什么是 Select？Select 表达式是 kotlinx.corouti...
+                        
+                    </p>
+                </div>
+            </div>
+        </div>
+        <footer class="kratos-entry-post-meta">
+            <span class="pull-left">
+                <time datetime="2026-04-03T23:37:00.000Z" itemprop="datePublished">
+                    <a><i class="fa fa-calendar"></i> 2026-04-03</a>
+                </time>
+                <a>
+                    
+                        <i class="fa fa-tags"></i>
+                        <a class="tag-none-link" href="/blog/tags/Coroutines/" rel="tag">Coroutines</a>, <a class="tag-none-link" href="/blog/tags/Kotlin/" rel="tag">Kotlin</a>, <a class="tag-none-link" href="/blog/tags/Select/" rel="tag">Select</a>
+                    
+                </a>
+                
+                
+            </span>
+            <span class="pull-right">
+                <a class="read-more" href="/blog/2026/04/03/Kotlin-Coroutines-Select%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%AD%A6%E4%B9%A0/" title="阅读全文">阅读全文<i class="fa fa-chevron-circle-right"></i></a>
+            </span>
+        </footer>
+    </div>
+</article>
+    
+
+    
+    
+        <article class="kratos-hentry clearfix" itemscope itemtype="https://schema.org/Article">
+    <div class="kratos-entry-border clearfix">
+        
+        <div class="kratos-entry-post-main">
+            
+            
+                <div class="kratos-entry-thumb">
+                    <a href="/blog/2026/04/03/Kotlin%E5%8F%8D%E5%B0%84Reflection%E5%AD%A6%E4%B9%A0/">
+                        <img class="kratos-entry-thumb-img" src="/images/default.webp" alt="Kotlin反射Reflection学习">
+                    </a>
+                </div>
+            
+            <div class="kratos-entry-post-inner">
+                <header class="kratos-entry-header">
+                        <a class="label-link" href="/blog/categories/Kotlin%E5%AD%A6%E4%B9%A0/">Kotlin学习</a>
+                    <h2 class="kratos-entry-title"><a href="/blog/2026/04/03/Kotlin%E5%8F%8D%E5%B0%84Reflection%E5%AD%A6%E4%B9%A0/" itemprop="mainEntityOfPage"><span itemprop="name headline">Kotlin反射Reflection学习</span></a>
+                </header>
+                <div class="kratos-entry-content">
+                    <p itemProp="description">
+                        
+                            前言反射是一组语言和库特性，允许你在运行时内省程序结构。函数和属性在 Kotlin 中是一等公民，内省它们的能力（例如，在运行时学习属性或函数的名称或类型）在使用函数式或响应式风格时非常重要。
+一、添加依赖Gradle123depen...
+                        
+                    </p>
+                </div>
+            </div>
+        </div>
+        <footer class="kratos-entry-post-meta">
+            <span class="pull-left">
+                <time datetime="2026-04-03T23:35:00.000Z" itemprop="datePublished">
+                    <a><i class="fa fa-calendar"></i> 2026-04-03</a>
+                </time>
+                <a>
+                    
+                        <i class="fa fa-tags"></i>
+                        <a class="tag-none-link" href="/blog/tags/KClass/" rel="tag">KClass</a>, <a class="tag-none-link" href="/blog/tags/KFunction/" rel="tag">KFunction</a>, <a class="tag-none-link" href="/blog/tags/Kotlin/" rel="tag">Kotlin</a>
+                    
+                </a>
+                
+                
+            </span>
+            <span class="pull-right">
+                <a class="read-more" href="/blog/2026/04/03/Kotlin%E5%8F%8D%E5%B0%84Reflection%E5%AD%A6%E4%B9%A0/" title="阅读全文">阅读全文<i class="fa fa-chevron-circle-right"></i></a>
+            </span>
+        </footer>
+    </div>
+</article>
+    
+
+    
+    
+        <article class="kratos-hentry clearfix" itemscope itemtype="https://schema.org/Article">
+    <div class="kratos-entry-border clearfix">
+        
+        <div class="kratos-entry-post-main">
+            
+            
+                <div class="kratos-entry-thumb">
+                    <a href="/blog/2026/04/03/Kotlin-Reified%E5%AE%9E%E5%8C%96%E7%B1%BB%E5%9E%8B%E5%8F%82%E6%95%B0%E5%AD%A6%E4%B9%A0/">
+                        <img class="kratos-entry-thumb-img" src="/images/default.webp" alt="Kotlin Reified实化类型参数学习">
+                    </a>
+                </div>
+            
+            <div class="kratos-entry-post-inner">
+                <header class="kratos-entry-header">
+                        <a class="label-link" href="/blog/categories/Kotlin%E5%AD%A6%E4%B9%A0/">Kotlin学习</a>
+                    <h2 class="kratos-entry-title"><a href="/blog/2026/04/03/Kotlin-Reified%E5%AE%9E%E5%8C%96%E7%B1%BB%E5%9E%8B%E5%8F%82%E6%95%B0%E5%AD%A6%E4%B9%A0/" itemprop="mainEntityOfPage"><span itemprop="name headline">Kotlin Reified实化类型参数学习</span></a>
+                </header>
+                <div class="kratos-entry-content">
+                    <p itemProp="description">
+                        
+                            前言Kotlin 和 Java 一样，在编译阶段会擦除泛型类型信息。reified 关键字可以让泛型参数在运行时”具体化”，获得其实际类型信息。
+一、类型擦除问题什么是类型擦除？在编译阶段，泛型类型信息会被擦除：
+
+List&lt;S...
+                        
+                    </p>
+                </div>
+            </div>
+        </div>
+        <footer class="kratos-entry-post-meta">
+            <span class="pull-left">
+                <time datetime="2026-04-03T23:33:00.000Z" itemprop="datePublished">
+                    <a><i class="fa fa-calendar"></i> 2026-04-03</a>
+                </time>
+                <a>
+                    
+                        <i class="fa fa-tags"></i>
+                        <a class="tag-none-link" href="/blog/tags/Kotlin/" rel="tag">Kotlin</a>, <a class="tag-none-link" href="/blog/tags/Reified/" rel="tag">Reified</a>, <a class="tag-none-link" href="/blog/tags/%E5%86%85%E8%81%94%E5%87%BD%E6%95%B0/" rel="tag">内联函数</a>
+                    
+                </a>
+                
+                
+            </span>
+            <span class="pull-right">
+                <a class="read-more" href="/blog/2026/04/03/Kotlin-Reified%E5%AE%9E%E5%8C%96%E7%B1%BB%E5%9E%8B%E5%8F%82%E6%95%B0%E5%AD%A6%E4%B9%A0/" title="阅读全文">阅读全文<i class="fa fa-chevron-circle-right"></i></a>
+            </span>
+        </footer>
+    </div>
+</article>
+    
+
+
+
+    <div class='text-center pagination'>
+    <a class="extend prev" rel="prev" href="/blog/categories/Kotlin%E5%AD%A6%E4%B9%A0/page/3/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/blog/categories/Kotlin%E5%AD%A6%E4%B9%A0/">1</a><a class="page-number" href="/blog/categories/Kotlin%E5%AD%A6%E4%B9%A0/page/2/">2</a><a class="page-number" href="/blog/categories/Kotlin%E5%AD%A6%E4%B9%A0/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/blog/categories/Kotlin%E5%AD%A6%E4%B9%A0/page/5/">5</a><a class="page-number" href="/blog/categories/Kotlin%E5%AD%A6%E4%B9%A0/page/6/">6</a><a class="extend next" rel="next" href="/blog/categories/Kotlin%E5%AD%A6%E4%B9%A0/page/5/"><i class="fa fa-angle-right"></i></a>
+    </div>
+
+
+
+
+
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>

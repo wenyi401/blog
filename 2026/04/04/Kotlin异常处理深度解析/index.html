@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>Kotlin异常处理深度解析 | Wenyi&#39;s Blog</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/04/Kotlin%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="Exception, Kotlin, Nothing, try-catch, 异常处理" />
+  
+  <meta name="description" content="前言Kotlin 将所有异常视为非受检异常，简化了异常处理流程。本文将深入解析 Kotlin 异常处理的核心概念、最佳实践和高级用法。 一、异常概述Kotlin 异常处理包含两个主要操作：  抛出异常：指示问题发生 捕获异常：手动处理异常  异常由 Exception 类的子类表示，Exception 是 Throwable 的子类。 二、抛出异常基本语法1throw IllegalArgumen">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kotlin异常处理深度解析">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/04/Kotlin%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog">
+<meta property="og:description" content="前言Kotlin 将所有异常视为非受检异常，简化了异常处理流程。本文将深入解析 Kotlin 异常处理的核心概念、最佳实践和高级用法。 一、异常概述Kotlin 异常处理包含两个主要操作：  抛出异常：指示问题发生 捕获异常：手动处理异常  异常由 Exception 类的子类表示，Exception 是 Throwable 的子类。 二、抛出异常基本语法1throw IllegalArgumen">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-04-04T00:50:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T16:49:03.976Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="Exception">
+<meta property="article:tag" content="Kotlin">
+<meta property="article:tag" content="Nothing">
+<meta property="article:tag" content="try-catch">
+<meta property="article:tag" content="异常处理">
+<meta name="twitter:card" content="summary">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Kotlin异常处理深度解析","description":"前言Kotlin 将所有异常视为非受检异常，简化了异常处理流程。本文将深入解析 Kotlin 异常处理的核心概念、最佳实践和高级用法。\n","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-04T00:50:00.000Z","dateModified":"2026-04-03T16:49:03.976Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/04/Kotlin%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog</h2> <br />
+                        <span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/04/Kotlin%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Kotlin异常处理深度解析</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-04T00:50:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-04</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~8.12K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Kotlin 将所有异常视为非受检异常，简化了异常处理流程。本文将深入解析 Kotlin 异常处理的核心概念、最佳实践和高级用法。</p>
+<h2 id="一、异常概述"><a href="#一、异常概述" class="headerlink" title="一、异常概述"></a>一、异常概述</h2><p>Kotlin 异常处理包含两个主要操作：</p>
+<ul>
+<li><strong>抛出异常</strong>：指示问题发生</li>
+<li><strong>捕获异常</strong>：手动处理异常</li>
+</ul>
+<p>异常由 Exception 类的子类表示，Exception 是 Throwable 的子类。</p>
+<h2 id="二、抛出异常"><a href="#二、抛出异常" class="headerlink" title="二、抛出异常"></a>二、抛出异常</h2><h3 id="基本语法"><a href="#基本语法" class="headerlink" title="基本语法"></a>基本语法</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">throw</span> IllegalArgumentException()</span><br></pre></td></tr></table></figure>
+
+<h3 id="包含详细信息"><a href="#包含详细信息" class="headerlink" title="包含详细信息"></a>包含详细信息</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> cause = IllegalStateException(<span class="string">&quot;Original cause: illegal state&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (userInput &lt; <span class="number">0</span>) &#123;</span><br><span class="line">    <span class="keyword">throw</span> IllegalArgumentException(<span class="string">&quot;Input must be non-negative&quot;</span>, cause)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="三、前置条件函数"><a href="#三、前置条件函数" class="headerlink" title="三、前置条件函数"></a>三、前置条件函数</h2><p>Kotlin 提供了前置条件函数，用于自动抛出异常：</p>
+<table>
+<thead>
+<tr>
+<th>函数</th>
+<th>用途</th>
+<th>抛出异常</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>require()</td>
+<td>验证输入参数</td>
+<td>IllegalArgumentException</td>
+</tr>
+<tr>
+<td>check()</td>
+<td>验证对象&#x2F;变量状态</td>
+<td>IllegalStateException</td>
+</tr>
+<tr>
+<td>error()</td>
+<td>指示非法状态</td>
+<td>IllegalStateException</td>
+</tr>
+</tbody></table>
+<h3 id="require-函数"><a href="#require-函数" class="headerlink" title="require() 函数"></a>require() 函数</h3><p>用于验证输入参数：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">getIndices</span><span class="params">(count: <span class="type">Int</span>)</span></span>: List&lt;<span class="built_in">Int</span>&gt; &#123;</span><br><span class="line">    require(count &gt;= <span class="number">0</span>) &#123; <span class="string">&quot;Count must be non-negative. You set count to <span class="variable">$count</span>.&quot;</span> &#125;</span><br><span class="line">    <span class="keyword">return</span> List(count) &#123; it + <span class="number">1</span> &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 测试</span></span><br><span class="line">getIndices(-<span class="number">1</span>)  <span class="comment">// 抛出 IllegalArgumentException</span></span><br><span class="line">getIndices(<span class="number">3</span>)   <span class="comment">// [1, 2, 3]</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="check-函数"><a href="#check-函数" class="headerlink" title="check() 函数"></a>check() 函数</h3><p>用于验证对象或变量状态：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> someState: String? = <span class="literal">null</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">getStateValue</span><span class="params">()</span></span>: String &#123;</span><br><span class="line">    <span class="keyword">val</span> state = checkNotNull(someState) &#123; <span class="string">&quot;State must be set beforehand!&quot;</span> &#125;</span><br><span class="line">    check(state.isNotEmpty()) &#123; <span class="string">&quot;State must be non-empty!&quot;</span> &#125;</span><br><span class="line">    <span class="keyword">return</span> state</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 测试</span></span><br><span class="line">someState = <span class="literal">null</span></span><br><span class="line">getStateValue()  <span class="comment">// 抛出 IllegalStateException: State must be set beforehand!</span></span><br><span class="line"></span><br><span class="line">someState = <span class="string">&quot;&quot;</span></span><br><span class="line">getStateValue()  <span class="comment">// 抛出 IllegalStateException: State must be non-empty!</span></span><br><span class="line"></span><br><span class="line">someState = <span class="string">&quot;valid&quot;</span></span><br><span class="line">getStateValue()  <span class="comment">// 返回 &quot;valid&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="error-函数"><a href="#error-函数" class="headerlink" title="error() 函数"></a>error() 函数</h3><p>用于在 when 表达式中处理不应发生的情况：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">User</span>(<span class="keyword">val</span> name: String, <span class="keyword">val</span> role: String)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">processUserRole</span><span class="params">(user: <span class="type">User</span>)</span></span> &#123;</span><br><span class="line">    <span class="keyword">when</span> (user.role) &#123;</span><br><span class="line">        <span class="string">&quot;admin&quot;</span> -&gt; println(<span class="string">&quot;<span class="subst">$&#123;user.name&#125;</span> is an admin.&quot;</span>)</span><br><span class="line">        <span class="string">&quot;editor&quot;</span> -&gt; println(<span class="string">&quot;<span class="subst">$&#123;user.name&#125;</span> is an editor.&quot;</span>)</span><br><span class="line">        <span class="string">&quot;viewer&quot;</span> -&gt; println(<span class="string">&quot;<span class="subst">$&#123;user.name&#125;</span> is a viewer.&quot;</span>)</span><br><span class="line">        <span class="keyword">else</span> -&gt; error(<span class="string">&quot;Undefined role: <span class="subst">$&#123;user.role&#125;</span>&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 测试</span></span><br><span class="line">processUserRole(User(<span class="string">&quot;Alice&quot;</span>, <span class="string">&quot;admin&quot;</span>))  <span class="comment">// Alice is an admin.</span></span><br><span class="line">processUserRole(User(<span class="string">&quot;Bob&quot;</span>, <span class="string">&quot;guest&quot;</span>))    <span class="comment">// 抛出 IllegalStateException: Undefined role: guest</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="四、try-catch-块"><a href="#四、try-catch-块" class="headerlink" title="四、try-catch 块"></a>四、try-catch 块</h2><h3 id="基本用法"><a href="#基本用法" class="headerlink" title="基本用法"></a>基本用法</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="comment">// 可能抛出异常的代码</span></span><br><span class="line">&#125; <span class="keyword">catch</span> (e: SomeException) &#123;</span><br><span class="line">    <span class="comment">// 处理异常</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="作为表达式"><a href="#作为表达式" class="headerlink" title="作为表达式"></a>作为表达式</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> num: <span class="built_in">Int</span> = <span class="keyword">try</span> &#123;</span><br><span class="line">    count()</span><br><span class="line">&#125; <span class="keyword">catch</span> (e: ArithmeticException) &#123;</span><br><span class="line">    -<span class="number">1</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="多个-catch-块"><a href="#多个-catch-块" class="headerlink" title="多个 catch 块"></a>多个 catch 块</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">open</span> <span class="keyword">class</span> <span class="title class_">WithdrawalException</span>(message: String) : Exception(message)</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">InsufficientFundsException</span>(message: String) : WithdrawalException(message)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">processWithdrawal</span><span class="params">(amount: <span class="type">Double</span>, availableFunds: <span class="type">Double</span>)</span></span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (amount &gt; availableFunds) &#123;</span><br><span class="line">        <span class="keyword">throw</span> InsufficientFundsException(<span class="string">&quot;Insufficient funds for the withdrawal.&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (amount &lt; <span class="number">1</span> || amount % <span class="number">1</span> != <span class="number">0.0</span>) &#123;</span><br><span class="line">        <span class="keyword">throw</span> WithdrawalException(<span class="string">&quot;Invalid withdrawal amount.&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    println(<span class="string">&quot;Withdrawal processed&quot;</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    processWithdrawal(withdrawalAmount, availableFunds)</span><br><span class="line">&#125; <span class="keyword">catch</span> (e: InsufficientFundsException) &#123;</span><br><span class="line">    println(<span class="string">&quot;Caught an InsufficientFundsException: <span class="subst">$&#123;e.message&#125;</span>&quot;</span>)</span><br><span class="line">&#125; <span class="keyword">catch</span> (e: WithdrawalException) &#123;</span><br><span class="line">    println(<span class="string">&quot;Caught a WithdrawalException: <span class="subst">$&#123;e.message&#125;</span>&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>注意</strong>：catch 块的顺序很重要！从最具体到最不具体排序。</p>
+<h2 id="五、finally-块"><a href="#五、finally-块" class="headerlink" title="五、finally 块"></a>五、finally 块</h2><p>finally 块始终执行，无论是否发生异常：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">divideOrNull</span><span class="params">(a: <span class="type">Int</span>)</span></span>: <span class="built_in">Int</span> &#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">val</span> b = <span class="number">44</span> / a</span><br><span class="line">        println(<span class="string">&quot;try block: Executing division: <span class="variable">$b</span>&quot;</span>)</span><br><span class="line">        <span class="keyword">return</span> b</span><br><span class="line">    &#125; <span class="keyword">catch</span> (e: ArithmeticException) &#123;</span><br><span class="line">        println(<span class="string">&quot;catch block: Encountered ArithmeticException <span class="variable">$e</span>&quot;</span>)</span><br><span class="line">        <span class="keyword">return</span> -<span class="number">1</span></span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        println(<span class="string">&quot;finally block: The finally block is always executed&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">divideOrNull(<span class="number">0</span>)</span><br><span class="line"><span class="comment">// 输出：</span></span><br><span class="line"><span class="comment">// try block: Executing division: ...</span></span><br><span class="line"><span class="comment">// finally block: The finally block is always executed</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="资源清理"><a href="#资源清理" class="headerlink" title="资源清理"></a>资源清理</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> resource = MockResource()</span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    resource.use()</span><br><span class="line">&#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">    resource.close()  <span class="comment">// 确保资源始终关闭</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="六、自定义异常"><a href="#六、自定义异常" class="headerlink" title="六、自定义异常"></a>六、自定义异常</h2><h3 id="基本自定义异常"><a href="#基本自定义异常" class="headerlink" title="基本自定义异常"></a>基本自定义异常</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MyException</span> : <span class="type">Exception</span>(<span class="string">&quot;My message&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">NumberTooLargeException</span> : <span class="type">ArithmeticException</span>(<span class="string">&quot;Number is too large&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="异常层次结构"><a href="#异常层次结构" class="headerlink" title="异常层次结构"></a>异常层次结构</h3><p>使用 sealed class 创建异常层次结构：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">sealed</span> <span class="keyword">class</span> <span class="title class_">AccountException</span>(message: String, cause: Throwable? = <span class="literal">null</span>) : Exception(message, cause)</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">InvalidAccountCredentialsException</span> : <span class="type">AccountException</span>(<span class="string">&quot;Invalid account credentials detected&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">APIKeyExpiredException</span>(</span><br><span class="line">    message: String = <span class="string">&quot;API key expired&quot;</span>,</span><br><span class="line">    cause: Throwable? = <span class="literal">null</span></span><br><span class="line">) : AccountException(message, cause)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">validateAccount</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (!areCredentialsValid()) <span class="keyword">throw</span> InvalidAccountCredentialsException()</span><br><span class="line">    <span class="keyword">if</span> (isAPIKeyExpired()) &#123;</span><br><span class="line">        <span class="keyword">val</span> cause = RuntimeException(<span class="string">&quot;API key validation failed due to network error&quot;</span>)</span><br><span class="line">        <span class="keyword">throw</span> APIKeyExpiredException(cause = cause)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    validateAccount()</span><br><span class="line">&#125; <span class="keyword">catch</span> (e: AccountException) &#123;</span><br><span class="line">    println(<span class="string">&quot;Error: <span class="subst">$&#123;e.message&#125;</span>&quot;</span>)</span><br><span class="line">    e.cause?.let &#123; println(<span class="string">&quot;Caused by: <span class="subst">$&#123;it.message&#125;</span>&quot;</span>) &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="七、Nothing-类型"><a href="#七、Nothing-类型" class="headerlink" title="七、Nothing 类型"></a>七、Nothing 类型</h2><p>Nothing 是 Kotlin 的特殊类型，表示永不成功完成的函数或表达式。</p>
+<h3 id="用作返回类型"><a href="#用作返回类型" class="headerlink" title="用作返回类型"></a>用作返回类型</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">fail</span><span class="params">(message: <span class="type">String</span>)</span></span>: <span class="built_in">Nothing</span> &#123;</span><br><span class="line">    <span class="keyword">throw</span> IllegalArgumentException(message)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> person = Person(name = <span class="literal">null</span>)</span><br><span class="line"><span class="keyword">val</span> s: String = person.name ?: fail(<span class="string">&quot;Name required&quot;</span>)</span><br><span class="line"><span class="comment">// &#x27;s&#x27; 保证已初始化</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="TODO-函数"><a href="#TODO-函数" class="headerlink" title="TODO() 函数"></a>TODO() 函数</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">notImplementedFunction</span><span class="params">()</span></span>: <span class="built_in">Int</span> &#123;</span><br><span class="line">    TODO(<span class="string">&quot;This function is not yet implemented&quot;</span>)</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 抛出 NotImplementedError</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="编译器推断"><a href="#编译器推断" class="headerlink" title="编译器推断"></a>编译器推断</h3><p>当编译器推断到 Nothing 类型时，会警告。显式定义 Nothing 可以消除警告：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">alwaysThrow</span><span class="params">()</span></span>: <span class="built_in">Nothing</span> &#123;</span><br><span class="line">    <span class="keyword">throw</span> Exception(<span class="string">&quot;Always throws&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="八、常见异常类型"><a href="#八、常见异常类型" class="headerlink" title="八、常见异常类型"></a>八、常见异常类型</h2><p>所有异常都是 RuntimeException 的子类：</p>
+<table>
+<thead>
+<tr>
+<th>异常</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ArithmeticException</td>
+<td>算术运算异常（如除零）</td>
+</tr>
+<tr>
+<td>IndexOutOfBoundsException</td>
+<td>索引越界</td>
+</tr>
+<tr>
+<td>NoSuchElementException</td>
+<td>元素不存在</td>
+</tr>
+<tr>
+<td>NumberFormatException</td>
+<td>数字格式错误</td>
+</tr>
+<tr>
+<td>NullPointerException</td>
+<td>空指针异常</td>
+</tr>
+</tbody></table>
+<h3 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ArithmeticException</span></span><br><span class="line"><span class="keyword">val</span> example = <span class="number">2</span> / <span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// IndexOutOfBoundsException</span></span><br><span class="line"><span class="keyword">val</span> myList = mutableListOf(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>)</span><br><span class="line">myList.removeAt(<span class="number">3</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// NoSuchElementException</span></span><br><span class="line"><span class="keyword">val</span> emptyList = listOf()</span><br><span class="line"><span class="keyword">val</span> firstElement = emptyList.first()</span><br><span class="line"></span><br><span class="line"><span class="comment">// NumberFormatException</span></span><br><span class="line"><span class="keyword">val</span> string = <span class="string">&quot;This is not a number&quot;</span></span><br><span class="line"><span class="keyword">val</span> number = string.toInt()</span><br><span class="line"></span><br><span class="line"><span class="comment">// NullPointerException</span></span><br><span class="line"><span class="keyword">val</span> text: String? = <span class="literal">null</span></span><br><span class="line">println(text!!.length)</span><br></pre></td></tr></table></figure>
+
+<h2 id="九、异常层次结构"><a href="#九、异常层次结构" class="headerlink" title="九、异常层次结构"></a>九、异常层次结构</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Throwable</span><br><span class="line">├── Error (严重问题，不应处理)</span><br><span class="line">│   ├── OutOfMemoryError</span><br><span class="line">│   └── StackOverflowError</span><br><span class="line">└── Exception (可处理的条件)</span><br><span class="line">    ├── RuntimeException</span><br><span class="line">    │   ├── NullPointerException</span><br><span class="line">    │   ├── IllegalArgumentException</span><br><span class="line">    │   ├── IllegalStateException</span><br><span class="line">    │   └── ...</span><br><span class="line">    └── IOException</span><br><span class="line">        └── ...</span><br></pre></td></tr></table></figure>
+
+<h2 id="十、栈跟踪"><a href="#十、栈跟踪" class="headerlink" title="十、栈跟踪"></a>十、栈跟踪</h2><p>栈跟踪显示导致异常的函数调用序列：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">throw</span> ArithmeticException(<span class="string">&quot;This is an arithmetic exception!&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Exception in thread &quot;main&quot; java.lang.ArithmeticException: This is an arithmetic exception!</span><br><span class="line"> at MainKt.main(Main.kt:3)</span><br><span class="line"> at MainKt.main(Main.kt)</span><br></pre></td></tr></table></figure>
+
+<h2 id="十一、与其他语言的互操作"><a href="#十一、与其他语言的互操作" class="headerlink" title="十一、与其他语言的互操作"></a>十一、与其他语言的互操作</h2><h3 id="Throws-注解"><a href="#Throws-注解" class="headerlink" title="@Throws 注解"></a>@Throws 注解</h3><p>当 Kotlin 代码被 Java、Swift 或 Objective-C 调用时，可以使用 @Throws 注解通知调用者可能的异常：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Throws(IOException::class)</span></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">readFile</span><span class="params">(path: <span class="type">String</span>)</span></span>: String &#123;</span><br><span class="line">    <span class="comment">// 可能抛出 IOException</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="十二、最佳实践"><a href="#十二、最佳实践" class="headerlink" title="十二、最佳实践"></a>十二、最佳实践</h2><h3 id="1-使用前置条件函数"><a href="#1-使用前置条件函数" class="headerlink" title="1. 使用前置条件函数"></a>1. 使用前置条件函数</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 推荐</span></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">process</span><span class="params">(value: <span class="type">Int</span>)</span></span> &#123;</span><br><span class="line">    require(value &gt;= <span class="number">0</span>) &#123; <span class="string">&quot;Value must be non-negative&quot;</span> &#125;</span><br><span class="line">    check(initialized) &#123; <span class="string">&quot;Not initialized&quot;</span> &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 不推荐</span></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">process</span><span class="params">(value: <span class="type">Int</span>)</span></span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (value &lt; <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">throw</span> IllegalArgumentException(<span class="string">&quot;Value must be non-negative&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-创建有意义的异常消息"><a href="#2-创建有意义的异常消息" class="headerlink" title="2. 创建有意义的异常消息"></a>2. 创建有意义的异常消息</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 推荐</span></span><br><span class="line"><span class="keyword">throw</span> IllegalArgumentException(<span class="string">&quot;User age must be at least 18, but was <span class="variable">$age</span>&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 不推荐</span></span><br><span class="line"><span class="keyword">throw</span> IllegalArgumentException(<span class="string">&quot;Invalid age&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-保留原始原因"><a href="#3-保留原始原因" class="headerlink" title="3. 保留原始原因"></a>3. 保留原始原因</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="comment">// 操作</span></span><br><span class="line">&#125; <span class="keyword">catch</span> (e: IOException) &#123;</span><br><span class="line">    <span class="keyword">throw</span> MyException(<span class="string">&quot;Operation failed&quot;</span>, e)  <span class="comment">// 保留原始异常</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-使用-sealed-class-创建异常层次结构"><a href="#4-使用-sealed-class-创建异常层次结构" class="headerlink" title="4. 使用 sealed class 创建异常层次结构"></a>4. 使用 sealed class 创建异常层次结构</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">sealed</span> <span class="keyword">class</span> <span class="title class_">AppException</span> : <span class="type">Exception</span>()</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">NetworkException</span> : <span class="type">AppException</span>()</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">DatabaseException</span> : <span class="type">AppException</span>()</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ValidationException</span> : <span class="type">AppException</span>()</span><br></pre></td></tr></table></figure>
+
+<h2 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://kotlinlang.org/docs/exceptions.html">Exception and error handling | Kotlin Documentation</a></li>
+<li><a target="_blank" rel="noopener" href="https://juejin.cn/post/7528183432443904035">Kotlin 异常处理新玩法：runCatching 与 try-catch 的”华山论剑”</a></li>
+</ul>
+<hr>
+<p><em>深入学习中…</em></p>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/Exception/" rel="tag">Exception</a>, <a class="tag-none-link" href="/blog/tags/Kotlin/" rel="tag">Kotlin</a>, <a class="tag-none-link" href="/blog/tags/Nothing/" rel="tag">Nothing</a>, <a class="tag-none-link" href="/blog/tags/try-catch/" rel="tag">try-catch</a>, <a class="tag-none-link" href="/blog/tags/%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86/" rel="tag">异常处理</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-03T16:49:03.976Z" itemprop="dateModified">最后编辑：2026-04-03</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Android Fragment生命周期深度解析" href="/blog/2026/04/04/Android-Fragment生命周期深度解析/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+            <div class="nav-next clearfix">
+                <a title=" Android协程与生命周期感知型组件深度解析" href="/blog/2026/04/04/Android协程与生命周期感知型组件深度解析/">下一篇 <i class="fa fa-angle-right"></i></a>
+            </div>
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>
