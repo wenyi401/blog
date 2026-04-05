@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+    <head>
+  <!-- 元数据 -->
+  <meta charset="utf-8">
+  
+  
+  <title>Android LSPosed 灵动岛模块进阶开发 - 2026 学习总结 | Wenyi&#39;s Blog 🌸</title>
+  <link rel="canonical" href="https://wenyi401.github.io/blog/2026/04/05/Android-LSPosed%E7%81%B5%E5%8A%A8%E5%B2%9B%E6%A8%A1%E5%9D%97%E8%BF%9B%E9%98%B6%E5%BC%80%E5%8F%91-2026%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93/">
+  <meta name="author" content="Wenyi" />
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="robots" content="index,follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telphone=no, email=no" />
+  
+    <meta name="keywords" content="Android, Jetpack Compose, Kotlin, LSPosed, Xposed, 灵动岛" />
+  
+  <meta name="description" content="LSPosed 灵动岛模块进阶开发 - 2026-04-05 学习总结今日学习核心成果项目构建状态✅ BUILD SUCCESSFUL - Debug APK 成功构建 (57MB)  路径: app&#x2F;build&#x2F;outputs&#x2F;apk&#x2F;debug&#x2F;app-debug.apk Gradle: 8.5 Kotlin: 2.0.21 Jetpack Compose BOM: 2024.09.00">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android LSPosed 灵动岛模块进阶开发 - 2026 学习总结">
+<meta property="og:url" content="https://wenyi401.github.io/blog/2026/04/05/Android-LSPosed%E7%81%B5%E5%8A%A8%E5%B2%9B%E6%A8%A1%E5%9D%97%E8%BF%9B%E9%98%B6%E5%BC%80%E5%8F%91-2026%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93/index.html">
+<meta property="og:site_name" content="Wenyi&#39;s Blog 🌸">
+<meta property="og:description" content="LSPosed 灵动岛模块进阶开发 - 2026-04-05 学习总结今日学习核心成果项目构建状态✅ BUILD SUCCESSFUL - Debug APK 成功构建 (57MB)  路径: app&#x2F;build&#x2F;outputs&#x2F;apk&#x2F;debug&#x2F;app-debug.apk Gradle: 8.5 Kotlin: 2.0.21 Jetpack Compose BOM: 2024.09.00">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-04-05T11:30:00.000Z">
+<meta property="article:modified_time" content="2026-04-05T04:00:07.536Z">
+<meta property="article:author" content="Wenyi">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="Jetpack Compose">
+<meta property="article:tag" content="Kotlin">
+<meta property="article:tag" content="LSPosed">
+<meta property="article:tag" content="Xposed">
+<meta property="article:tag" content="灵动岛">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/blog/atom.xml" title="Wenyi's Blog 🌸" type="application/atom+xml">
+  
+  <!-- JSON-LD 结构化数据 -->
+  
+  
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"Android LSPosed 灵动岛模块进阶开发 - 2026 学习总结","description":"","image":"https://wenyi401.github.io/blog/images/user.svg","author":{"@type":"Person","name":"Wenyi"},"publisher":{"@type":"Organization","name":"Wenyi's Blog 🌸","logo":{"@type":"ImageObject","url":"https://wenyi401.github.io/blog/images/user.svg"}},"datePublished":"2026-04-05T11:30:00.000Z","dateModified":"2026-04-05T04:00:07.536Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://wenyi401.github.io/blog/2026/04/05/Android-LSPosed%E7%81%B5%E5%8A%A8%E5%B2%9B%E6%A8%A1%E5%9D%97%E8%BF%9B%E9%98%B6%E5%BC%80%E5%8F%91-2026%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93/"}}
+    </script>
+  
+  <!-- 关键 CSS 预加载 -->
+  <link rel="preload" href="/blog/css/kr-core.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/light.min.css" as="style" crossorigin>
+  <link rel="preload" href="/blog/css/kr-theme/dark.min.css" as="style" crossorigin>
+  <!-- 样式表文件 -->
+  <link rel="stylesheet" id="kratos-css" href="/blog/css/kr-core.min.css" media="all">
+  <link rel="stylesheet" id="theme-light-css" href="/blog/css/kr-theme/light.min.css" media="all">
+  <link rel="stylesheet" id="theme-dark-css" href="/blog/css/kr-theme/dark.min.css" media="(prefers-color-scheme: dark)">
+  
+    <link rel="stylesheet"  id="highlight-css" href="/blog/css/highlight/highlight.js/night-eighties.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/css/highlight/highlight.js/night-eighties.min.css"></noscript>
+  
+  <script src="/blog/js/kr-theme.min.js"></script>
+  <link rel="stylesheet"  id="fontawe-css" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/font-awesome@4.7.0/css/font-awesome.min.css"></noscript>
+  
+    <link rel="stylesheet"  id="nprogress-css" href="/blog/vendors/nprogress@0.2.0/nprogress.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/nprogress@0.2.0/nprogress.css"></noscript>
+  
+  
+    <link rel="stylesheet"  href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css" media="print" onload="this.media='all'" onerror="this.media='all'"><noscript><link rel="stylesheet" href="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.css"></noscript>
+  
+  <!-- 预先加载的JS文件 -->
+  
+    <script src="/blog/vendors/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  
+  <!-- 自定义站点横幅和背景 -->
+  <style>
+    
+      .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+      html[data-theme="dark"] .kratos-cover.kratos-cover-2 {
+        background-image: url('');
+      }
+    
+    
+      @media(min-width:768px) {
+        body.custom-background {
+          background-image: url('');
+        }
+        html[data-theme="dark"] body.custom-background {
+          background-image: url('');
+        }
+      }
+    
+    
+      .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+      html[data-theme="dark"] .widget-kratos-about .photo-background {
+        background-image: url('/images/default.webp');
+      }
+    
+  </style>
+
+  <!-- 额外的追加注入项 -->
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <body class="custom-background">
+        <div id="kratos-wrapper">
+    <div id="kratos-page">
+        <div id="kratos-header">
+            <header id="kratos-desktop-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="nav-header">
+                        <nav id="kratos-menu-wrap">
+                            <ul id="kratos-primary-menu" class="sf-menu">
+                                
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <header id="kratos-mobile-topnav" class="kratos-topnav">
+                <div class="container">
+                    <div class="color-logo"><a href="/blog/">Wenyi&#39;s Blog 🌸</a></div>
+                    <div id="kratos-nav-toggle-wrapper" class="nav-toggle">
+                        <a id="kratos-nav-toggle" class="kratos-nav-toggle">
+                            <i></i>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="kratos-start kratos-hero-2">
+            <!-- <div class="kratos-overlay"></div> -->
+            <div class="kratos-cover kratos-cover-2 text-center">
+                <div class="desc desc2 animate-box">
+                    <a href="/blog/">
+                        <h2>Wenyi&#39;s Blog 🌸</h2> <br />
+                        <span>学习笔记与技术分享</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="kratos-blog-post">
+            <div class="container">
+                <div id="main" class="row">
+
+
+        
+
+            
+
+            <section class="kr-main-col col-md-8">
+
+        
+
+            <article itemscope itemtype="https://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://wenyi401.github.io/blog/2026/04/05/Android-LSPosed%E7%81%B5%E5%8A%A8%E5%B2%9B%E6%A8%A1%E5%9D%97%E8%BF%9B%E9%98%B6%E5%BC%80%E5%8F%91-2026%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93/">
+    <div class="kratos-hentry kratos-page-inner clearfix">
+        <header class="kratos-page-header">
+            
+                <h1 class="kratos-page-title text-center" itemprop="name headline">Android LSPosed 灵动岛模块进阶开发 - 2026 学习总结</h1>
+            
+            <ul class="kratos-page-meta text-center">
+                <li><time datetime="2026-04-05T11:30:00.000Z" itemprop="datePublished"><i class="fa fa-calendar"></i> 2026-04-05</time></li>
+                <li itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <i class="fa fa-user"></i> 作者 <span itemprop="name">Wenyi</span>
+                </li>
+                
+                    <li>
+                        <i class="fa fa-edit"></i> 
+                        
+                        
+                            ~5.79K
+                        
+                        字
+                    </li>
+                
+                
+                
+            </ul>
+        </header>
+        <div class="kratos-page-content kr-post">
+            
+            
+            
+            <hr />
+            <div itemprop="articleBody"><h1 id="LSPosed-灵动岛模块进阶开发-2026-04-05-学习总结"><a href="#LSPosed-灵动岛模块进阶开发-2026-04-05-学习总结" class="headerlink" title="LSPosed 灵动岛模块进阶开发 - 2026-04-05 学习总结"></a>LSPosed 灵动岛模块进阶开发 - 2026-04-05 学习总结</h1><h2 id="今日学习核心成果"><a href="#今日学习核心成果" class="headerlink" title="今日学习核心成果"></a>今日学习核心成果</h2><h3 id="项目构建状态"><a href="#项目构建状态" class="headerlink" title="项目构建状态"></a>项目构建状态</h3><p>✅ <strong>BUILD SUCCESSFUL</strong> - Debug APK 成功构建 (57MB)</p>
+<ul>
+<li>路径: <code>app/build/outputs/apk/debug/app-debug.apk</code></li>
+<li>Gradle: 8.5</li>
+<li>Kotlin: 2.0.21</li>
+<li>Jetpack Compose BOM: 2024.09.00</li>
+</ul>
+<hr>
+<h2 id="一、Xposed-vs-LSPosed-核心差异深度解析"><a href="#一、Xposed-vs-LSPosed-核心差异深度解析" class="headerlink" title="一、Xposed vs LSPosed 核心差异深度解析"></a>一、Xposed vs LSPosed 核心差异深度解析</h2><h3 id="1-1-底层架构对比"><a href="#1-1-底层架构对比" class="headerlink" title="1.1 底层架构对比"></a>1.1 底层架构对比</h3><table>
+<thead>
+<tr>
+<th>特性</th>
+<th>Xposed</th>
+<th>LSPosed</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>注入方式</td>
+<td>Riru</td>
+<td>Zygisk</td>
+</tr>
+<tr>
+<td>资源 Hook</td>
+<td>✅ 支持</td>
+<td>❌ 不支持</td>
+</tr>
+<tr>
+<td>minApiVersion</td>
+<td>54+</td>
+<td>93+ (Android 14+)</td>
+</tr>
+<tr>
+<td>staticScope</td>
+<td>❌ 不支持</td>
+<td>✅ 支持</td>
+</tr>
+<tr>
+<td>模块隔离</td>
+<td>较弱</td>
+<td>强 (每个模块独立)</td>
+</tr>
+</tbody></table>
+<h3 id="1-2-关键差异"><a href="#1-2-关键差异" class="headerlink" title="1.2 关键差异"></a>1.2 关键差异</h3><p><strong>Riru vs Zygisk:</strong></p>
+<ul>
+<li>Riru: 注入到 Zygote 进程，使用 <code>nativeForkAndSpecialize</code></li>
+<li>Zygisk: 注入到 Zygote 进程，使用 <code>ZygiskRequest</code> 机制，更干净</li>
+</ul>
+<p><strong>资源 Hook 在 Zygisk 下不可用:</strong></p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ❌ Zygisk 下不可用</span></span><br><span class="line">XposedHelpers.findAndHookMethod(<span class="string">&quot;com.android.systemui.R<span class="variable">$layout</span>&quot;</span>, ...) </span><br><span class="line"></span><br><span class="line"><span class="comment">// ✅ 替代方案：修改资源 XML 或使用副本</span></span><br><span class="line"><span class="comment">// 在模块资源目录下放置同名资源文件</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>staticScope 配置:</strong></p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- LSPosed 特有的作用域优化 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">meta-data</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:name</span>=<span class="string">&quot;staticScope&quot;</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:value</span>=<span class="string">&quot;true&quot;</span> /&gt;</span></span><br></pre></td></tr></table></figure>
+<p>启用后，Hook 只在声明的包内生效，提高性能。</p>
+<hr>
+<h2 id="二、灵动岛实现核心架构"><a href="#二、灵动岛实现核心架构" class="headerlink" title="二、灵动岛实现核心架构"></a>二、灵动岛实现核心架构</h2><h3 id="2-1-三层架构设计"><a href="#2-1-三层架构设计" class="headerlink" title="2.1 三层架构设计"></a>2.1 三层架构设计</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">┌─────────────────────────────────────────────────────┐</span><br><span class="line">│                    Hook 层                          │</span><br><span class="line">│  MainHook.kt / ModernMainHook.kt                   │</span><br><span class="line">│  - IXposedHookLoadPackage                          │</span><br><span class="line">│  - SystemUI / MIUI SystemUI Hook                  │</span><br><span class="line">└─────────────────┬───────────────────────────────────┘</span><br><span class="line">                  │ 广播/IPC</span><br><span class="line">┌─────────────────▼───────────────────────────────────┐</span><br><span class="line">│                  服务层                             │</span><br><span class="line">│  DynamicIslandNotificationService.kt                │</span><br><span class="line">│  - NotificationListenerService                      │</span><br><span class="line">│  - 通知拦截、过滤、优先级判断                        │</span><br><span class="line">└─────────────────┬───────────────────────────────────┘</span><br><span class="line">                  │ StateFlow</span><br><span class="line">┌─────────────────▼───────────────────────────────────┐</span><br><span class="line">│                  UI 层                             │</span><br><span class="line">│  DynamicIslandOverlayService.kt                    │</span><br><span class="line">│  - TYPE_APPLICATION_OVERLAY                        │</span><br><span class="line">│  - Jetpack Compose UI                              │</span><br><span class="line">└─────────────────────────────────────────────────────┘</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-2-通知优先级系统"><a href="#2-2-通知优先级系统" class="headerlink" title="2.2 通知优先级系统"></a>2.2 通知优先级系统</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 优先级分层 (0-100)</span></span><br><span class="line">音乐播放:     <span class="number">100</span> (最高)</span><br><span class="line">下载进度:      <span class="number">90</span></span><br><span class="line">来电/通话:     <span class="number">95</span></span><br><span class="line">闹钟/计时器:   <span class="number">85</span></span><br><span class="line">导航应用:      <span class="number">80</span></span><br><span class="line">高优先级 IM:   <span class="number">80</span></span><br><span class="line">普通通知:      <span class="number">40</span>-<span class="number">60</span></span><br><span class="line">营销通知:      <span class="number">5</span>-<span class="number">10</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="2-3-IPC-通信方案对比"><a href="#2-3-IPC-通信方案对比" class="headerlink" title="2.3 IPC 通信方案对比"></a>2.3 IPC 通信方案对比</h3><table>
+<thead>
+<tr>
+<th>方案</th>
+<th>优点</th>
+<th>缺点</th>
+<th>推荐度</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>BroadcastReceiver</td>
+<td>简单</td>
+<td>不可靠、延迟</td>
+<td>⭐⭐</td>
+</tr>
+<tr>
+<td>ContentProvider</td>
+<td>结构化、可靠</td>
+<td>稍复杂</td>
+<td>⭐⭐⭐⭐</td>
+</tr>
+<tr>
+<td>LocalSocket</td>
+<td>实时性最好</td>
+<td>最复杂</td>
+<td>⭐⭐⭐⭐⭐</td>
+</tr>
+<tr>
+<td>XSharedPreferences</td>
+<td>配置共享</td>
+<td>非实时</td>
+<td>⭐⭐⭐</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="三、SystemUI-Hook-核心类参考"><a href="#三、SystemUI-Hook-核心类参考" class="headerlink" title="三、SystemUI Hook 核心类参考"></a>三、SystemUI Hook 核心类参考</h2><h3 id="3-1-AOSP-SystemUI-Hook-点"><a href="#3-1-AOSP-SystemUI-Hook-点" class="headerlink" title="3.1 AOSP SystemUI Hook 点"></a>3.1 AOSP SystemUI Hook 点</h3><table>
+<thead>
+<tr>
+<th>类名</th>
+<th>作用</th>
+<th>Hook 方法</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>NotificationPanelView</td>
+<td>通知面板</td>
+<td>setExpanded, onNotificationClicked</td>
+</tr>
+<tr>
+<td>NotificationStackScrollLayout</td>
+<td>通知列表</td>
+<td>addNotification, removeNotification</td>
+</tr>
+<tr>
+<td>ExpandableNotificationRow</td>
+<td>单条通知</td>
+<td>setExpanded, onNotificationClick</td>
+</tr>
+<tr>
+<td>StatusBarIconController</td>
+<td>状态栏图标</td>
+<td>setIcon, removeIcon</td>
+</tr>
+<tr>
+<td>PhoneWindowManager</td>
+<td>窗口管理</td>
+<td>getTopFocusedWindow</td>
+</tr>
+</tbody></table>
+<h3 id="3-2-MIUI-HyperOS-特有类"><a href="#3-2-MIUI-HyperOS-特有类" class="headerlink" title="3.2 MIUI&#x2F;HyperOS 特有类"></a>3.2 MIUI&#x2F;HyperOS 特有类</h3><table>
+<thead>
+<tr>
+<th>类名</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>MiuiDynamicIsland</td>
+<td>MIUI 灵动岛核心</td>
+</tr>
+<tr>
+<td>MiuiDynamicIslandManager</td>
+<td>灵动岛管理器</td>
+</tr>
+<tr>
+<td>MiuiIslandAnalytics</td>
+<td>灵动岛数据分析</td>
+</tr>
+<tr>
+<td>NotificationPanelView (MIUI)</td>
+<td>MIUI 通知面板</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="四、开源项目架构学习"><a href="#四、开源项目架构学习" class="headerlink" title="四、开源项目架构学习"></a>四、开源项目架构学习</h2><h3 id="4-1-HyperCeiler-最完整参考"><a href="#4-1-HyperCeiler-最完整参考" class="headerlink" title="4.1 HyperCeiler (最完整参考)"></a>4.1 HyperCeiler (最完整参考)</h3><p><strong>架构特点:</strong></p>
+<ul>
+<li>模块化设计：每个功能独立注册</li>
+<li>精细化 Hook：按 Android 版本选择正确类</li>
+<li>ContentProvider IPC：可靠的跨进程通信</li>
+<li>XSharedPreferences：配置持久化</li>
+</ul>
+<h3 id="4-2-其他参考项目"><a href="#4-2-其他参考项目" class="headerlink" title="4.2 其他参考项目"></a>4.2 其他参考项目</h3><table>
+<thead>
+<tr>
+<th>项目</th>
+<th>特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>HyperIsland</td>
+<td>Flutter 超级岛样式</td>
+</tr>
+<tr>
+<td>MaterialYou-Dynamic-Island</td>
+<td>Jetpack Compose 插件化</td>
+</tr>
+<tr>
+<td>LSPosed Core</td>
+<td>框架本身</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="五、项目改进建议"><a href="#五、项目改进建议" class="headerlink" title="五、项目改进建议"></a>五、项目改进建议</h2><h3 id="5-1-高优先级改进"><a href="#5-1-高优先级改进" class="headerlink" title="5.1 高优先级改进"></a>5.1 高优先级改进</h3><ol>
+<li><p><strong>ContentProvider IPC</strong></p>
+<ul>
+<li>替代广播实现更可靠的进程间通信</li>
+<li>定义 Uri: <code>content://com.example.dynamicislandxposed.provider/notifications</code></li>
+</ul>
+</li>
+<li><p><strong>MediaSession 集成</strong></p>
+<ul>
+<li>完善音乐播放通知的媒体控制按钮</li>
+<li>支持 MediaSession.Token 获取当前播放信息</li>
+</ul>
+</li>
+<li><p><strong>真机测试</strong></p>
+<ul>
+<li>Hook 实际运行验证</li>
+<li>不同 Android 版本兼容性测试</li>
+</ul>
+</li>
+</ol>
+<h3 id="5-2-中优先级改进"><a href="#5-2-中优先级改进" class="headerlink" title="5.2 中优先级改进"></a>5.2 中优先级改进</h3><ol>
+<li><strong>多通知切换</strong> - 左右滑动切换不同通知</li>
+<li><strong>通知操作按钮</strong> - Reply 快捷回复、Action 按钮点击</li>
+<li><strong>主题定制</strong> - 深色&#x2F;浅色主题、自定义颜色</li>
+</ol>
+<hr>
+<h2 id="六、关键代码片段"><a href="#六、关键代码片段" class="headerlink" title="六、关键代码片段"></a>六、关键代码片段</h2><h3 id="6-1-通知监听服务"><a href="#6-1-通知监听服务" class="headerlink" title="6.1 通知监听服务"></a>6.1 通知监听服务</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@AndroidEntryPoint</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">DynamicIslandNotificationService</span> : <span class="type">NotificationListenerService</span>() &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">companion</span> <span class="keyword">object</span> &#123;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">val</span> _currentNotification = MutableStateFlow&lt;DynamicIslandNotification?&gt;(<span class="literal">null</span>)</span><br><span class="line">        <span class="keyword">val</span> currentNotification: StateFlow&lt;DynamicIslandNotification?&gt; = _currentNotification.asStateFlow()</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onNotificationPosted</span><span class="params">(sbn: <span class="type">StatusBarNotification</span>?)</span></span> &#123;</span><br><span class="line">        sbn ?: <span class="keyword">return</span></span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> (notificationHandler.shouldShowInIsland(sbn)) &#123;</span><br><span class="line">            <span class="keyword">val</span> notification = sbn.toDynamicIslandNotification()</span><br><span class="line">            <span class="comment">// 优先级判断后更新</span></span><br><span class="line">            <span class="keyword">if</span> (currentNotification.value == <span class="literal">null</span> || </span><br><span class="line">                getPriority(notification) &gt; getPriority(currentNotification.value!!)) &#123;</span><br><span class="line">                _currentNotification.value = notification</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="6-2-悬浮窗服务核心"><a href="#6-2-悬浮窗服务核心" class="headerlink" title="6.2 悬浮窗服务核心"></a>6.2 悬浮窗服务核心</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@AndroidEntryPoint</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">DynamicIslandOverlayService</span> : <span class="type">Service</span>(), LifecycleOwner &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">lateinit</span> <span class="keyword">var</span> composeView: ComposeView</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">attachToWindow</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="keyword">val</span> layoutParams = WindowManager.LayoutParams(</span><br><span class="line">            WindowManager.LayoutParams.WRAP_CONTENT,</span><br><span class="line">            WindowManager.LayoutParams.WRAP_CONTENT,</span><br><span class="line">            WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,</span><br><span class="line">            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or</span><br><span class="line">                    WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,</span><br><span class="line">            PixelFormat.TRANSLUCENT</span><br><span class="line">        ).apply &#123;</span><br><span class="line">            gravity = Gravity.TOP or Gravity.CENTER_HORIZONTAL</span><br><span class="line">            y = getStatusBarHeight() + <span class="number">8</span></span><br><span class="line">        &#125;</span><br><span class="line">        windowManager.addView(composeView, layoutParams)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="6-3-Hook-入口"><a href="#6-3-Hook-入口" class="headerlink" title="6.3 Hook 入口"></a>6.3 Hook 入口</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MainHook</span> : <span class="type">IXposedHookLoadPackage</span> &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">handleLoadPackage</span><span class="params">(lpparam: <span class="type">XC_LoadPackage</span>.<span class="type">LoadPackageParam</span>)</span></span> &#123;</span><br><span class="line">        <span class="keyword">when</span> (lpparam.packageName) &#123;</span><br><span class="line">            TARGET_SYSTEM_UI -&gt; hookSystemUI(lpparam)</span><br><span class="line">            TARGET_MIUI_SYSTEM_UI -&gt; hookMiuiSystemUI(lpparam)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="七、参考资源"><a href="#七、参考资源" class="headerlink" title="七、参考资源"></a>七、参考资源</h2><table>
+<thead>
+<tr>
+<th>项目</th>
+<th>地址</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>LSPosed Core</td>
+<td>github.com&#x2F;LSPosed&#x2F;LSPosed</td>
+<td>框架本身</td>
+</tr>
+<tr>
+<td>HyperCeiler</td>
+<td>github.com&#x2F;LonelyBurger&#x2F;HyperCeiler-R1</td>
+<td>完整参考</td>
+</tr>
+<tr>
+<td>Vector</td>
+<td>github.com&#x2F;JingMatrix&#x2F;Vector</td>
+<td>Modern Xposed</td>
+</tr>
+<tr>
+<td>LSPosed Module Repo</td>
+<td>modules.lsposed.org</td>
+<td>模块市场</td>
+</tr>
+</tbody></table>
+<hr>
+<p><em>学习日期: 2026-04-05</em><br><em>项目: DynamicIslandXposed</em><br><em>GitHub: <a target="_blank" rel="noopener" href="https://github.com/wenyi401/DynamicIslandXposed">https://github.com/wenyi401/DynamicIslandXposed</a></em></p>
+</div>
+        </div>
+        
+        <footer class="kratos-entry-footer clearfix">
+            
+            
+            
+                <div class="post-actions text-center clearfix" id="post-actions">
+                
+                    <a class="donate" href="javascript:;" onclick="krOpenDonateModal()"><i class="fa fa-bitcoin"></i> 打赏</a>
+                
+                
+                    <a class="share" href="javascript:;" onclick="krOpenShareModal()"><i class="fa fa-share-alt"></i> 分享</a>
+                
+                </div>
+            
+            <div class="footer-tag clearfix">
+                <div class="pull-left">
+                <i class="fa fa-tags"></i>
+                    <a class="tag-none-link" href="/blog/tags/Android/" rel="tag">Android</a>, <a class="tag-none-link" href="/blog/tags/Jetpack-Compose/" rel="tag">Jetpack Compose</a>, <a class="tag-none-link" href="/blog/tags/Kotlin/" rel="tag">Kotlin</a>, <a class="tag-none-link" href="/blog/tags/LSPosed/" rel="tag">LSPosed</a>, <a class="tag-none-link" href="/blog/tags/Xposed/" rel="tag">Xposed</a>, <a class="tag-none-link" href="/blog/tags/%E7%81%B5%E5%8A%A8%E5%B2%9B/" rel="tag">灵动岛</a>
+                </div>
+                <div class="pull-date">
+                    <time datetime="2026-04-05T04:00:07.536Z" itemprop="dateModified">最后编辑：2026-04-05</time>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <nav class="navigation post-navigation clearfix" role="navigation">
+            
+            <div class="nav-previous clearfix">
+                <a title=" Android 灵动岛进阶开发 - 从 HyperCeiler 学到的架构与最佳实践" href="/blog/2026/04/05/Android-灵动岛进阶开发-HyperCeiler架构学习/"><i class="fa fa-angle-left"></i> 上一篇</a>
+            </div>
+            
+            
+        </nav>
+    
+    
+</article>
+
+        
+
+            </section>
+
+            
+                
+
+<section id="kratos-widget-area" class="col-md-4 hidden-xs hidden-sm">
+    <!-- 文章和页面根据splitter来分割，没有的话就从头开始设置为sticky -->
+    
+        <div class="sticky-area">
+    
+    
+    </div>
+</section>
+            
+
+        
+
+                </div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 footer-list text-center">
+                    <ul class="kratos-social-icons">
+                        
+                    </ul>
+                    <ul class="kratos-copyright">
+                        <div>
+                            <li>&copy; 2026 Wenyi's Blog 🌸 版权所有.</li>
+                            <li>本站已运行<span id="kr-since">Loading...</span></li>
+                        </div>
+                        <div>
+                            <li>自豪地使用 <a href="https://github.com/Candinya/Kratos-Rebirth" target="_blank">Kratos:Rebirth</a> 主题</li>
+                            <li>站点由 Wenyi 用 <i class="fa fa-heart" style="color:#d43f57"></i> 搭建</li>
+                        </div>
+                        <!-- 额外的追加注入项 -->
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="kr-tool text-center">
+            <div class="tool">
+                <!-- 额外的追加注入项 -->
+                
+                
+                    <div class="box search-box">
+                        <a href="/blog/search">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                
+                <div class="box theme-box" id="theme-toggle">
+                    <span class="fa fa-adjust"></span>
+                </div>
+            </div>
+            <div id="gotop-box" class="box gotop-box">
+                <span class="fa fa-chevron-up"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+
+
+    <div id="kr-donate-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseDonateModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-bitcoin"></i>
+            </div>
+            <div class="kr-modal-title">打赏</div>
+            <button class="kr-modal-close" onclick="krCloseDonateModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-donate-message">打赏提示信息</div>
+            <div class="kr-donate-qr" id="kr-donate-qr">
+                
+            </div>
+            <div class="kr-donate-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/donate.min.js"></script>
+
+
+
+
+    <div id="kr-share-modal" class="kr-modal">
+    <div class="kr-modal-bg" onclick="krCloseShareModal()"></div>
+    <div class="kr-modal-content">
+        <div class="kr-modal-header">
+            <div class="kr-modal-icon">
+                <i class="fa fa-share-alt"></i>
+            </div>
+            <div class="kr-modal-title">分享</div>
+            <button class="kr-modal-close" onclick="krCloseShareModal()">
+                <i class="fa fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="kr-modal-body">
+            <div class="kr-share-message">分享提示信息</div>
+            <div class="kr-share-qr" id="kr-share-qr"></div>
+            <div class="kr-share-platforms">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/blog/js/kr-modal/share.min.js"></script>
+
+
+
+<!-- 额外的追加注入项 -->
+
+
+        <script>
+    if (!window.kr) {
+        window.kr = {};
+    }
+    window.kr.notMobile = (!(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)));
+    window.kr.siteRoot = "/blog/";
+</script>
+
+
+  <script defer src="/blog/vendors/nprogress@0.2.0/nprogress.js"></script>
+
+
+
+  <script defer src="/blog/vendors/viewerjs@1.11.6/dist/viewer.min.js"></script>
+
+
+<script defer src="/blog/js/kr-core.min.js"></script>
+
+
+  <script defer src="/blog/js/kr-pjax.min.js"></script>
+
+
+<!-- 额外的追加注入项 -->
+
+
+    </body>
+</html>
